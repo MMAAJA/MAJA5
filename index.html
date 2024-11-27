@@ -14,22 +14,34 @@
             font-family: Arial, sans-serif;
             background-color: #000;
             color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        .fullscreen-image {
-            height: 100vh;
+        .image-container {
             width: 100%;
-            background-size: cover;
-            background-position: center;
-        }
-        .video-container {
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            overflow: hidden;
+        }
+        .image-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain; /* Cambia a cover si prefieres que ocupe toda la pantalla */
+        }
+        .video-container {
+            width: 80%;
+            max-width: 1000px;
             padding: 20px;
+            margin: 20px 0;
             background-color: #111;
+            display: flex;
+            justify-content: center;
         }
         video {
-            width: 80%;
+            width: 100%;
             max-width: 1000px;
             border: 2px solid #fff;
             border-radius: 10px;
@@ -38,10 +50,14 @@
 </head>
 <body>
     <!-- Imagen 1 -->
-    <div class="fullscreen-image" style="background-image: url('imagen1.png');"></div>
+    <div class="image-container">
+        <img src="imagen1.jpg" alt="Imagen 1">
+    </div>
     
     <!-- Imagen 2 -->
-    <div class="fullscreen-image" style="background-image: url('imagen2.png');"></div>
+    <div class="image-container">
+        <img src="imagen2.jpg" alt="Imagen 2">
+    </div>
     
     <!-- Video -->
     <div class="video-container">
