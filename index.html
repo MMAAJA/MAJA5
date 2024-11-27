@@ -3,27 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página con PDF y Video Pop-up</title>
+    <title>Página con PDF y Video</title>
     <style>
         body {
             font-family: Arial, sans-serif;
         }
-        /* Estilo para el botón de abrir el pop-up */
-        #openVideoBtn {
-            margin: 20px;
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        #openVideoBtn:hover {
-            background-color: #45a049;
-        }
 
         /* Estilo para el contenedor del pop-up */
         .popup {
-            display: none;
+            display: flex; /* Mostrar automáticamente */
             position: fixed;
             left: 0;
             top: 0;
@@ -57,20 +45,14 @@
 </head>
 <body>
 
-    <h1>Mi página con PDF y Video Pop-up</h1>
-
-    <!-- Enlace para abrir el pop-up -->
-    <button id="openVideoBtn">Ver Video</button>
-
-    <!-- Contenedor para el PDF -->
+    <!-- Enlace para mostrar el PDF (puedes cambiar el enlace al PDF que desees) -->
     <iframe src="ruta/a/tu/pdf.pdf" width="100%" height="500px"></iframe>
 
     <!-- Pop-up del video -->
     <div id="videoPopup" class="popup">
         <div class="popup-content">
-            <!-- Botón de cerrar el video -->
             <button class="close-btn" id="closeVideoBtn">&times;</button>
-            <video id="videoPlayer" width="100%" controls>
+            <video width="100%" controls autoplay>
                 <source src="ruta/a/tu/video.mp4" type="video/mp4">
                 Tu navegador no soporta el formato de video.
             </video>
@@ -78,31 +60,19 @@
     </div>
 
     <script>
-        // Obtener el botón y el pop-up
-        var openVideoBtn = document.getElementById('openVideoBtn');
-        var videoPopup = document.getElementById('videoPopup');
+        // Obtener el botón de cerrar y el pop-up
         var closeVideoBtn = document.getElementById('closeVideoBtn');
-        var videoPlayer = document.getElementById('videoPlayer');
-
-        // Abrir el pop-up del video
-        openVideoBtn.onclick = function() {
-            videoPopup.style.display = 'flex';
-            videoPlayer.play();  // Reproduce el video automáticamente cuando se abre
-        }
+        var videoPopup = document.getElementById('videoPopup');
 
         // Cerrar el pop-up del video
         closeVideoBtn.onclick = function() {
             videoPopup.style.display = 'none';
-            videoPlayer.pause();  // Pausa el video cuando se cierra el pop-up
-            videoPlayer.currentTime = 0;  // Vuelve al inicio del video
         }
 
-        // Cerrar el pop-up si se hace clic fuera del contenido
+        // Cerrar el pop-up si haces clic fuera del contenido
         window.onclick = function(event) {
             if (event.target == videoPopup) {
                 videoPopup.style.display = 'none';
-                videoPlayer.pause();  // Pausa el video cuando se hace clic fuera
-                videoPlayer.currentTime = 0;  // Vuelve al inicio del video
             }
         }
     </script>
