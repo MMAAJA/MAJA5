@@ -365,7 +365,7 @@ pdf2htmlEX.defaultViewer = new pdf2htmlEX.Viewer({});
 <!-- Pop-up del video -->
 <div id="videoPopup" class="popup">
     <div class="popup-content">
-        <button class="close-btn" id="closeVideoBtn">&times;</button>
+        <button class="close-btn" id="closeVideoBtn">×</button>
         <video width="100%" height="auto" controls autoplay>
             <source src="ruta/a/tu/video.mp4" type="video/mp4">
             Tu navegador no soporta el formato de video.
@@ -416,25 +416,23 @@ pdf2htmlEX.defaultViewer = new pdf2htmlEX.Viewer({});
         overflow: hidden; /* Para que el contenido no se desborde */
     }
 
-    /* Estilo para el botón de cerrar */
+    /* Estilo para el botón de cerrar (X roja) */
     .close-btn {
         position: absolute;
         top: 10px;
         right: 10px;
         font-size: 36px;
         cursor: pointer;
-        color: white;
-        background-color: black; /* Botón negro */
+        color: red; /* X roja */
+        background-color: transparent; /* Sin fondo */
         border: none;
-        padding: 10px;
-        border-radius: 50%;
-        transition: background-color 0.3s, transform 0.3s;
+        padding: 0;
+        font-weight: bold;
     }
 
     /* Efecto al pasar el mouse */
     .close-btn:hover {
-        background-color: #444; /* Color gris oscuro al pasar el mouse */
-        transform: scale(1.1); /* Aumenta ligeramente el tamaño */
+        color: darkred; /* Color más oscuro al pasar el mouse */
     }
 </style>
 
