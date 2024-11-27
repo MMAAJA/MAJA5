@@ -366,7 +366,7 @@ pdf2htmlEX.defaultViewer = new pdf2htmlEX.Viewer({});
 <div id="videoPopup" class="popup">
     <div class="popup-content">
         <button class="close-btn" id="closeVideoBtn">×</button>
-        <video width="100%" height="auto" controls autoplay>
+        <video controls autoplay>
             <source src="ruta/a/tu/video.mp4" type="video/mp4">
             Tu navegador no soporta el formato de video.
         </video>
@@ -403,6 +403,7 @@ pdf2htmlEX.defaultViewer = new pdf2htmlEX.Viewer({});
         background-color: rgba(0, 0, 0, 0.8);
         justify-content: center;
         align-items: center;
+        z-index: 9999; /* Asegura que el pop-up esté por encima de todo */
     }
 
     /* Estilo para el contenido del pop-up */
@@ -411,9 +412,18 @@ pdf2htmlEX.defaultViewer = new pdf2htmlEX.Viewer({});
         background-color: white;
         padding: 20px;
         border-radius: 10px;
-        max-width: 90%;
-        max-height: 90%;
+        max-width: 95%;
+        max-height: 95%;
         overflow: hidden; /* Para que el contenido no se desborde */
+    }
+
+    /* Estilo para el video */
+    .popup-content video {
+        width: 100%;
+        height: auto;
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain; /* Asegura que el video se ajuste correctamente */
     }
 
     /* Estilo para el botón de cerrar (X roja) */
@@ -428,6 +438,7 @@ pdf2htmlEX.defaultViewer = new pdf2htmlEX.Viewer({});
         border: none;
         padding: 0;
         font-weight: bold;
+        z-index: 10000; /* Asegura que la X esté por encima */
     }
 
     /* Efecto al pasar el mouse */
