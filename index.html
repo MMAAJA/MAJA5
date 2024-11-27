@@ -1,104 +1,62 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página con PDF y Video Pop-up</title>
+    <title>Video Pop-up Automático</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
         }
-        /* Estilo para el botón de abrir el pop-up */
-        #openVideoBtn {
-            margin: 20px;
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        #openVideoBtn:hover {
-            background-color: #45a049;
-        }
-
-        /* Estilo para el contenedor del pop-up */
-        .popup {
-            display: none;
+        /* Estilos para la ventana emergente */
+        #videoPopup {
+            display: none;  /* Ocultamos el popup inicialmente */
             position: fixed;
-            left: 0;
             top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
             justify-content: center;
             align-items: center;
         }
-
-        /* Estilo para el contenido del pop-up */
-        .popup-content {
-            position: relative;
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            max-width: 80%;
-            max-height: 80%;
+        #videoContainer {
+            width: 80%;
+            height: 80%;
+            background: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-
-        /* Estilo para el botón de cerrar */
-        .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 24px;
-            cursor: pointer;
-            color: #fff;
+        video {
+            width: 100%;
+            height: 100%;
         }
     </style>
 </head>
 <body>
-
-    <h1>Mi página con PDF y Video Pop-up</h1>
-
-    <!-- Enlace para abrir el pop-up -->
-    <button id="openVideoBtn">Ver Video</button>
-
-    <!-- Contenedor para el PDF (puedes cambiar el enlace al PDF que desees) -->
-    <iframe src="La Musica en miniatura.pdf" width="100%" height="500px"></iframe>
-
-    <!-- Pop-up del video -->
-    <div id="videoPopup" class="popup">
-        <div class="popup-content">
-            <button class="close-btn" id="closeVideoBtn">&times;</button>
-            <video width="100%" controls>
-                <source src="ruta/a/tu/video.mp4" type="video/mp4">
-                Tu navegador no soporta el formato de video.
+    <!-- Contenedor del video -->
+    <div id="videoPopup">
+        <div id="videoContainer">
+            <video controls autoplay>
+                <source src="video.mp4" type="video/mp4">
+                Tu navegador no soporta el video.
             </video>
         </div>
     </div>
 
     <script>
-        // Obtener el botón y el pop-up
-        var openVideoBtn = document.getElementById('openVideoBtn');
-        var videoPopup = document.getElementById('videoPopup');
-        var closeVideoBtn = document.getElementById('closeVideoBtn');
+        // Mostrar el popup automáticamente cuando la página cargue
+        window.onload = function() {
+            document.getElementById("videoPopup").style.display = "flex";
+        };
 
-        // Abrir el pop-up del video
-        openVideoBtn.onclick = function() {
-            videoPopup.style.display = 'flex';
-        }
-
-        // Cerrar el pop-up del video
-        closeVideoBtn.onclick = function() {
-            videoPopup.style.display = 'none';
-        }
-
-        // Cerrar el pop-up si haces clic fuera del contenido
-        window.onclick = function(event) {
-            if (event.target == videoPopup) {
-                videoPopup.style.display = 'none';
-            }
-        }
+        // Cerrar el popup cuando el usuario haga clic en cualquier parte del fondo
+        document.getElementById("videoPopup").onclick = function() {
+            document.getElementById("videoPopup").style.display = "none";
+        };
     </script>
-
 </body>
 </html>
