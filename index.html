@@ -6,7 +6,7 @@
   <title>Control Profesional - Combustible & Mantenimiento</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
   <style>
-    :root{--bg:#0f172a;--card:#0b1220;--accent:#06b6d4;--glass:rgba(255,255,255,0.04);--muted:#94a3b8}
+    :root{--bg:#0f172a;--card:#0b1220;--accent:#06b6d4;--muted:#94a3b8}
     *{box-sizing:border-box;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial}
     body{margin:0;background:linear-gradient(180deg,#071129 0%, #081224 100%);color:#e6eef8;-webkit-font-smoothing:antialiased}
     header{padding:22px 28px;display:flex;align-items:center;justify-content:space-between}
@@ -17,7 +17,7 @@
     .container{max-width:1200px;margin:18px auto;padding:18px}
 
     /* Menu elegante */
-    .menu-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:24px}
+    .menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:24px}
     .menu-card{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 6px 20px rgba(2,6,23,0.6);cursor:pointer;transition:transform .16s ease, box-shadow .16s ease}
     .menu-card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(2,6,23,0.7)}
     .menu-card h3{margin:0 0 6px 0}
@@ -27,7 +27,7 @@
     .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
 
     label{display:block;margin-top:10px;color:var(--muted);font-size:13px}
-    select,input[type="date"],input[type="number"]{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit;margin-top:6px}
+    select,input[type="date"],input[type="number"],input[type="text"]{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit;margin-top:6px}
     .hidden{display:none}
     .qty-row{display:flex;gap:10px;margin-top:10px}
     .qty-row > div{flex:1}
@@ -51,6 +51,8 @@
 
     .top-actions{display:flex;justify-content:space-between;gap:10px;align-items:center}
     .center{display:flex;align-items:center;gap:12px}
+
+    .chart-controls{display:flex;gap:8px;align-items:center;margin-top:10px}
 
     @media(max-width:980px){.layout{grid-template-columns:1fr}.menu-grid{grid-template-columns:repeat(2,1fr)}.two-copies{flex-direction:column}}
   </style>
@@ -84,15 +86,11 @@
       </div>
       <div class="menu-card" data-page="mantenimiento">
         <h3>MANTENIMIENTO</h3>
-        <p>Órdenes de trabajo, repuestos y control de costos (pendiente de diseño).</p>
+        <p>Órdenes de trabajo, repuestos y control de costos (personalizable).</p>
       </div>
-      <div class="menu-card" id="menu-report">
-        <h3>REPORTES</h3>
-        <p>Genera PDF profesional con gráficos y resumen por máquina.</p>
-      </div>
-      <div class="menu-card" id="menu-settings">
+      <div class="menu-card" id="menu-ajustes">
         <h3>AJUSTES</h3>
-        <p>Configura precios, contraseña y opciones de exportación.</p>
+        <p>Cambia precios y opciones de exportación (protegido por contraseña).</p>
       </div>
     </div>
 
@@ -129,34 +127,80 @@
 
         <div class="actions">
           <button class="btn primary" id="btn-generar">Generar recibo</button>
-          <button class="btn ghost" id="btn-imprimir" title="Imprimir las copias mostradas">Imprimir copias</button>
+          <button class="btn ghost" id="btn-imprimir">Imprimir copias</button>
           <button class="btn ghost" id="btn-clear">Limpiar formulario</button>
         </div>
 
         <div id="mensaje" style="margin-top:12px"></div>
 
         <div class="two-copies" id="recibos"></div>
+
+        <div style="margin-top:10px">
+          <label>Opciones de impresión</label>
+          <div class="actions">
+            <button class="btn ghost" id="btn-print-copia1">Imprimir COPIA 1 (página)</button>
+            <button class="btn ghost" id="btn-print-copia2">Imprimir COPIA 2 (página)</button>
+          </div>
+        </div>
       </div>
 
       <div class="card">
         <div class="top-actions">
-          <h3>Resumen - Control</h3>
+          <h3>Resumen & Gráficas</h3>
           <div>
-            <button class="btn primary" id="btn-resumen-pdf">Generar PDF profesional</button>
-            <button class="btn ghost" id="btn-descargar-grafica">Descargar gráfica</button>
+            <button class="btn primary" id="btn-generate-pdf">PDF</button>
+            <button class="btn ghost" id="btn-download-chart">Descargar gráfica (PNG)</button>
           </div>
         </div>
 
-        <div style="margin-top:10px">
-          <button class="btn ghost" id="btn-resumen">Generar resumen por máquina</button>
+        <div class="chart-controls">
+          <select id="chart-type">
+            <option value="bar">Barra</option>
+            <option value="line">Línea</option>
+            <option value="pie">Pastel</option>
+            <option value="doughnut">Dona</option>
+            <option value="radar">Radar</option>
+          </select>
+          <button class="btn ghost" id="btn-toggle-recent">Ver totales globales</button>
+          <label style="margin-left:auto" class="small">Paleta: Profesional</label>
         </div>
 
-        <canvas id="chartTotales" style="margin-top:12px;max-height:220px"></canvas>
+        <canvas id="chartTotales" style="margin-top:12px;max-height:260px;background:transparent"></canvas>
 
         <div id="resumen" style="margin-top:12px"></div>
 
-        <h4 style="margin-top:12px">Registros recientes</h4>
+        <h4 style="margin-top:12px">Registros / Totales</h4>
         <div id="lista-registros" style="max-height:320px;overflow:auto;margin-top:8px"></div>
+      </div>
+    </div>
+
+    <!-- SETTINGS modal (protegido) -->
+    <div id="settings-modal" class="hidden">
+      <div class="backdrop"></div>
+      <div class="excel-modal card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <h3>Ajustes</h3>
+          <div>
+            <button class="btn ghost" id="btn-close-settings">Cerrar</button>
+            <button class="btn primary" id="btn-save-settings">Guardar ajustes</button>
+          </div>
+        </div>
+        <div style="margin-top:12px">
+          <label>Precio ACPM (actual)</label>
+          <input type="number" id="price-acpm" step="0.1" />
+          <label>Precio CORRIENTE (actual)</label>
+          <input type="number" id="price-corriente" step="0.1" />
+          <label>Precio UREA (actual)</label>
+          <input type="number" id="price-urea" step="0.1" />
+
+          <label style="margin-top:12px">Opciones de exportación / IA</label>
+          <div style="display:flex;gap:8px;align-items:center;margin-top:6px">
+            <input type="checkbox" id="allow-ai" /> <label class="small">Permitir generación automática de informe con IA (recomendado usar servidor)</label>
+          </div>
+          <label style="margin-top:8px">(Opcional) Clave API OpenAI para uso directo desde navegador</label>
+          <input type="text" id="openai-key" placeholder="sk-... (opcional)" />
+          <div class="small" style="margin-top:8px;color:#fca5a5">Advertencia: guardar la clave en el navegador es inseguro. Se recomienda usar un servidor proxy.</div>
+        </div>
       </div>
     </div>
 
@@ -180,12 +224,18 @@
   </div>
 
   <script>
-    // CONFIG
+    // CONFIG defaults
+    const DEFAULT_PRICES = {ACPM:20, CORRIENTE:10, UREA:5};
     const ADMIN_PASSWORD = 'AC.ardila2006'; // contraseña suministrada
-    const PRECIOS = {ACPM:20, CORRIENTE:10, UREA:5};
-    const STORAGE_KEY = 'combustible_registros_prof_v2';
+    const STORAGE_KEY = 'combustible_registros_prof_v3';
+    const SETTINGS_KEY = 'combustible_settings_v1';
 
-    // DOM
+    // Load settings or defaults
+    function loadSettings(){ const sRaw = localStorage.getItem(SETTINGS_KEY); if(!sRaw) return {prices:DEFAULT_PRICES, allowAI:false, openaiKey:''}; try{return JSON.parse(sRaw);}catch(e){return {prices:DEFAULT_PRICES, allowAI:false, openaiKey:''}} }
+    function saveSettings(s){ localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); }
+    let SETTINGS = loadSettings();
+
+    // DOM refs
     const menuCards = document.querySelectorAll('.menu-card');
     const btnIrExcel = document.getElementById('btn-ir-excel');
     const btnDescargarXLSX = document.getElementById('btn-descargar-xlsx');
@@ -197,8 +247,21 @@
     const listaRegistros = document.getElementById('lista-registros');
     const resumenEl = document.getElementById('resumen');
     const btnResumen = document.getElementById('btn-resumen');
-    const btnResumenPdf = document.getElementById('btn-resumen-pdf');
+    const btnGeneratePdf = document.getElementById('btn-generate-pdf');
     const chartCanvas = document.getElementById('chartTotales');
+    const chartTypeSel = document.getElementById('chart-type');
+    const btnToggleRecent = document.getElementById('btn-toggle-recent');
+    const btnDownloadChart = document.getElementById('btn-download-chart');
+
+    const settingsModal = document.getElementById('settings-modal');
+    const btnCloseSettings = document.getElementById('btn-close-settings');
+    const btnSaveSettings = document.getElementById('btn-save-settings');
+    const priceAcpmEl = document.getElementById('price-acpm');
+    const priceCorrEl = document.getElementById('price-corriente');
+    const priceUreaEl = document.getElementById('price-urea');
+    const allowAiEl = document.getElementById('allow-ai');
+    const openaiKeyEl = document.getElementById('openai-key');
+
     const excelModal = document.getElementById('excel-modal');
     const btnCloseExcel = document.getElementById('btn-close-excel');
     const btnExportExcel = document.getElementById('btn-export-excel');
@@ -210,17 +273,16 @@
     const corrienteEl = document.getElementById('corriente');
     const ureaEl = document.getElementById('urea');
 
-    // Inicializar fecha
-    fechaEl.valueAsDate = new Date();
+    // Print copy buttons
+    const btnPrintCopia1 = document.getElementById('btn-print-copia1');
+    const btnPrintCopia2 = document.getElementById('btn-print-copia2');
 
-    // Navegación menu (solo visual)
-    menuCards.forEach(c=>{
-      c.addEventListener('click', ()=>{
-        const p = c.dataset.page;
-        if(p==='combustible') window.scrollTo({top:document.getElementById('card-main').offsetTop - 20, behavior:'smooth'});
-        if(p==='mantenimiento') alert('Sección Mantenimiento: dime los campos que quieres y la diseño.');
-      });
-    });
+    // Initialize
+    fechaEl.valueAsDate = new Date();
+    applySettingsToUI();
+
+    // Menu navigation
+    menuCards.forEach(c=>{ c.addEventListener('click', ()=>{ if(c.id==='menu-ajustes'){ promptSettings(); } else if(c.dataset.page==='mantenimiento'){ alert('Sección Mantenimiento: dime los campos que quieres y la diseño.'); } else { window.scrollTo({top:document.getElementById('card-main').offsetTop - 20, behavior:'smooth'}); } }); });
 
     // Storage helpers
     function readStorage(){ const raw = localStorage.getItem(STORAGE_KEY); if(!raw) return []; try{return JSON.parse(raw);}catch(e){return []} }
@@ -230,8 +292,8 @@
 
     function formatoMoneda(v){ return '$' + Number(v).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); }
 
-    // Render recibos (dos copias) - only quantities displayed (no prices on screen)
-    function renderRecibos(record){ recibosEl.innerHTML = ''; ['COPIA 1','COPIA 2'].forEach(titulo=>{
+    // Render recibos (dos copias) - quantities only
+    function renderRecibos(record){ recibosEl.innerHTML = ''; ['COPIA 1','COPIA 2'].forEach((titulo, idx)=>{
       const div = document.createElement('div'); div.className='copy';
       div.innerHTML = `<h4>${titulo}</h4>
         <div><strong>Recibo - ${record.maquina}</strong></div>
@@ -241,160 +303,97 @@
         <div>CORRIENTE: ${Number(record.corriente_qty).toFixed(2)} L</div>
         <div>UREA: ${Number(record.urea_qty).toFixed(2)} L</div>
         <div class="small" style="margin-top:8px">Código: ${record.timestamp}</div>
+        <div style="margin-top:8px"><button class='btn ghost' onclick='window.printCopy(${idx})'>Imprimir solo esta copia</button></div>
       `;
       recibosEl.appendChild(div);
     }); }
 
-    // Render lista registros (bien nombradas y ordenadas por fecha desc)
-    function renderLista(){ const arr = readStorage().slice().sort((a,b)=> new Date(b.timestamp) - new Date(a.timestamp)); if(arr.length===0){ listaRegistros.innerHTML = '<div class="small">No hay registros.</div>'; return; }
-      listaRegistros.innerHTML = '';
-      arr.slice(0,200).forEach(r=>{
-        const d = document.createElement('div'); d.className='card'; d.style.marginBottom='8px'; d.innerHTML = `<div style="display:flex;justify-content:space-between"><div><strong>${r.maquina}</strong><div class='small'>${r.fecha} · ${new Date(r.timestamp).toLocaleString()}</div></div><div class='small'>ACPM: ${Number(r.acpm_qty).toFixed(2)} L<br>CORR: ${Number(r.corriente_qty).toFixed(2)} L<br>UREA: ${Number(r.urea_qty).toFixed(2)} L</div></div>`;
-        listaRegistros.appendChild(d);
-      }); }
+    // Expose printCopy to global (used by inline onclick)
+    window.printCopy = function(index){
+      const nodes = recibosEl.querySelectorAll('.copy');
+      if(!nodes[index]){ alert('Copia no disponible.'); return; }
+      const html = nodes[index].outerHTML;
+      const win = window.open('','_blank','width=900,height=700');
+      win.document.write('<html><head><title>Copia</title>');
+      win.document.write('<style>body{font-family:Inter,Arial;padding:24px} .copy{border:1px solid #ddd;padding:12px;margin-bottom:12px}</style>');
+      win.document.write('</head><body>');
+      win.document.write(html);
+      win.document.write('</body></html>');
+      win.document.close();
+      setTimeout(()=>{ win.focus(); win.print(); },300);
+    }
 
-    // Generar registro
+    // Render lista registros (desc by timestamp) or totals (toggle)
+    let showTotals = false;
+    function renderLista(){ if(showTotals){ renderTotalsGlobal(); return; } const arr = readStorage().slice().sort((a,b)=> new Date(b.timestamp) - new Date(a.timestamp)); if(arr.length===0){ listaRegistros.innerHTML = '<div class="small">No hay registros.</div>'; return; } listaRegistros.innerHTML = ''; arr.slice(0,200).forEach(r=>{ const d = document.createElement('div'); d.className='card'; d.style.marginBottom='8px'; d.innerHTML = `<div style="display:flex;justify-content:space-between"><div><strong>${r.maquina}</strong><div class='small'>${r.fecha} · ${new Date(r.timestamp).toLocaleString()}</div></div><div class='small'>ACPM: ${Number(r.acpm_qty).toFixed(2)} L<br>CORR: ${Number(r.corriente_qty).toFixed(2)} L<br>UREA: ${Number(r.urea_qty).toFixed(2)} L</div></div>`; listaRegistros.appendChild(d); }); }
+
+    function renderTotalsGlobal(){ const arr = readStorage(); if(arr.length===0){ listaRegistros.innerHTML = '<div class="small">No hay registros.</div>'; return; } const totals = {acpm:0,corriente:0,urea:0,money:0}; arr.forEach(r=>{ totals.acpm += Number(r.acpm_qty)||0; totals.corriente += Number(r.corriente_qty)||0; totals.urea += Number(r.urea_qty)||0; totals.money += Number(r.total_precio)||0; }); listaRegistros.innerHTML = `<div style='padding:12px'><div><strong>Totales globales</strong></div><div class='small' style='margin-top:8px'>ACPM: ${totals.acpm.toFixed(2)} L</div><div class='small'>CORRIENTE: ${totals.corriente.toFixed(2)} L</div><div class='small'>UREA: ${totals.urea.toFixed(2)} L</div><div style='margin-top:8px;font-weight:800'>Valor total (pesos): ${formatoMoneda(totals.money)}</div></div>`; }
+
+    // Generate record
     btnGenerar.addEventListener('click', ()=>{
-      const maquina = maquinaEl.value;
-      const fecha = fechaEl.value || new Date().toISOString().slice(0,10);
-      const acpm_qty = parseFloat(acpmEl.value) || 0;
-      const corriente_qty = parseFloat(corrienteEl.value) || 0;
-      const urea_qty = parseFloat(ureaEl.value) || 0;
-
-      // calcular total precio interno (no mostrado en UI) pero guardado
-      const acpm_total = acpm_qty * PRECIOS.ACPM;
-      const corriente_total = corriente_qty * PRECIOS.CORRIENTE;
-      const urea_total = urea_qty * PRECIOS.UREA;
-      const total_precio = acpm_total + corriente_total + urea_total;
-
-      const record = {
-        timestamp: new Date().toISOString(), maquina, fecha,
-        acpm_qty, corriente_qty, urea_qty,
-        acpm_total, corriente_total, urea_total,
-        total_precio
-      };
-
-      addRecord(record);
-      mensajeEl.innerHTML = '<div style="color:#34d399;font-weight:700">Registro guardado ✔</div>';
-      renderRecibos(record);
-      renderLista();
+      const maquina = maquinaEl.value; const fecha = fechaEl.value || new Date().toISOString().slice(0,10);
+      const acpm_qty = parseFloat(acpmEl.value) || 0; const corriente_qty = parseFloat(corrienteEl.value) || 0; const urea_qty = parseFloat(ureaEl.value) || 0;
+      // Apply current prices
+      const prices = SETTINGS.prices || DEFAULT_PRICES;
+      const acpm_total = acpm_qty * prices.ACPM; const corriente_total = corriente_qty * prices.CORRIENTE; const urea_total = urea_qty * prices.UREA; const total_precio = acpm_total + corriente_total + urea_total;
+      const record = { timestamp: new Date().toISOString(), maquina, fecha, acpm_qty, corriente_qty, urea_qty, acpm_total, corriente_total, urea_total, total_precio };
+      addRecord(record); mensajeEl.innerHTML = '<div style="color:#34d399;font-weight:700">Registro guardado ✔</div>'; renderRecibos(record); renderLista(); renderResumen();
     });
 
-    // Imprimir copias (imprime la sección de recibos)
+    // Printing all copies
     btnImprimir.addEventListener('click', ()=>{
-      if(!recibosEl.innerHTML.trim()){ alert('No hay recibos para imprimir. Genera primero.'); return; }
-      const printWindow = window.open('', '', 'width=900,height=700');
-      printWindow.document.write('<html><head><title>Imprimir recibo</title>');
-      printWindow.document.write('<style>body{font-family:Inter,Arial;padding:24px;background:white;color:#000} .copy{border:1px solid #ddd;padding:12px;margin-bottom:12px}</style>');
-      printWindow.document.write('</head><body>');
-      printWindow.document.write(recibosEl.innerHTML);
-      printWindow.document.write('</body></html>');
-      printWindow.document.close();
-      printWindow.focus();
-      setTimeout(()=>{ printWindow.print(); },500);
+      if(!recibosEl.innerHTML.trim()){ alert('No hay recibos para imprimir.'); return; }
+      const win = window.open('','_blank','width=900,height=700'); win.document.write('<html><head><title>Imprimir recibos</title>'); win.document.write('<style>body{font-family:Inter,Arial;padding:24px;background:white;color:#000} .copy{border:1px solid #ddd;padding:12px;margin-bottom:12px}</style>'); win.document.write('</head><body>'); win.document.write(recibosEl.innerHTML); win.document.write('</body></html>'); win.document.close(); setTimeout(()=>{ win.focus(); win.print(); },500);
     });
 
     btnClear.addEventListener('click', ()=>{ maquinaEl.selectedIndex=0; fechaEl.valueAsDate=new Date(); acpmEl.value=''; corrienteEl.value=''; ureaEl.value=''; mensajeEl.innerHTML=''; recibosEl.innerHTML=''; });
 
-    // Resumen por máquina con gráfica
+    // Chart and resumen
     let chartInst = null;
-    btnResumen.addEventListener('click', ()=>{ renderResumen(); });
-
-    function renderResumen(){
-      const arr = readStorage(); if(arr.length===0){ resumenEl.innerHTML = '<div class="small">No hay registros.</div>'; if(chartInst){ chartInst.destroy(); chartInst=null;} return; }
-      const resumen = {};
-      arr.forEach(r=>{ if(!resumen[r.maquina]) resumen[r.maquina]={acpm:0,corriente:0,urea:0,total:0}; resumen[r.maquina].acpm += Number(r.acpm_qty)||0; resumen[r.maquina].corriente += Number(r.corriente_qty)||0; resumen[r.maquina].urea += Number(r.urea_qty)||0; resumen[r.maquina].total += Number(r.total_precio)||0; });
-
-      // Tabla HTML
+    function renderResumen(){ const arr = readStorage(); if(arr.length===0){ resumenEl.innerHTML = '<div class="small">No hay registros.</div>'; if(chartInst){ chartInst.destroy(); chartInst=null;} return; }
+      const resumen = {}; arr.forEach(r=>{ if(!resumen[r.maquina]) resumen[r.maquina]={acpm:0,corriente:0,urea:0,total:0}; resumen[r.maquina].acpm += Number(r.acpm_qty)||0; resumen[r.maquina].corriente += Number(r.corriente_qty)||0; resumen[r.maquina].urea += Number(r.urea_qty)||0; resumen[r.maquina].total += Number(r.total_precio)||0; });
       let html = '<table class="summary-table"><thead><tr><th>Máquina</th><th>ACPM (L)</th><th>CORRIENTE (L)</th><th>UREA (L)</th><th>Valor (pesos)</th></tr></thead><tbody>';
-      const labels = [], dataTotals = [];
-      for(const m in resumen){ const r = resumen[m]; html += `<tr><td>${m}</td><td>${r.acpm.toFixed(2)}</td><td>${r.corriente.toFixed(2)}</td><td>${r.urea.toFixed(2)}</td><td>${formatoMoneda(r.total)}</td></tr>`; labels.push(m); dataTotals.push(Number(r.total.toFixed(2))); }
+      const labels = [], dataTotals = [], acpms=[], corrs=[], ure=[];
+      for(const m in resumen){ const r = resumen[m]; html += `<tr><td>${m}</td><td>${r.acpm.toFixed(2)}</td><td>${r.corriente.toFixed(2)}</td><td>${r.urea.toFixed(2)}</td><td>${formatoMoneda(r.total)}</td></tr>`; labels.push(m); dataTotals.push(Number(r.total.toFixed(2))); acpms.push(r.acpm); corrs.push(r.corriente); ure.push(r.urea); }
       html += '</tbody></table>';
       resumenEl.innerHTML = html;
 
-      // Chart
-      const ctx = chartCanvas.getContext('2d');
+      // Chart based on selected type
+      const type = chartTypeSel.value || 'bar'; const ctx = chartCanvas.getContext('2d');
+      const palette = ['rgba(59,130,246,0.9)','rgba(99,102,241,0.9)','rgba(16,185,129,0.9)','rgba(236,72,153,0.9)','rgba(250,204,21,0.9)'];
       if(chartInst) chartInst.destroy();
-      chartInst = new Chart(ctx, {type:'bar', data:{labels, datasets:[{label:'Valor total (pesos)', data:dataTotals, backgroundColor:'rgba(59,130,246,0.8)'}]}, options:{responsive:true,maintainAspectRatio:false}});
+      const dataset = {label:'Valor total (pesos)', data:dataTotals, backgroundColor:palette, borderColor:palette.map(c=>c.replace('0.9','1')), borderWidth:1};
+      const data = {labels, datasets:[dataset]};
+      const options = {responsive:true, maintainAspectRatio:false, plugins:{legend:{display:true,position:'bottom'}}, scales: { y: { beginAtZero: true } }};
+      chartInst = new Chart(ctx, {type, data, options});
     }
 
-    // Generar PDF profesional con gráficos y tabla (incluye contraseña en PDF)
-    btnResumenPdf.addEventListener('click', async ()=>{
-      const arr = readStorage(); if(arr.length===0){ alert('No hay datos para generar el PDF.'); return; }
-      // Preparar resumen
-      const resumen = {};
-      arr.forEach(r=>{ if(!resumen[r.maquina]) resumen[r.maquina]={acpm:0,corriente:0,urea:0,total:0}; resumen[r.maquina].acpm += Number(r.acpm_qty)||0; resumen[r.maquina].corriente += Number(r.corriente_qty)||0; resumen[r.maquina].urea += Number(r.urea_qty)||0; resumen[r.maquina].total += Number(r.total_precio)||0; });
+    chartTypeSel.addEventListener('change', ()=>{ renderResumen(); });
 
-      // Crear pequeña canvas chart para el PDF
-      const canvas = document.createElement('canvas'); canvas.width = 800; canvas.height = 400; const ctx = canvas.getContext('2d');
-      const labels = Object.keys(resumen); const dataTotals = labels.map(m=>resumen[m].total.toFixed(2));
-      new Chart(ctx, {type:'pie', data:{labels, datasets:[{data:dataTotals}]}, options:{plugins:{legend:{position:'right'}}}});
-
-      // Esperar dibujo
-      await new Promise(r=>setTimeout(r,600));
-      const chartDataUrl = canvas.toDataURL('image/png');
-
-      // Construir tabla HTML para incluir
-      let tableHtml = `<div style="font-size:12px;margin-top:8px"><table style="width:100%;border-collapse:collapse"><thead><tr><th style="text-align:left">Máquina</th><th>ACPM (L)</th><th>CORRIENTE (L)</th><th>UREA (L)</th><th>Valor (pesos)</th></tr></thead><tbody>`;
-      let totalGeneral = 0; for(const m of labels){ const r = resumen[m]; tableHtml += `<tr><td style="padding:6px 0">${m}</td><td>${r.acpm.toFixed(2)}</td><td>${r.corriente.toFixed(2)}</td><td>${r.urea.toFixed(2)}</td><td>${formatoMoneda(r.total)}</td></tr>`; totalGeneral += r.total; }
-      tableHtml += `</tbody></table><div style="margin-top:12px;font-weight:800">Valor total general: ${formatoMoneda(totalGeneral)}</div></div>`;
-
-      // Crear PDF con jsPDF y html2canvas
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF({orientation:'portrait',unit:'pt',format:'a4'});
-
-      // Encabezado
-      pdf.setFontSize(18); pdf.text('Resumen Profesional - Combustible', 40, 50);
-      pdf.setFontSize(10); pdf.text(`Generado por: Cristian · Fecha: ${new Date().toLocaleString()}`, 40, 70);
-
-      // Insertar chart
-      pdf.addImage(chartDataUrl, 'PNG', 40, 90, 520, 250);
-
-      // Insertar tabla (render HTML to canvas)
-      const tableContainer = document.createElement('div'); tableContainer.innerHTML = tableHtml; tableContainer.style.width = '780px'; tableContainer.style.padding='8px'; tableContainer.style.background='white';
-      document.body.appendChild(tableContainer);
-      const canvasTable = await html2canvas(tableContainer, {scale:1.5});
-      const imgData = canvasTable.toDataURL('image/png');
-      pdf.addPage();
-      pdf.setFontSize(12); pdf.text('Detalles por máquina', 40, 40);
-      pdf.addImage(imgData, 'PNG', 40, 60, 520, 700*(canvasTable.height/canvasTable.width));
-      document.body.removeChild(tableContainer);
-
-      // Añadir contraseña visible en el PDF (según petición)
-      pdf.setPage(1);
-      pdf.setFontSize(10);
-      pdf.text(`Contraseña para acceder al Excel virtual: ${ADMIN_PASSWORD}`, 40, 370);
-
-      // Pie con firma
-      pdf.setFontSize(9);
-      pdf.text('Informe generado automáticamente — Control Profesional', 40, pdf.internal.pageSize.getHeight()-40);
-
-      // Guardar
-      pdf.save('resumen_combustible_profesional.pdf');
+    // Download chart as PNG (transparent background)
+    btnDownloadChart.addEventListener('click', ()=>{
+      if(!chartInst){ alert('Genera el resumen primero.'); return; }
+      const link = document.createElement('a'); link.download = 'grafica.png';
+      // temporarily set background transparent
+      chartCanvas.style.background = 'transparent';
+      setTimeout(()=>{
+        link.href = chartCanvas.toDataURL('image/png'); document.body.appendChild(link); link.click(); link.remove();
+      },150);
     });
 
-    // Descargar XLSX de todos los registros
-    btnDescargarXLSX.addEventListener('click', ()=>{ const arr = readStorage(); if(arr.length===0){ alert('No hay registros para exportar.'); return; } const ws = XLSX.utils.json_to_sheet(arr); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'registros'); const wbout = XLSX.write(wb, {bookType:'xlsx', type:'array'}); const blob = new Blob([wbout],{type:'application/octet-stream'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download='registros_combustible.xlsx'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); });
+    // Toggle recent / totals
+    btnToggleRecent.addEventListener('click', ()=>{ showTotals = !showTotals; btnToggleRecent.textContent = showTotals? 'Ver registros recientes' : 'Ver totales globales'; renderLista(); });
 
-    // Excel modal protegido por contraseña
-    btnIrExcel.addEventListener('click', ()=>{
-      const pw = prompt('Ingrese la contraseña para ver el Excel:');
-      if(pw === ADMIN_PASSWORD){ openExcelModal(); } else { alert('Contraseña incorrecta'); }
-    });
-
-    function openExcelModal(){ excelModal.classList.remove('hidden'); const backdrop = document.createElement('div'); backdrop.className='backdrop'; document.body.appendChild(backdrop); // render table
-      renderExcelTable();
-    }
+    // Excel modal protected by password
+    btnIrExcel.addEventListener('click', ()=>{ const pw = prompt('Ingrese la contraseña para ver el Excel:'); if(pw === ADMIN_PASSWORD){ openExcelModal(); } else { alert('Contraseña incorrecta'); } });
+    function openExcelModal(){ excelModal.classList.remove('hidden'); document.body.insertAdjacentHTML('beforeend','<div class="backdrop"></div>'); renderExcelTable(); }
     btnCloseExcel.addEventListener('click', ()=>{ excelModal.classList.add('hidden'); document.querySelectorAll('.backdrop').forEach(b=>b.remove()); });
-
     btnExportExcel.addEventListener('click', ()=>{ const arr = readStorage(); if(arr.length===0){ alert('No hay registros para exportar.'); return; } const ws = XLSX.utils.json_to_sheet(arr); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'registros'); const wbout = XLSX.write(wb, {bookType:'xlsx', type:'array'}); const blob = new Blob([wbout],{type:'application/octet-stream'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download='registros_combustible.xlsx'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); });
-
     function renderExcelTable(){ const tbody = document.querySelector('#table-excel tbody'); const arr = readStorage().slice().sort((a,b)=> new Date(b.timestamp)-new Date(a.timestamp)); tbody.innerHTML=''; arr.forEach(r=>{ const tr = document.createElement('tr'); tr.innerHTML = `<td>${r.timestamp}</td><td>${r.maquina}</td><td>${r.fecha}</td><td>${Number(r.acpm_qty).toFixed(2)}</td><td>${Number(r.corriente_qty).toFixed(2)}</td><td>${Number(r.urea_qty).toFixed(2)}</td><td>${formatoMoneda(r.total_precio)}</td>`; tbody.appendChild(tr); }); }
 
-    // Inicial render
-    renderLista();
-    renderResumen();
-
-  </script>
-</body>
-</html>
+    // SETTINGS: password protected prompt
+    function promptSettings(){ const pw = prompt('Ingrese la contraseña para abrir Ajustes:'); if(pw === ADMIN_PASSWORD){ openSettings(); } else { alert('Contraseña incorrecta'); } }
+    function openSettings(){ settingsModal.classList.remove('hidden'); document.body.insertAdjacentHTML('beforeend','<div class="backdrop"></div>'); // fill fields
+      priceAcpmEl.value = (SETTINGS.prices && SETTINGS.prices.ACPM) ? SETTINGS.prices.ACPM : DEFAULT_PRICES.ACPM; priceCorrEl.value = (SETTINGS.prices && SETTINGS.prices.CORRIENTE) ? SETTINGS.prices.CORRIENTE : DEFAULT_PRICES.CORRIENTE; priceUreaEl.value = (SETTINGS.prices && SETTINGS.prices.UREA) ? SETTINGS.prices.UREA : DEFAULT_PRICES.UREA; allowAiEl.checked = SETTINGS.allowAI; openaiKeyEl.value = SETTINGS.openaiKey || ''; }
+    btnCloseSettings.addEventListener('click', ()=>{ settingsModal.classList.add('hidden'); document.querySelectorAll('.backdrop').forEach(b=>b.remove()); });
+    btnSaveSettings.addEventListener('click', ()=>{ SETTINGS.prices = {ACPM: parseFloat(priceAcpmEl.value)||DEFAULT_PRICES.ACPM, CORRIENTE: parseFloat(priceCorrEl.value)||DEFAULT_PRICES.CORRIENTE, UREA: parseFloat(priceUreaEl.value)||DEFAULT_PRICES.UREA }; SETTINGS.allowAI = allowAiEl.checked; SETTINGS.openaiKey = openaiKeyEl.value.trim(); saveSettings(SETTINGS); applySettingsToUI();
