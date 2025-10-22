@@ -3,214 +3,257 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Control de Combustible y Mantenimiento</title>
+  <title>Control Profesional - Combustible & Mantenimiento</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
   <style>
-    :root{--primary:#0b5fff;--muted:#6b7280;--card:#ffffff;--bg:#f3f4f6}
-    *{box-sizing:border-box;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial}
-    body{margin:0;background:var(--bg);color:#111}
-    header{background:linear-gradient(90deg,var(--primary),#3ea0ff);padding:18px 24px;color:white;display:flex;align-items:center;justify-content:space-between}
-    header h1{margin:0;font-size:18px}
-    .container{max-width:1100px;margin:28px auto;padding:18px}
-    .menu{display:flex;gap:12px}
-    .btn{background:white;color:var(--primary);border-radius:10px;padding:10px 14px;border:none;cursor:pointer;font-weight:600;box-shadow:0 6px 18px rgba(11,95,255,0.12)}
-    .btn.secondary{background:transparent;color:white;border:1px solid rgba(255,255,255,0.18)}
-    .card{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 6px 20px rgba(16,24,40,0.06)}
-    .grid{display:grid;grid-template-columns:1fr 380px;gap:18px}
-    label{display:block;margin-top:8px;font-size:13px;color:var(--muted)}
-    input[type="text"], input[type="date"], input[type="number"], select{width:100%;padding:10px;border-radius:8px;border:1px solid #e6e9ef;margin-top:6px}
-    .qtys{display:flex;gap:8px}
-    .qtys > div{flex:1}
-    .two-copies{display:flex;gap:12px;margin-top:14px}
-    .copy{flex:1;background:#fafafa;padding:12px;border-radius:8px;border:1px dashed #e2e8f0}
-    .tot{font-weight:800;font-size:16px;margin-top:8px}
-    .small{font-size:13px;color:var(--muted)}
-    .summary-table{width:100%;border-collapse:collapse;margin-top:8px}
-    .summary-table th,.summary-table td{padding:8px;border-bottom:1px solid #f1f5f9;text-align:left}
-    .footer{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap}
-    .actions{display:flex;gap:8px}
-    .right{display:flex;flex-direction:column;gap:8px}
+    :root{--bg:#0f172a;--card:#0b1220;--accent:#06b6d4;--glass:rgba(255,255,255,0.04);--muted:#94a3b8}
+    *{box-sizing:border-box;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial}
+    body{margin:0;background:linear-gradient(180deg,#071129 0%, #081224 100%);color:#e6eef8;-webkit-font-smoothing:antialiased}
+    header{padding:22px 28px;display:flex;align-items:center;justify-content:space-between}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:46px;height:46px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#3b82f6);display:flex;align-items:center;justify-content:center;color:#021025;font-weight:800}
+    h1{margin:0;font-size:18px}
+
+    .container{max-width:1200px;margin:18px auto;padding:18px}
+
+    /* Menu elegante */
+    .menu-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:24px}
+    .menu-card{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 6px 20px rgba(2,6,23,0.6);cursor:pointer;transition:transform .16s ease, box-shadow .16s ease}
+    .menu-card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(2,6,23,0.7)}
+    .menu-card h3{margin:0 0 6px 0}
+    .menu-card p{margin:0;color:var(--muted);font-size:13px}
+
+    .layout{display:grid;grid-template-columns:1fr 420px;gap:18px}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+
+    label{display:block;margin-top:10px;color:var(--muted);font-size:13px}
+    select,input[type="date"],input[type="number"]{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit;margin-top:6px}
     .hidden{display:none}
-    @media(max-width:900px){.grid{grid-template-columns:1fr}.two-copies{flex-direction:column}}
+    .qty-row{display:flex;gap:10px;margin-top:10px}
+    .qty-row > div{flex:1}
+
+    .actions{display:flex;gap:10px;margin-top:14px}
+    .btn{padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:700}
+    .btn.primary{background:linear-gradient(90deg,var(--accent),#3b82f6);color:#031125}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:#cfe9f2}
+
+    .two-copies{display:flex;gap:12px;margin-top:18px}
+    .copy{flex:1;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:14px;border-radius:10px;border:1px dashed rgba(255,255,255,0.04)}
+    .copy h4{margin:0 0 8px 0}
+
+    .small{font-size:13px;color:var(--muted)}
+
+    .summary-table{width:100%;border-collapse:collapse;margin-top:10px}
+    .summary-table th,.summary-table td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.03);text-align:left}
+
+    .excel-modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:90%;max-width:1200px;max-height:80vh;overflow:auto;z-index:9999}
+    .backdrop{position:fixed;inset:0;background:linear-gradient(180deg, rgba(2,6,23,0.6), rgba(2,6,23,0.8));z-index:999}
+
+    .top-actions{display:flex;justify-content:space-between;gap:10px;align-items:center}
+    .center{display:flex;align-items:center;gap:12px}
+
+    @media(max-width:980px){.layout{grid-template-columns:1fr}.menu-grid{grid-template-columns:repeat(2,1fr)}.two-copies{flex-direction:column}}
   </style>
-  <!-- SheetJS for Excel export -->
+
+  <!-- Librerías: SheetJS (XLSX), Chart.js, html2canvas, jsPDF -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 </head>
 <body>
   <header>
-    <h1>Control de Combustible y Mantenimiento</h1>
-    <div class="menu">
-      <button class="btn" id="btn-combustible">COMBUSTIBLE</button>
-      <button class="btn secondary" id="btn-mantenimiento">MANTENIMIENTO</button>
+    <div class="brand">
+      <div class="logo">CA</div>
+      <div>
+        <h1>Control Profesional - Combustible</h1>
+        <div class="small">Interfaz elegante para registro y reportes | Usuario: Cristian</div>
+      </div>
+    </div>
+    <div class="center">
+      <button class="btn ghost" id="btn-ir-excel">Ir a Excel (AC)</button>
+      <button class="btn ghost" id="btn-descargar-xlsx">Descargar Excel</button>
     </div>
   </header>
 
   <div class="container">
-    <div id="page-inicio">
-      <div class="card">
-        <h2>Bienvenido</h2>
-        <p class="small">Selecciona una de las opciones arriba para comenzar. Esta aplicación funciona completamente en tu navegador. Se guardan los registros en el "Excel virtual" almacenado en el navegador (localStorage). Puedes exportarlos a un archivo .xlsx cuando quieras.</p>
+    <div class="menu-grid">
+      <div class="menu-card" data-page="combustible">
+        <h3>COMBUSTIBLE</h3>
+        <p>Registro de consumos por máquina. Genera recibos e informes profesionales.</p>
+      </div>
+      <div class="menu-card" data-page="mantenimiento">
+        <h3>MANTENIMIENTO</h3>
+        <p>Órdenes de trabajo, repuestos y control de costos (pendiente de diseño).</p>
+      </div>
+      <div class="menu-card" id="menu-report">
+        <h3>REPORTES</h3>
+        <p>Genera PDF profesional con gráficos y resumen por máquina.</p>
+      </div>
+      <div class="menu-card" id="menu-settings">
+        <h3>AJUSTES</h3>
+        <p>Configura precios, contraseña y opciones de exportación.</p>
       </div>
     </div>
 
-    <div id="page-combustible" class="hidden">
-      <div class="grid">
-        <div class="card">
-          <h2>Registro - COMBUSTIBLE</h2>
+    <!-- Página principal - COMBUSTIBLE -->
+    <div class="layout">
+      <div class="card" id="card-main">
+        <h2>Registro - COMBUSTIBLE</h2>
+        <label>Máquina</label>
+        <select id="maquina">
+          <option>RETRO</option>
+          <option>NIVELADORA</option>
+          <option>VOLQUETA</option>
+          <option>VIBRO</option>
+        </select>
 
-          <label>Máquina</label>
-          <select id="maquina">
-            <option>RETRO</option>
-            <option>NIVELADORA</option>
-            <option>VOLQUETA</option>
-            <option>VIBRO</option>
-          </select>
+        <label>Fecha</label>
+        <input type="date" id="fecha" />
 
-          <label>Fecha</label>
-          <input type="date" id="fecha" />
-
-          <p class="small" style="margin-top:8px">Ingrese cantidades (si deja vacío o 0, se asumirá 0):</p>
-          <div class="qtys">
-            <div>
-              <label>ACPM (litros) — precio unitario $20</label>
-              <input type="number" id="acpm" min="0" step="0.1" placeholder="0" />
-            </div>
-            <div>
-              <label>CORRIENTE (litros) — precio unitario $10</label>
-              <input type="number" id="corriente" min="0" step="0.1" placeholder="0" />
-            </div>
-            <div>
-              <label>UREA (litros) — precio unitario $5</label>
-              <input type="number" id="urea" min="0" step="0.1" placeholder="0" />
-            </div>
+        <p class="small" style="margin-top:12px">Materiales (ingrese solo la cantidad; los precios no se muestran en la interfaz)</p>
+        <div class="qty-row">
+          <div>
+            <label>ACPM (litros)</label>
+            <input type="number" id="acpm" min="0" step="0.1" placeholder="0" />
           </div>
-
-          <div class="footer">
-            <div class="actions">
-              <button class="btn" id="btn-generar">Generar</button>
-              <button class="btn" id="btn-exportar">Exportar todo (XLSX)</button>
-              <button class="btn secondary" id="btn-limpiar">Limpiar registros</button>
-            </div>
-            <div class="right">
-              <small class="small">Precios: ACPM $20 | CORRIENTE $10 | UREA $5</small>
-              <small class="small">Los datos se guardan en tu navegador; para compartir la app sube este archivo a GitHub Pages o un hosting estático.</small>
-            </div>
+          <div>
+            <label>CORRIENTE (litros)</label>
+            <input type="number" id="corriente" min="0" step="0.1" placeholder="0" />
           </div>
-
-          <div id="mensaje" style="margin-top:10px"></div>
-
-          <div class="two-copies" id="recibos"></div>
+          <div>
+            <label>UREA (litros)</label>
+            <input type="number" id="urea" min="0" step="0.1" placeholder="0" />
+          </div>
         </div>
 
-        <div class="card">
-          <h3>Resumen y Consulta</h3>
-          <button class="btn" id="btn-resumen">Generar resumen por máquina</button>
-          <div id="resumen" style="margin-top:10px"></div>
-
-          <h4 style="margin-top:16px">Registros recientes</h4>
-          <div id="lista-registros" style="max-height:320px;overflow:auto;margin-top:8px"></div>
+        <div class="actions">
+          <button class="btn primary" id="btn-generar">Generar recibo</button>
+          <button class="btn ghost" id="btn-imprimir" title="Imprimir las copias mostradas">Imprimir copias</button>
+          <button class="btn ghost" id="btn-clear">Limpiar formulario</button>
         </div>
+
+        <div id="mensaje" style="margin-top:12px"></div>
+
+        <div class="two-copies" id="recibos"></div>
+      </div>
+
+      <div class="card">
+        <div class="top-actions">
+          <h3>Resumen - Control</h3>
+          <div>
+            <button class="btn primary" id="btn-resumen-pdf">Generar PDF profesional</button>
+            <button class="btn ghost" id="btn-descargar-grafica">Descargar gráfica</button>
+          </div>
+        </div>
+
+        <div style="margin-top:10px">
+          <button class="btn ghost" id="btn-resumen">Generar resumen por máquina</button>
+        </div>
+
+        <canvas id="chartTotales" style="margin-top:12px;max-height:220px"></canvas>
+
+        <div id="resumen" style="margin-top:12px"></div>
+
+        <h4 style="margin-top:12px">Registros recientes</h4>
+        <div id="lista-registros" style="max-height:320px;overflow:auto;margin-top:8px"></div>
       </div>
     </div>
 
-    <div id="page-mantenimiento" class="hidden">
-      <div class="card">
-        <h2>MANTENIMIENTO</h2>
-        <p class="small">Sección de mantenimiento: placeholder por ahora. Si quieres que la extienda con órdenes de trabajo, repuestos y costos, lo hago y lo integro con el mismo sistema de almacenamiento.</p>
+    <!-- Excel modal (protegido por contraseña) -->
+    <div id="excel-modal" class="hidden">
+      <div class="backdrop"></div>
+      <div class="excel-modal card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <h3>Excel virtual - Registros</h3>
+          <div>
+            <button class="btn ghost" id="btn-close-excel">Cerrar</button>
+            <button class="btn primary" id="btn-export-excel">Exportar .xlsx</button>
+          </div>
+        </div>
+        <div style="margin-top:12px">
+          <table class="summary-table" id="table-excel"><thead><tr><th>Timestamp</th><th>Máquina</th><th>Fecha</th><th>ACPM (L)</th><th>CORRIENTE (L)</th><th>UREA (L)</th><th>Total (calculado)</th></tr></thead><tbody></tbody></table>
+        </div>
       </div>
     </div>
 
   </div>
 
   <script>
-    // Precios
+    // CONFIG
+    const ADMIN_PASSWORD = 'AC.ardila2006'; // contraseña suministrada
     const PRECIOS = {ACPM:20, CORRIENTE:10, UREA:5};
+    const STORAGE_KEY = 'combustible_registros_prof_v2';
 
     // DOM
-    const pageInicio = document.getElementById('page-inicio');
-    const pageComb = document.getElementById('page-combustible');
-    const pageMant = document.getElementById('page-mantenimiento');
-    const btnComb = document.getElementById('btn-combustible');
-    const btnMant = document.getElementById('btn-mantenimiento');
-
-    const maquinaEl = document.getElementById('maquina');
-    const fechaEl = document.getElementById('fecha');
-    const acpmEl = document.getElementById('acpm');
-    const corrienteEl = document.getElementById('corriente');
-    const ureaEl = document.getElementById('urea');
+    const menuCards = document.querySelectorAll('.menu-card');
+    const btnIrExcel = document.getElementById('btn-ir-excel');
+    const btnDescargarXLSX = document.getElementById('btn-descargar-xlsx');
     const btnGenerar = document.getElementById('btn-generar');
+    const btnImprimir = document.getElementById('btn-imprimir');
+    const btnClear = document.getElementById('btn-clear');
     const recibosEl = document.getElementById('recibos');
     const mensajeEl = document.getElementById('mensaje');
     const listaRegistros = document.getElementById('lista-registros');
     const resumenEl = document.getElementById('resumen');
     const btnResumen = document.getElementById('btn-resumen');
-    const btnExport = document.getElementById('btn-exportar');
-    const btnLimpiar = document.getElementById('btn-limpiar');
+    const btnResumenPdf = document.getElementById('btn-resumen-pdf');
+    const chartCanvas = document.getElementById('chartTotales');
+    const excelModal = document.getElementById('excel-modal');
+    const btnCloseExcel = document.getElementById('btn-close-excel');
+    const btnExportExcel = document.getElementById('btn-export-excel');
 
-    // Inicializar fecha con hoy
+    // Form fields
+    const maquinaEl = document.getElementById('maquina');
+    const fechaEl = document.getElementById('fecha');
+    const acpmEl = document.getElementById('acpm');
+    const corrienteEl = document.getElementById('corriente');
+    const ureaEl = document.getElementById('urea');
+
+    // Inicializar fecha
     fechaEl.valueAsDate = new Date();
 
-    // Navegación simple
-    btnComb.addEventListener('click', ()=>{showPage('combustible')});
-    btnMant.addEventListener('click', ()=>{showPage('mantenimiento')});
+    // Navegación menu (solo visual)
+    menuCards.forEach(c=>{
+      c.addEventListener('click', ()=>{
+        const p = c.dataset.page;
+        if(p==='combustible') window.scrollTo({top:document.getElementById('card-main').offsetTop - 20, behavior:'smooth'});
+        if(p==='mantenimiento') alert('Sección Mantenimiento: dime los campos que quieres y la diseño.');
+      });
+    });
 
-    function showPage(p){
-      pageInicio.classList.add('hidden');
-      pageComb.classList.add('hidden');
-      pageMant.classList.add('hidden');
-      if(p==='combustible') pageComb.classList.remove('hidden');
-      if(p==='mantenimiento') pageMant.classList.remove('hidden');
-      if(p==='inicio') pageInicio.classList.remove('hidden');
-    }
-
-    // Storage key
-    const STORAGE_KEY = 'combustible_registros_v1';
-
-    function readStorage(){
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if(!raw) return [];
-      try{ return JSON.parse(raw); }catch(e){return []}
-    }
+    // Storage helpers
+    function readStorage(){ const raw = localStorage.getItem(STORAGE_KEY); if(!raw) return []; try{return JSON.parse(raw);}catch(e){return []} }
     function writeStorage(arr){ localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
 
-    function formatoMoneda(v){
-      return '$' + Number(v).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
-    }
+    function addRecord(r){ const arr = readStorage(); arr.push(r); writeStorage(arr); }
 
-    function renderRecibos(record){
-      recibosEl.innerHTML = '';
-      ['COPIA 1','COPIA 2'].forEach((titulo)=>{
-        const div = document.createElement('div'); div.className='copy';
-        div.innerHTML = `<h4>${titulo}</h4>
-          <div><strong>Recibo - ${record.maquina}</strong></div>
-          <div class="small">Fecha: ${record.fecha}</div>
-          <hr />
-          <div>ACPM: ${record.acpm_qty} L — ${formatoMoneda(record.acpm_total)}</div>
-          <div>CORRIENTE: ${record.corriente_qty} L — ${formatoMoneda(record.corriente_total)}</div>
-          <div>UREA: ${record.urea_qty} L — ${formatoMoneda(record.urea_total)}</div>
-          <div class="tot">TOTAL: ${formatoMoneda(record.total_precio)}</div>
-          <div class="small" style="margin-top:8px">Código: ${record.timestamp}</div>
-        `;
-        recibosEl.appendChild(div);
-      });
-    }
+    function formatoMoneda(v){ return '$' + Number(v).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); }
 
-    function añadirRegistro(record){
-      const arr = readStorage();
-      arr.push(record);
-      writeStorage(arr);
-    }
+    // Render recibos (dos copias) - only quantities displayed (no prices on screen)
+    function renderRecibos(record){ recibosEl.innerHTML = ''; ['COPIA 1','COPIA 2'].forEach(titulo=>{
+      const div = document.createElement('div'); div.className='copy';
+      div.innerHTML = `<h4>${titulo}</h4>
+        <div><strong>Recibo - ${record.maquina}</strong></div>
+        <div class="small">Fecha: ${record.fecha}</div>
+        <hr />
+        <div>ACPM: ${Number(record.acpm_qty).toFixed(2)} L</div>
+        <div>CORRIENTE: ${Number(record.corriente_qty).toFixed(2)} L</div>
+        <div>UREA: ${Number(record.urea_qty).toFixed(2)} L</div>
+        <div class="small" style="margin-top:8px">Código: ${record.timestamp}</div>
+      `;
+      recibosEl.appendChild(div);
+    }); }
 
-    function renderListaRegistros(){
-      const arr = readStorage().slice().reverse();
-      if(arr.length===0){ listaRegistros.innerHTML='<div class="small">No hay registros aún.</div>'; return; }
+    // Render lista registros (bien nombradas y ordenadas por fecha desc)
+    function renderLista(){ const arr = readStorage().slice().sort((a,b)=> new Date(b.timestamp) - new Date(a.timestamp)); if(arr.length===0){ listaRegistros.innerHTML = '<div class="small">No hay registros.</div>'; return; }
       listaRegistros.innerHTML = '';
       arr.slice(0,200).forEach(r=>{
-        const d = document.createElement('div'); d.className='card'; d.style.marginBottom='8px';
-        d.innerHTML = `<div style="display:flex;justify-content:space-between"><div><strong>${r.maquina}</strong><div class='small'>${r.fecha}</div></div><div>${formatoMoneda(r.total_precio)}</div></div>`;
+        const d = document.createElement('div'); d.className='card'; d.style.marginBottom='8px'; d.innerHTML = `<div style="display:flex;justify-content:space-between"><div><strong>${r.maquina}</strong><div class='small'>${r.fecha} · ${new Date(r.timestamp).toLocaleString()}</div></div><div class='small'>ACPM: ${Number(r.acpm_qty).toFixed(2)} L<br>CORR: ${Number(r.corriente_qty).toFixed(2)} L<br>UREA: ${Number(r.urea_qty).toFixed(2)} L</div></div>`;
         listaRegistros.appendChild(d);
-      });
-    }
+      }); }
 
+    // Generar registro
     btnGenerar.addEventListener('click', ()=>{
       const maquina = maquinaEl.value;
       const fecha = fechaEl.value || new Date().toISOString().slice(0,10);
@@ -218,76 +261,140 @@
       const corriente_qty = parseFloat(corrienteEl.value) || 0;
       const urea_qty = parseFloat(ureaEl.value) || 0;
 
+      // calcular total precio interno (no mostrado en UI) pero guardado
       const acpm_total = acpm_qty * PRECIOS.ACPM;
       const corriente_total = corriente_qty * PRECIOS.CORRIENTE;
       const urea_total = urea_qty * PRECIOS.UREA;
       const total_precio = acpm_total + corriente_total + urea_total;
 
       const record = {
-        timestamp: new Date().toISOString(),
-        maquina, fecha,
+        timestamp: new Date().toISOString(), maquina, fecha,
         acpm_qty, corriente_qty, urea_qty,
         acpm_total, corriente_total, urea_total,
         total_precio
       };
 
-      añadirRegistro(record);
-      mensajeEl.innerHTML = `<div style="color:green;font-weight:700;margin-top:8px">Registro guardado ✔</div>`;
+      addRecord(record);
+      mensajeEl.innerHTML = '<div style="color:#34d399;font-weight:700">Registro guardado ✔</div>';
       renderRecibos(record);
-      renderListaRegistros();
+      renderLista();
     });
 
-    btnResumen.addEventListener('click', ()=>{
-      const arr = readStorage();
-      if(arr.length===0){ resumenEl.innerHTML = '<div class="small">No hay registros.</div>'; return; }
-      // Agrupar
+    // Imprimir copias (imprime la sección de recibos)
+    btnImprimir.addEventListener('click', ()=>{
+      if(!recibosEl.innerHTML.trim()){ alert('No hay recibos para imprimir. Genera primero.'); return; }
+      const printWindow = window.open('', '', 'width=900,height=700');
+      printWindow.document.write('<html><head><title>Imprimir recibo</title>');
+      printWindow.document.write('<style>body{font-family:Inter,Arial;padding:24px;background:white;color:#000} .copy{border:1px solid #ddd;padding:12px;margin-bottom:12px}</style>');
+      printWindow.document.write('</head><body>');
+      printWindow.document.write(recibosEl.innerHTML);
+      printWindow.document.write('</body></html>');
+      printWindow.document.close();
+      printWindow.focus();
+      setTimeout(()=>{ printWindow.print(); },500);
+    });
+
+    btnClear.addEventListener('click', ()=>{ maquinaEl.selectedIndex=0; fechaEl.valueAsDate=new Date(); acpmEl.value=''; corrienteEl.value=''; ureaEl.value=''; mensajeEl.innerHTML=''; recibosEl.innerHTML=''; });
+
+    // Resumen por máquina con gráfica
+    let chartInst = null;
+    btnResumen.addEventListener('click', ()=>{ renderResumen(); });
+
+    function renderResumen(){
+      const arr = readStorage(); if(arr.length===0){ resumenEl.innerHTML = '<div class="small">No hay registros.</div>'; if(chartInst){ chartInst.destroy(); chartInst=null;} return; }
       const resumen = {};
-      arr.forEach(r=>{
-        if(!resumen[r.maquina]) resumen[r.maquina] = {acpm:0,corriente:0,urea:0,total:0};
-        resumen[r.maquina].acpm += Number(r.acpm_qty) || 0;
-        resumen[r.maquina].corriente += Number(r.corriente_qty) || 0;
-        resumen[r.maquina].urea += Number(r.urea_qty) || 0;
-        resumen[r.maquina].total += Number(r.total_precio) || 0;
-      });
+      arr.forEach(r=>{ if(!resumen[r.maquina]) resumen[r.maquina]={acpm:0,corriente:0,urea:0,total:0}; resumen[r.maquina].acpm += Number(r.acpm_qty)||0; resumen[r.maquina].corriente += Number(r.corriente_qty)||0; resumen[r.maquina].urea += Number(r.urea_qty)||0; resumen[r.maquina].total += Number(r.total_precio)||0; });
 
+      // Tabla HTML
       let html = '<table class="summary-table"><thead><tr><th>Máquina</th><th>ACPM (L)</th><th>CORRIENTE (L)</th><th>UREA (L)</th><th>Valor (pesos)</th></tr></thead><tbody>';
-      let totales = {acpm:0,corriente:0,urea:0,total:0};
-      for(const m in resumen){
-        const r = resumen[m];
-        html += `<tr><td>${m}</td><td>${r.acpm.toFixed(2)}</td><td>${r.corriente.toFixed(2)}</td><td>${r.urea.toFixed(2)}</td><td>${formatoMoneda(r.total)}</td></tr>`;
-        totales.acpm += r.acpm; totales.corriente += r.corriente; totales.urea += r.urea; totales.total += r.total;
-      }
-      html += `</tbody></table>
-        <div style="margin-top:10px"><strong>Totales generales:</strong><div class="small">ACPM: ${totales.acpm.toFixed(2)} L — CORRIENTE: ${totales.corriente.toFixed(2)} L — UREA: ${totales.urea.toFixed(2)} L</div><div class="tot">Valor total: ${formatoMoneda(totales.total)}</div></div>`;
-
+      const labels = [], dataTotals = [];
+      for(const m in resumen){ const r = resumen[m]; html += `<tr><td>${m}</td><td>${r.acpm.toFixed(2)}</td><td>${r.corriente.toFixed(2)}</td><td>${r.urea.toFixed(2)}</td><td>${formatoMoneda(r.total)}</td></tr>`; labels.push(m); dataTotals.push(Number(r.total.toFixed(2))); }
+      html += '</tbody></table>';
       resumenEl.innerHTML = html;
+
+      // Chart
+      const ctx = chartCanvas.getContext('2d');
+      if(chartInst) chartInst.destroy();
+      chartInst = new Chart(ctx, {type:'bar', data:{labels, datasets:[{label:'Valor total (pesos)', data:dataTotals, backgroundColor:'rgba(59,130,246,0.8)'}]}, options:{responsive:true,maintainAspectRatio:false}});
+    }
+
+    // Generar PDF profesional con gráficos y tabla (incluye contraseña en PDF)
+    btnResumenPdf.addEventListener('click', async ()=>{
+      const arr = readStorage(); if(arr.length===0){ alert('No hay datos para generar el PDF.'); return; }
+      // Preparar resumen
+      const resumen = {};
+      arr.forEach(r=>{ if(!resumen[r.maquina]) resumen[r.maquina]={acpm:0,corriente:0,urea:0,total:0}; resumen[r.maquina].acpm += Number(r.acpm_qty)||0; resumen[r.maquina].corriente += Number(r.corriente_qty)||0; resumen[r.maquina].urea += Number(r.urea_qty)||0; resumen[r.maquina].total += Number(r.total_precio)||0; });
+
+      // Crear pequeña canvas chart para el PDF
+      const canvas = document.createElement('canvas'); canvas.width = 800; canvas.height = 400; const ctx = canvas.getContext('2d');
+      const labels = Object.keys(resumen); const dataTotals = labels.map(m=>resumen[m].total.toFixed(2));
+      new Chart(ctx, {type:'pie', data:{labels, datasets:[{data:dataTotals}]}, options:{plugins:{legend:{position:'right'}}}});
+
+      // Esperar dibujo
+      await new Promise(r=>setTimeout(r,600));
+      const chartDataUrl = canvas.toDataURL('image/png');
+
+      // Construir tabla HTML para incluir
+      let tableHtml = `<div style="font-size:12px;margin-top:8px"><table style="width:100%;border-collapse:collapse"><thead><tr><th style="text-align:left">Máquina</th><th>ACPM (L)</th><th>CORRIENTE (L)</th><th>UREA (L)</th><th>Valor (pesos)</th></tr></thead><tbody>`;
+      let totalGeneral = 0; for(const m of labels){ const r = resumen[m]; tableHtml += `<tr><td style="padding:6px 0">${m}</td><td>${r.acpm.toFixed(2)}</td><td>${r.corriente.toFixed(2)}</td><td>${r.urea.toFixed(2)}</td><td>${formatoMoneda(r.total)}</td></tr>`; totalGeneral += r.total; }
+      tableHtml += `</tbody></table><div style="margin-top:12px;font-weight:800">Valor total general: ${formatoMoneda(totalGeneral)}</div></div>`;
+
+      // Crear PDF con jsPDF y html2canvas
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({orientation:'portrait',unit:'pt',format:'a4'});
+
+      // Encabezado
+      pdf.setFontSize(18); pdf.text('Resumen Profesional - Combustible', 40, 50);
+      pdf.setFontSize(10); pdf.text(`Generado por: Cristian · Fecha: ${new Date().toLocaleString()}`, 40, 70);
+
+      // Insertar chart
+      pdf.addImage(chartDataUrl, 'PNG', 40, 90, 520, 250);
+
+      // Insertar tabla (render HTML to canvas)
+      const tableContainer = document.createElement('div'); tableContainer.innerHTML = tableHtml; tableContainer.style.width = '780px'; tableContainer.style.padding='8px'; tableContainer.style.background='white';
+      document.body.appendChild(tableContainer);
+      const canvasTable = await html2canvas(tableContainer, {scale:1.5});
+      const imgData = canvasTable.toDataURL('image/png');
+      pdf.addPage();
+      pdf.setFontSize(12); pdf.text('Detalles por máquina', 40, 40);
+      pdf.addImage(imgData, 'PNG', 40, 60, 520, 700*(canvasTable.height/canvasTable.width));
+      document.body.removeChild(tableContainer);
+
+      // Añadir contraseña visible en el PDF (según petición)
+      pdf.setPage(1);
+      pdf.setFontSize(10);
+      pdf.text(`Contraseña para acceder al Excel virtual: ${ADMIN_PASSWORD}`, 40, 370);
+
+      // Pie con firma
+      pdf.setFontSize(9);
+      pdf.text('Informe generado automáticamente — Control Profesional', 40, pdf.internal.pageSize.getHeight()-40);
+
+      // Guardar
+      pdf.save('resumen_combustible_profesional.pdf');
     });
 
-    btnExport.addEventListener('click', ()=>{
-      const arr = readStorage();
-      if(arr.length===0){ alert('No hay registros para exportar.'); return; }
-      // Convertir a sheet
-      const ws = XLSX.utils.json_to_sheet(arr);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'registros');
-      const wbout = XLSX.write(wb, {bookType:'xlsx', type:'array'});
-      const blob = new Blob([wbout],{type:'application/octet-stream'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href = url; a.download = 'registros_combustible.xlsx'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    // Descargar XLSX de todos los registros
+    btnDescargarXLSX.addEventListener('click', ()=>{ const arr = readStorage(); if(arr.length===0){ alert('No hay registros para exportar.'); return; } const ws = XLSX.utils.json_to_sheet(arr); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'registros'); const wbout = XLSX.write(wb, {bookType:'xlsx', type:'array'}); const blob = new Blob([wbout],{type:'application/octet-stream'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download='registros_combustible.xlsx'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); });
+
+    // Excel modal protegido por contraseña
+    btnIrExcel.addEventListener('click', ()=>{
+      const pw = prompt('Ingrese la contraseña para ver el Excel:');
+      if(pw === ADMIN_PASSWORD){ openExcelModal(); } else { alert('Contraseña incorrecta'); }
     });
 
-    btnLimpiar.addEventListener('click', ()=>{
-      if(confirm('¿Eliminar todos los registros almacenados en este navegador? Esta acción no se puede deshacer en este navegador.')){
-        localStorage.removeItem(STORAGE_KEY);
-        renderListaRegistros();
-        resumenEl.innerHTML='';
-        recibosEl.innerHTML='';
-        mensajeEl.innerHTML = '<div style="color:#b91c1c">Registros eliminados.</div>';
-      }
-    });
+    function openExcelModal(){ excelModal.classList.remove('hidden'); const backdrop = document.createElement('div'); backdrop.className='backdrop'; document.body.appendChild(backdrop); // render table
+      renderExcelTable();
+    }
+    btnCloseExcel.addEventListener('click', ()=>{ excelModal.classList.add('hidden'); document.querySelectorAll('.backdrop').forEach(b=>b.remove()); });
+
+    btnExportExcel.addEventListener('click', ()=>{ const arr = readStorage(); if(arr.length===0){ alert('No hay registros para exportar.'); return; } const ws = XLSX.utils.json_to_sheet(arr); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'registros'); const wbout = XLSX.write(wb, {bookType:'xlsx', type:'array'}); const blob = new Blob([wbout],{type:'application/octet-stream'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download='registros_combustible.xlsx'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); });
+
+    function renderExcelTable(){ const tbody = document.querySelector('#table-excel tbody'); const arr = readStorage().slice().sort((a,b)=> new Date(b.timestamp)-new Date(a.timestamp)); tbody.innerHTML=''; arr.forEach(r=>{ const tr = document.createElement('tr'); tr.innerHTML = `<td>${r.timestamp}</td><td>${r.maquina}</td><td>${r.fecha}</td><td>${Number(r.acpm_qty).toFixed(2)}</td><td>${Number(r.corriente_qty).toFixed(2)}</td><td>${Number(r.urea_qty).toFixed(2)}</td><td>${formatoMoneda(r.total_precio)}</td>`; tbody.appendChild(tr); }); }
 
     // Inicial render
-    renderListaRegistros();
+    renderLista();
+    renderResumen();
+
   </script>
 </body>
 </html>
