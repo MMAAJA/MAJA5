@@ -121,26 +121,87 @@
         <select id="maquina">
           <option>RETRO</option>
           <option>NIVELADORA</option>
-          <option>VOLQUETA</option>
           <option>VIBRO</option>
+          <option>VOLQUETA</option>
+          <option>XFK75C</option>
+          <option>DQU91D</option>
+          <option>QIE55H</option>
+          <option>VCW59C</option>
+          <option>FPZ593</option>
+          <option>EKV832</option>
+          <option>BUS</option>
+          <option>GUADAÑA</option>
+          <option>DEPORTE GUADAÑA</option>
+          <option>JBO785</option>
         </select>
 
         <label>Fecha</label>
         <input type="date" id="fecha" />
 
         <p class="small" style="margin-top:12px">Materiales (ingrese solo la cantidad; los precios no se muestran en la interfaz)</p>
+        
+        <!-- Primera fila de materiales -->
         <div class="qty-row">
           <div>
-            <label>ACPM (litros)</label>
+            <label>ACPM (GL)</label>
             <input type="number" id="acpm" min="0" step="0.1" placeholder="0" />
           </div>
           <div>
-            <label>CORRIENTE (litros)</label>
+            <label>CORRIENTE (GL)</label>
             <input type="number" id="corriente" min="0" step="0.1" placeholder="0" />
           </div>
           <div>
-            <label>UREA (litros)</label>
+            <label>GRASA (LB)</label>
+            <input type="number" id="grasa" min="0" step="0.1" placeholder="0" />
+          </div>
+        </div>
+        
+        <!-- Segunda fila de materiales -->
+        <div class="qty-row">
+          <div>
+            <label>ACEITE 2T (1/4)</label>
+            <input type="number" id="aceite2t" min="0" step="0.1" placeholder="0" />
+          </div>
+          <div>
+            <label>ACEITE 4T (1/4)</label>
+            <input type="number" id="aceite4t" min="0" step="0.1" placeholder="0" />
+          </div>
+          <div>
+            <label>ACEITE MOTOR PESADO (1/4)</label>
+            <input type="number" id="aceite-pesado" min="0" step="0.1" placeholder="0" />
+          </div>
+        </div>
+        
+        <!-- Tercera fila de materiales -->
+        <div class="qty-row">
+          <div>
+            <label>ACEITE MOTOR LIVIANO (1/4)</label>
+            <input type="number" id="aceite-liviano" min="0" step="0.1" placeholder="0" />
+          </div>
+          <div>
+            <label>ACEITE HIDRAULICO (GL)</label>
+            <input type="number" id="aceite-hidraulico-gl" min="0" step="0.1" placeholder="0" />
+          </div>
+          <div>
+            <label>ACEITE HIDRAULICO (1/4)</label>
+            <input type="number" id="aceite-hidraulico-cuarto" min="0" step="0.1" placeholder="0" />
+          </div>
+        </div>
+        
+        <!-- Cuarta fila de materiales -->
+        <div class="qty-row">
+          <div>
+            <label>REFRIGERANTE ROJO (1/4)</label>
+            <input type="number" id="refrigerante-rojo" min="0" step="0.1" placeholder="0" />
+          </div>
+          <div>
+            <label>UREA (GL)</label>
             <input type="number" id="urea" min="0" step="0.1" placeholder="0" />
+          </div>
+          <div style="visibility: hidden;">
+            <!-- Espacio vacío para mantener el diseño -->
+            <label>&nbsp;</label>
+            <input type="number" disabled style="visibility: hidden;" />
           </div>
         </div>
 
@@ -239,6 +300,22 @@
           <input type="number" id="price-acpm" step="0.1" />
           <label>Precio CORRIENTE (actual)</label>
           <input type="number" id="price-corriente" step="0.1" />
+          <label>Precio GRASA (actual)</label>
+          <input type="number" id="price-grasa" step="0.1" />
+          <label>Precio ACEITE 2T (actual)</label>
+          <input type="number" id="price-aceite2t" step="0.1" />
+          <label>Precio ACEITE 4T (actual)</label>
+          <input type="number" id="price-aceite4t" step="0.1" />
+          <label>Precio ACEITE MOTOR PESADO (actual)</label>
+          <input type="number" id="price-aceite-pesado" step="0.1" />
+          <label>Precio ACEITE MOTOR LIVIANO (actual)</label>
+          <input type="number" id="price-aceite-liviano" step="0.1" />
+          <label>Precio ACEITE HIDRAULICO (GL) (actual)</label>
+          <input type="number" id="price-aceite-hidraulico-gl" step="0.1" />
+          <label>Precio ACEITE HIDRAULICO (1/4) (actual)</label>
+          <input type="number" id="price-aceite-hidraulico-cuarto" step="0.1" />
+          <label>Precio REFRIGERANTE ROJO (actual)</label>
+          <input type="number" id="price-refrigerante-rojo" step="0.1" />
           <label>Precio UREA (actual)</label>
           <input type="number" id="price-urea" step="0.1" />
           
@@ -269,7 +346,7 @@
           </div>
         </div>
         <div style="margin-top:12px">
-          <table class="summary-table" id="table-excel"><thead><tr><th>Timestamp</th><th>Máquina</th><th>Fecha</th><th>ACPM (L)</th><th>CORRIENTE (L)</th><th>UREA (L)</th><th>Total (calculado)</th></tr></thead><tbody></tbody></table>
+          <table class="summary-table" id="table-excel"><thead><tr><th>Timestamp</th><th>Máquina</th><th>Fecha</th><th>ACPM (GL)</th><th>CORRIENTE (GL)</th><th>GRASA (LB)</th><th>ACEITE 2T (1/4)</th><th>ACEITE 4T (1/4)</th><th>ACEITE MOTOR PESADO (1/4)</th><th>ACEITE MOTOR LIVIANO (1/4)</th><th>ACEITE HIDRAULICO (GL)</th><th>ACEITE HIDRAULICO (1/4)</th><th>REFRIGERANTE ROJO (1/4)</th><th>UREA (GL)</th><th>Total (calculado)</th></tr></thead><tbody></tbody></table>
         </div>
       </div>
     </div>
@@ -278,10 +355,23 @@
 
   <script>
     // CONFIG defaults
-    const DEFAULT_PRICES = {ACPM:20, CORRIENTE:10, UREA:5};
+    const DEFAULT_PRICES = {
+      ACPM: 13250,
+      CORRIENTE: 20250,
+      GRASA: 16750,
+      ACEITE_2T: 34000,
+      ACEITE_4T: 35000,
+      ACEITE_MOTOR_PESADO: 40000,
+      ACEITE_MOTOR_LIVIANO: 38000,
+      ACEITE_HIDRAULICO_GL: 105000,
+      ACEITE_HIDRAULICO_CUARTO: 26000,
+      REFRIGERANTE_ROJO: 15000,
+      UREA: 29750
+    };
+    
     const ADMIN_PASSWORD = 'AC.ardila2006'; // contraseña suministrada
-    const STORAGE_KEY = 'combustible_registros_prof_v4';
-    const SETTINGS_KEY = 'combustible_settings_v1';
+    const STORAGE_KEY = 'combustible_registros_prof_v5';
+    const SETTINGS_KEY = 'combustible_settings_v2';
 
     // Load settings or defaults
     function loadSettings(){ 
@@ -329,6 +419,14 @@
     const btnSaveSettings = document.getElementById('btn-save-settings');
     const priceAcpmEl = document.getElementById('price-acpm');
     const priceCorrEl = document.getElementById('price-corriente');
+    const priceGrasaEl = document.getElementById('price-grasa');
+    const priceAceite2tEl = document.getElementById('price-aceite2t');
+    const priceAceite4tEl = document.getElementById('price-aceite4t');
+    const priceAceitePesadoEl = document.getElementById('price-aceite-pesado');
+    const priceAceiteLivianoEl = document.getElementById('price-aceite-liviano');
+    const priceAceiteHidraulicoGlEl = document.getElementById('price-aceite-hidraulico-gl');
+    const priceAceiteHidraulicoCuartoEl = document.getElementById('price-aceite-hidraulico-cuarto');
+    const priceRefrigeranteRojoEl = document.getElementById('price-refrigerante-rojo');
     const priceUreaEl = document.getElementById('price-urea');
     const valorContratoMCEl = document.getElementById('valor-contrato-mc');
     const allowAiEl = document.getElementById('allow-ai');
@@ -349,6 +447,14 @@
     const fechaEl = document.getElementById('fecha');
     const acpmEl = document.getElementById('acpm');
     const corrienteEl = document.getElementById('corriente');
+    const grasaEl = document.getElementById('grasa');
+    const aceite2tEl = document.getElementById('aceite2t');
+    const aceite4tEl = document.getElementById('aceite4t');
+    const aceitePesadoEl = document.getElementById('aceite-pesado');
+    const aceiteLivianoEl = document.getElementById('aceite-liviano');
+    const aceiteHidraulicoGlEl = document.getElementById('aceite-hidraulico-gl');
+    const aceiteHidraulicoCuartoEl = document.getElementById('aceite-hidraulico-cuarto');
+    const refrigeranteRojoEl = document.getElementById('refrigerante-rojo');
     const ureaEl = document.getElementById('urea');
 
     // Initialize
@@ -364,25 +470,41 @@
 
     function addRecord(r){ const arr = readStorage(); arr.push(r); writeStorage(arr); }
 
-    function formatoMoneda(v){ return '$' + Number(v).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); }
+    function formatoMoneda(v){ return '$' + Number(v).toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0}); }
 
     // Last generated record cache (for printing preview)
     let lastRecord = null;
 
     // Render recibos (two copies shown on screen) - quantities only
-    function renderRecibos(record){ recibosEl.innerHTML = ''; ['COPIA 1','COPIA 2'].forEach((titulo, idx)=>{
-      const div = document.createElement('div'); div.className='copy';
-      div.innerHTML = `<h4>${titulo}</h4>
-        <div><strong>Recibo - ${record.maquina}</strong></div>
-        <div class="small">Fecha: ${record.fecha}</div>
-        <hr />
-        <div>ACPM: ${Number(record.acpm_qty).toFixed(2)} L</div>
-        <div>CORRIENTE: ${Number(record.corriente_qty).toFixed(2)} L</div>
-        <div>UREA: ${Number(record.urea_qty).toFixed(2)} L</div>
-        <div class="small" style="margin-top:8px">Código: ${record.timestamp}</div>
-      `;
-      recibosEl.appendChild(div);
-    }); }
+    function renderRecibos(record){ 
+      recibosEl.innerHTML = ''; 
+      ['COPIA 1','COPIA 2'].forEach((titulo, idx)=>{
+        const div = document.createElement('div'); div.className='copy';
+        
+        // Crear lista de materiales con cantidades
+        let materialesHTML = '';
+        if (record.acpm_qty > 0) materialesHTML += `<div>ACPM: ${Number(record.acpm_qty).toFixed(2)} GL</div>`;
+        if (record.corriente_qty > 0) materialesHTML += `<div>CORRIENTE: ${Number(record.corriente_qty).toFixed(2)} GL</div>`;
+        if (record.grasa_qty > 0) materialesHTML += `<div>GRASA: ${Number(record.grasa_qty).toFixed(2)} LB</div>`;
+        if (record.aceite2t_qty > 0) materialesHTML += `<div>ACEITE 2T: ${Number(record.aceite2t_qty).toFixed(2)} 1/4</div>`;
+        if (record.aceite4t_qty > 0) materialesHTML += `<div>ACEITE 4T: ${Number(record.aceite4t_qty).toFixed(2)} 1/4</div>`;
+        if (record.aceite_pesado_qty > 0) materialesHTML += `<div>ACEITE MOTOR PESADO: ${Number(record.aceite_pesado_qty).toFixed(2)} 1/4</div>`;
+        if (record.aceite_liviano_qty > 0) materialesHTML += `<div>ACEITE MOTOR LIVIANO: ${Number(record.aceite_liviano_qty).toFixed(2)} 1/4</div>`;
+        if (record.aceite_hidraulico_gl_qty > 0) materialesHTML += `<div>ACEITE HIDRAULICO (GL): ${Number(record.aceite_hidraulico_gl_qty).toFixed(2)} GL</div>`;
+        if (record.aceite_hidraulico_cuarto_qty > 0) materialesHTML += `<div>ACEITE HIDRAULICO (1/4): ${Number(record.aceite_hidraulico_cuarto_qty).toFixed(2)} 1/4</div>`;
+        if (record.refrigerante_rojo_qty > 0) materialesHTML += `<div>REFRIGERANTE ROJO: ${Number(record.refrigerante_rojo_qty).toFixed(2)} 1/4</div>`;
+        if (record.urea_qty > 0) materialesHTML += `<div>UREA: ${Number(record.urea_qty).toFixed(2)} GL</div>`;
+        
+        div.innerHTML = `<h4>${titulo}</h4>
+          <div><strong>Recibo - ${record.maquina}</strong></div>
+          <div class="small">Fecha: ${record.fecha}</div>
+          <hr />
+          ${materialesHTML}
+          <div class="small" style="margin-top:8px">Código: ${record.timestamp}</div>
+        `;
+        recibosEl.appendChild(div);
+      }); 
+    }
 
     // Build printable HTML for two copies with page break between them
     function buildPrintableHtml(record){
@@ -397,6 +519,21 @@
           .page-break{page-break-before:always}
         </style>
       `;
+      
+      // Crear lista de materiales con cantidades para la impresión
+      let materialesHTML = '';
+      if (record.acpm_qty > 0) materialesHTML += `<div>ACPM: ${Number(record.acpm_qty).toFixed(2)} GL</div>`;
+      if (record.corriente_qty > 0) materialesHTML += `<div>CORRIENTE: ${Number(record.corriente_qty).toFixed(2)} GL</div>`;
+      if (record.grasa_qty > 0) materialesHTML += `<div>GRASA: ${Number(record.grasa_qty).toFixed(2)} LB</div>`;
+      if (record.aceite2t_qty > 0) materialesHTML += `<div>ACEITE 2T: ${Number(record.aceite2t_qty).toFixed(2)} 1/4</div>`;
+      if (record.aceite4t_qty > 0) materialesHTML += `<div>ACEITE 4T: ${Number(record.aceite4t_qty).toFixed(2)} 1/4</div>`;
+      if (record.aceite_pesado_qty > 0) materialesHTML += `<div>ACEITE MOTOR PESADO: ${Number(record.aceite_pesado_qty).toFixed(2)} 1/4</div>`;
+      if (record.aceite_liviano_qty > 0) materialesHTML += `<div>ACEITE MOTOR LIVIANO: ${Number(record.aceite_liviano_qty).toFixed(2)} 1/4</div>`;
+      if (record.aceite_hidraulico_gl_qty > 0) materialesHTML += `<div>ACEITE HIDRAULICO (GL): ${Number(record.aceite_hidraulico_gl_qty).toFixed(2)} GL</div>`;
+      if (record.aceite_hidraulico_cuarto_qty > 0) materialesHTML += `<div>ACEITE HIDRAULICO (1/4): ${Number(record.aceite_hidraulico_cuarto_qty).toFixed(2)} 1/4</div>`;
+      if (record.refrigerante_rojo_qty > 0) materialesHTML += `<div>REFRIGERANTE ROJO: ${Number(record.refrigerante_rojo_qty).toFixed(2)} 1/4</div>`;
+      if (record.urea_qty > 0) materialesHTML += `<div>UREA: ${Number(record.urea_qty).toFixed(2)} GL</div>`;
+      
       const copyHtml = (titulo)=>`
         <div class="copy print-window">
           <div class="header">
@@ -405,9 +542,7 @@
           </div>
           <div class="small">Máquina: ${record.maquina} · Fecha: ${record.fecha}</div>
           <div class="divider"></div>
-          <div>ACPM: ${Number(record.acpm_qty).toFixed(2)} L</div>
-          <div>CORRIENTE: ${Number(record.corriente_qty).toFixed(2)} L</div>
-          <div>UREA: ${Number(record.urea_qty).toFixed(2)} L</div>
+          ${materialesHTML}
         </div>
       `;
 
@@ -419,13 +554,42 @@
     function openPrintPreview(record){
       lastRecord = record;
       printPreviewContent.innerHTML = '';
-      const copy1 = document.createElement('div'); copy1.className = 'copy'; copy1.innerHTML = `<h4>COPIA 1</h4><div><strong>Recibo - ${record.maquina}</strong></div><div class=\"small\">Fecha: ${record.fecha}</div><hr /><div>ACPM: ${Number(record.acpm_qty).toFixed(2)} L</div><div>CORRIENTE: ${Number(record.corriente_qty).toFixed(2)} L</div><div>UREA: ${Number(record.urea_qty).toFixed(2)} L</div><div class=\"small\" style=\"margin-top:8px\">Código: ${record.timestamp}</div>`;
-      const copy2 = copy1.cloneNode(true); copy2.querySelector('h4').textContent = 'COPIA 2';
+      
+      // Crear lista de materiales con cantidades para la vista previa
+      let materialesHTML = '';
+      if (record.acpm_qty > 0) materialesHTML += `<div>ACPM: ${Number(record.acpm_qty).toFixed(2)} GL</div>`;
+      if (record.corriente_qty > 0) materialesHTML += `<div>CORRIENTE: ${Number(record.corriente_qty).toFixed(2)} GL</div>`;
+      if (record.grasa_qty > 0) materialesHTML += `<div>GRASA: ${Number(record.grasa_qty).toFixed(2)} LB</div>`;
+      if (record.aceite2t_qty > 0) materialesHTML += `<div>ACEITE 2T: ${Number(record.aceite2t_qty).toFixed(2)} 1/4</div>`;
+      if (record.aceite4t_qty > 0) materialesHTML += `<div>ACEITE 4T: ${Number(record.aceite4t_qty).toFixed(2)} 1/4</div>`;
+      if (record.aceite_pesado_qty > 0) materialesHTML += `<div>ACEITE MOTOR PESADO: ${Number(record.aceite_pesado_qty).toFixed(2)} 1/4</div>`;
+      if (record.aceite_liviano_qty > 0) materialesHTML += `<div>ACEITE MOTOR LIVIANO: ${Number(record.aceite_liviano_qty).toFixed(2)} 1/4</div>`;
+      if (record.aceite_hidraulico_gl_qty > 0) materialesHTML += `<div>ACEITE HIDRAULICO (GL): ${Number(record.aceite_hidraulico_gl_qty).toFixed(2)} GL</div>`;
+      if (record.aceite_hidraulico_cuarto_qty > 0) materialesHTML += `<div>ACEITE HIDRAULICO (1/4): ${Number(record.aceite_hidraulico_cuarto_qty).toFixed(2)} 1/4</div>`;
+      if (record.refrigerante_rojo_qty > 0) materialesHTML += `<div>REFRIGERANTE ROJO: ${Number(record.refrigerante_rojo_qty).toFixed(2)} 1/4</div>`;
+      if (record.urea_qty > 0) materialesHTML += `<div>UREA: ${Number(record.urea_qty).toFixed(2)} GL</div>`;
+      
+      const copy1 = document.createElement('div'); 
+      copy1.className = 'copy'; 
+      copy1.innerHTML = `<h4>COPIA 1</h4>
+        <div><strong>Recibo - ${record.maquina}</strong></div>
+        <div class="small">Fecha: ${record.fecha}</div>
+        <hr />
+        ${materialesHTML}
+        <div class="small" style="margin-top:8px">Código: ${record.timestamp}</div>`;
+      
+      const copy2 = copy1.cloneNode(true); 
+      copy2.querySelector('h4').textContent = 'COPIA 2';
+      
       printPreviewContent.appendChild(copy1);
-      const pageBreak = document.createElement('div'); pageBreak.className = 'page-break'; pageBreak.style.height='12px'; printPreviewContent.appendChild(pageBreak);
+      const pageBreak = document.createElement('div'); 
+      pageBreak.className = 'page-break'; 
+      pageBreak.style.height='12px'; 
+      printPreviewContent.appendChild(pageBreak);
       printPreviewContent.appendChild(copy2);
 
-      printModal.classList.remove('hidden'); document.body.insertAdjacentHTML('beforeend','<div class="backdrop"></div>');
+      printModal.classList.remove('hidden'); 
+      document.body.insertAdjacentHTML('beforeend','<div class="backdrop"></div>');
     }
 
     // Print both copies by opening a new window to ensure page-breaks and correct print preview
@@ -445,24 +609,195 @@
           .copy{padding:18px;border:1px solid #ddd;border-radius:8px}
         </style>
       `;
-      const copyHtml = `<div class="copy"><div style="display:flex;justify-content:space-between"><strong>Recibo - ${record.maquina} (${index===1? 'COPIA 1':'COPIA 2'})</strong><div>${record.timestamp}</div></div><div class="small">Fecha: ${record.fecha}</div><hr /><div>ACPM: ${Number(record.acpm_qty).toFixed(2)} L</div><div>CORRIENTE: ${Number(record.corriente_qty).toFixed(2)} L</div><div>UREA: ${Number(record.urea_qty).toFixed(2)} L</div></div>`;
+      
+      // Crear lista de materiales con cantidades para la impresión individual
+      let materialesHTML = '';
+      if (record.acpm_qty > 0) materialesHTML += `<div>ACPM: ${Number(record.acpm_qty).toFixed(2)} GL</div>`;
+      if (record.corriente_qty > 0) materialesHTML += `<div>CORRIENTE: ${Number(record.corriente_qty).toFixed(2)} GL</div>`;
+      if (record.grasa_qty > 0) materialesHTML += `<div>GRASA: ${Number(record.grasa_qty).toFixed(2)} LB</div>`;
+      if (record.aceite2t_qty > 0) materialesHTML += `<div>ACEITE 2T: ${Number(record.aceite2t_qty).toFixed(2)} 1/4</div>`;
+      if (record.aceite4t_qty > 0) materialesHTML += `<div>ACEITE 4T: ${Number(record.aceite4t_qty).toFixed(2)} 1/4</div>`;
+      if (record.aceite_pesado_qty > 0) materialesHTML += `<div>ACEITE MOTOR PESADO: ${Number(record.aceite_pesado_qty).toFixed(2)} 1/4</div>`;
+      if (record.aceite_liviano_qty > 0) materialesHTML += `<div>ACEITE MOTOR LIVIANO: ${Number(record.aceite_liviano_qty).toFixed(2)} 1/4</div>`;
+      if (record.aceite_hidraulico_gl_qty > 0) materialesHTML += `<div>ACEITE HIDRAULICO (GL): ${Number(record.aceite_hidraulico_gl_qty).toFixed(2)} GL</div>`;
+      if (record.aceite_hidraulico_cuarto_qty > 0) materialesHTML += `<div>ACEITE HIDRAULICO (1/4): ${Number(record.aceite_hidraulico_cuarto_qty).toFixed(2)} 1/4</div>`;
+      if (record.refrigerante_rojo_qty > 0) materialesHTML += `<div>REFRIGERANTE ROJO: ${Number(record.refrigerante_rojo_qty).toFixed(2)} 1/4</div>`;
+      if (record.urea_qty > 0) materialesHTML += `<div>UREA: ${Number(record.urea_qty).toFixed(2)} GL</div>`;
+      
+      const copyHtml = `<div class="copy">
+        <div style="display:flex;justify-content:space-between">
+          <strong>Recibo - ${record.maquina} (${index===1? 'COPIA 1':'COPIA 2'})</strong>
+          <div>${record.timestamp}</div>
+        </div>
+        <div class="small">Fecha: ${record.fecha}</div>
+        <hr />
+        ${materialesHTML}
+      </div>`;
+      
       const html = `<!doctype html><html><head><meta charset=\"utf-8\">${style}</head><body>${copyHtml}</body></html>`;
       const w = window.open('', '_blank'); w.document.open(); w.document.write(html); w.document.close(); w.onload = ()=>{ setTimeout(()=>{ w.focus(); w.print(); },200); };
     }
 
     // Render lista registros
     let showTotals = false;
-    function renderLista(){ if(showTotals){ renderTotalsGlobal(); return; } const arr = readStorage().slice().sort((a,b)=> new Date(b.timestamp) - new Date(a.timestamp)); if(arr.length===0){ listaRegistros.innerHTML = '<div class="small">No hay registros.</div>'; return; } listaRegistros.innerHTML = ''; arr.slice(0,200).forEach(r=>{ const d = document.createElement('div'); d.className='card'; d.style.marginBottom='8px'; d.innerHTML = `<div style="display:flex;justify-content:space-between"><div><strong>${r.maquina}</strong><div class='small'>${r.fecha} · ${new Date(r.timestamp).toLocaleString()}</div></div><div class='small'>ACPM: ${Number(r.acpm_qty).toFixed(2)} L<br>CORR: ${Number(r.corriente_qty).toFixed(2)} L<br>UREA: ${Number(r.urea_qty).toFixed(2)} L</div></div>`; listaRegistros.appendChild(d); }); }
-    function renderTotalsGlobal(){ const arr = readStorage(); if(arr.length===0){ listaRegistros.innerHTML = '<div class="small">No hay registros.</div>'; return; } const totals = {acpm:0,corriente:0,urea:0,money:0}; arr.forEach(r=>{ totals.acpm += Number(r.acpm_qty)||0; totals.corriente += Number(r.corriente_qty)||0; totals.urea += Number(r.urea_qty)||0; totals.money += Number(r.total_precio)||0; }); listaRegistros.innerHTML = `<div style='padding:12px'><div><strong>Totales globales</strong></div><div class='small' style='margin-top:8px'>ACPM: ${totals.acpm.toFixed(2)} L</div><div class='small'>CORRIENTE: ${totals.corriente.toFixed(2)} L</div><div class='small'>UREA: ${totals.urea.toFixed(2)} L</div><div style='margin-top:8px;font-weight:800'>Valor total (pesos): ${formatoMoneda(totals.money)}</div></div>`; }
+    function renderLista(){ 
+      if(showTotals){ 
+        renderTotalsGlobal(); 
+        return; 
+      } 
+      const arr = readStorage().slice().sort((a,b)=> new Date(b.timestamp) - new Date(a.timestamp)); 
+      if(arr.length===0){ 
+        listaRegistros.innerHTML = '<div class="small">No hay registros.</div>'; 
+        return; 
+      } 
+      listaRegistros.innerHTML = ''; 
+      arr.slice(0,200).forEach(r=>{ 
+        const d = document.createElement('div'); 
+        d.className='card'; 
+        d.style.marginBottom='8px'; 
+        
+        // Crear resumen de materiales para el registro
+        let materialesResumen = '';
+        if (r.acpm_qty > 0) materialesResumen += `ACPM: ${Number(r.acpm_qty).toFixed(2)} GL<br>`;
+        if (r.corriente_qty > 0) materialesResumen += `CORR: ${Number(r.corriente_qty).toFixed(2)} GL<br>`;
+        if (r.grasa_qty > 0) materialesResumen += `GRASA: ${Number(r.grasa_qty).toFixed(2)} LB<br>`;
+        if (r.aceite2t_qty > 0) materialesResumen += `ACEITE 2T: ${Number(r.aceite2t_qty).toFixed(2)} 1/4<br>`;
+        if (r.aceite4t_qty > 0) materialesResumen += `ACEITE 4T: ${Number(r.aceite4t_qty).toFixed(2)} 1/4<br>`;
+        if (r.aceite_pesado_qty > 0) materialesResumen += `ACEITE PESADO: ${Number(r.aceite_pesado_qty).toFixed(2)} 1/4<br>`;
+        if (r.aceite_liviano_qty > 0) materialesResumen += `ACEITE LIVIANO: ${Number(r.aceite_liviano_qty).toFixed(2)} 1/4<br>`;
+        if (r.aceite_hidraulico_gl_qty > 0) materialesResumen += `ACEITE HID GL: ${Number(r.aceite_hidraulico_gl_qty).toFixed(2)} GL<br>`;
+        if (r.aceite_hidraulico_cuarto_qty > 0) materialesResumen += `ACEITE HID 1/4: ${Number(r.aceite_hidraulico_cuarto_qty).toFixed(2)} 1/4<br>`;
+        if (r.refrigerante_rojo_qty > 0) materialesResumen += `REF ROJO: ${Number(r.refrigerante_rojo_qty).toFixed(2)} 1/4<br>`;
+        if (r.urea_qty > 0) materialesResumen += `UREA: ${Number(r.urea_qty).toFixed(2)} GL<br>`;
+        
+        d.innerHTML = `
+          <div style="display:flex;justify-content:space-between">
+            <div>
+              <strong>${r.maquina}</strong>
+              <div class='small'>${r.fecha} · ${new Date(r.timestamp).toLocaleString()}</div>
+            </div>
+            <div class='small'>${materialesResumen}</div>
+          </div>
+        `; 
+        listaRegistros.appendChild(d); 
+      }); 
+    }
+    
+    function renderTotalsGlobal(){ 
+      const arr = readStorage(); 
+      if(arr.length===0){ 
+        listaRegistros.innerHTML = '<div class="small">No hay registros.</div>'; 
+        return; 
+      } 
+      const totals = {
+        acpm:0, corriente:0, grasa:0, aceite2t:0, aceite4t:0, 
+        aceite_pesado:0, aceite_liviano:0, aceite_hidraulico_gl:0, 
+        aceite_hidraulico_cuarto:0, refrigerante_rojo:0, urea:0, money:0
+      }; 
+      arr.forEach(r=>{ 
+        totals.acpm += Number(r.acpm_qty)||0; 
+        totals.corriente += Number(r.corriente_qty)||0; 
+        totals.grasa += Number(r.grasa_qty)||0; 
+        totals.aceite2t += Number(r.aceite2t_qty)||0; 
+        totals.aceite4t += Number(r.aceite4t_qty)||0; 
+        totals.aceite_pesado += Number(r.aceite_pesado_qty)||0; 
+        totals.aceite_liviano += Number(r.aceite_liviano_qty)||0; 
+        totals.aceite_hidraulico_gl += Number(r.aceite_hidraulico_gl_qty)||0; 
+        totals.aceite_hidraulico_cuarto += Number(r.aceite_hidraulico_cuarto_qty)||0; 
+        totals.refrigerante_rojo += Number(r.refrigerante_rojo_qty)||0; 
+        totals.urea += Number(r.urea_qty)||0; 
+        totals.money += Number(r.total_precio)||0; 
+      }); 
+      listaRegistros.innerHTML = `
+        <div style='padding:12px'>
+          <div><strong>Totales globales</strong></div>
+          <div class='small' style='margin-top:8px'>
+            ${totals.acpm > 0 ? `ACPM: ${totals.acpm.toFixed(2)} GL<br>` : ''}
+            ${totals.corriente > 0 ? `CORRIENTE: ${totals.corriente.toFixed(2)} GL<br>` : ''}
+            ${totals.grasa > 0 ? `GRASA: ${totals.grasa.toFixed(2)} LB<br>` : ''}
+            ${totals.aceite2t > 0 ? `ACEITE 2T: ${totals.aceite2t.toFixed(2)} 1/4<br>` : ''}
+            ${totals.aceite4t > 0 ? `ACEITE 4T: ${totals.aceite4t.toFixed(2)} 1/4<br>` : ''}
+            ${totals.aceite_pesado > 0 ? `ACEITE MOTOR PESADO: ${totals.aceite_pesado.toFixed(2)} 1/4<br>` : ''}
+            ${totals.aceite_liviano > 0 ? `ACEITE MOTOR LIVIANO: ${totals.aceite_liviano.toFixed(2)} 1/4<br>` : ''}
+            ${totals.aceite_hidraulico_gl > 0 ? `ACEITE HIDRAULICO (GL): ${totals.aceite_hidraulico_gl.toFixed(2)} GL<br>` : ''}
+            ${totals.aceite_hidraulico_cuarto > 0 ? `ACEITE HIDRAULICO (1/4): ${totals.aceite_hidraulico_cuarto.toFixed(2)} 1/4<br>` : ''}
+            ${totals.refrigerante_rojo > 0 ? `REFRIGERANTE ROJO: ${totals.refrigerante_rojo.toFixed(2)} 1/4<br>` : ''}
+            ${totals.urea > 0 ? `UREA: ${totals.urea.toFixed(2)} GL<br>` : ''}
+          </div>
+          <div style='margin-top:8px;font-weight:800'>Valor total (pesos): ${formatoMoneda(totals.money)}</div>
+        </div>
+      `; 
+    }
 
     // Generate record
     btnGenerar.addEventListener('click', ()=>{
-      const maquina = maquinaEl.value; const fecha = fechaEl.value || new Date().toISOString().slice(0,10);
-      const acpm_qty = parseFloat(acpmEl.value) || 0; const corriente_qty = parseFloat(corrienteEl.value) || 0; const urea_qty = parseFloat(ureaEl.value) || 0;
+      const maquina = maquinaEl.value; 
+      const fecha = fechaEl.value || new Date().toISOString().slice(0,10);
+      const acpm_qty = parseFloat(acpmEl.value) || 0; 
+      const corriente_qty = parseFloat(corrienteEl.value) || 0; 
+      const grasa_qty = parseFloat(grasaEl.value) || 0; 
+      const aceite2t_qty = parseFloat(aceite2tEl.value) || 0; 
+      const aceite4t_qty = parseFloat(aceite4tEl.value) || 0; 
+      const aceite_pesado_qty = parseFloat(aceitePesadoEl.value) || 0; 
+      const aceite_liviano_qty = parseFloat(aceiteLivianoEl.value) || 0; 
+      const aceite_hidraulico_gl_qty = parseFloat(aceiteHidraulicoGlEl.value) || 0; 
+      const aceite_hidraulico_cuarto_qty = parseFloat(aceiteHidraulicoCuartoEl.value) || 0; 
+      const refrigerante_rojo_qty = parseFloat(refrigeranteRojoEl.value) || 0; 
+      const urea_qty = parseFloat(ureaEl.value) || 0; 
+      
       const prices = SETTINGS.prices || DEFAULT_PRICES;
-      const acpm_total = acpm_qty * prices.ACPM; const corriente_total = corriente_qty * prices.CORRIENTE; const urea_total = urea_qty * prices.UREA; const total_precio = acpm_total + corriente_total + urea_total;
-      const record = { timestamp: new Date().toISOString(), maquina, fecha, acpm_qty, corriente_qty, urea_qty, acpm_total, corriente_total, urea_total, total_precio };
-      addRecord(record); mensajeEl.innerHTML = '<div style="color:#34d399;font-weight:700">Registro guardado ✔</div>'; renderRecibos(record); renderLista(); renderResumen(); lastRecord = record;
+      const acpm_total = acpm_qty * prices.ACPM; 
+      const corriente_total = corriente_qty * prices.CORRIENTE; 
+      const grasa_total = grasa_qty * prices.GRASA; 
+      const aceite2t_total = aceite2t_qty * prices.ACEITE_2T; 
+      const aceite4t_total = aceite4t_qty * prices.ACEITE_4T; 
+      const aceite_pesado_total = aceite_pesado_qty * prices.ACEITE_MOTOR_PESADO; 
+      const aceite_liviano_total = aceite_liviano_qty * prices.ACEITE_MOTOR_LIVIANO; 
+      const aceite_hidraulico_gl_total = aceite_hidraulico_gl_qty * prices.ACEITE_HIDRAULICO_GL; 
+      const aceite_hidraulico_cuarto_total = aceite_hidraulico_cuarto_qty * prices.ACEITE_HIDRAULICO_CUARTO; 
+      const refrigerante_rojo_total = refrigerante_rojo_qty * prices.REFRIGERANTE_ROJO; 
+      const urea_total = urea_qty * prices.UREA; 
+      
+      const total_precio = acpm_total + corriente_total + grasa_total + aceite2t_total + 
+                          aceite4t_total + aceite_pesado_total + aceite_liviano_total + 
+                          aceite_hidraulico_gl_total + aceite_hidraulico_cuarto_total + 
+                          refrigerante_rojo_total + urea_total;
+      
+      const record = { 
+        timestamp: new Date().toISOString(), 
+        maquina, 
+        fecha, 
+        acpm_qty, 
+        corriente_qty, 
+        grasa_qty, 
+        aceite2t_qty, 
+        aceite4t_qty, 
+        aceite_pesado_qty, 
+        aceite_liviano_qty, 
+        aceite_hidraulico_gl_qty, 
+        aceite_hidraulico_cuarto_qty, 
+        refrigerante_rojo_qty, 
+        urea_qty, 
+        acpm_total, 
+        corriente_total, 
+        grasa_total, 
+        aceite2t_total, 
+        aceite4t_total, 
+        aceite_pesado_total, 
+        aceite_liviano_total, 
+        aceite_hidraulico_gl_total, 
+        aceite_hidraulico_cuarto_total, 
+        refrigerante_rojo_total, 
+        urea_total, 
+        total_precio 
+      };
+      
+      addRecord(record); 
+      mensajeEl.innerHTML = '<div style="color:#34d399;font-weight:700">Registro guardado ✔</div>'; 
+      renderRecibos(record); 
+      renderLista(); 
+      renderResumen(); 
+      lastRecord = record;
     });
 
     // Print both copies preview
@@ -505,7 +840,7 @@
     function openExcelModal(){ excelModal.classList.remove('hidden'); document.body.insertAdjacentHTML('beforeend','<div class="backdrop"></div>'); renderExcelTable(); }
     document.getElementById('btn-close-excel').addEventListener('click', ()=>{ excelModal.classList.add('hidden'); document.querySelectorAll('.backdrop').forEach(b=>b.remove()); });
     btnExportExcel.addEventListener('click', ()=>{ const arr = readStorage(); if(arr.length===0){ alert('No hay registros para exportar.'); return; } const ws = XLSX.utils.json_to_sheet(arr); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'registros'); const wbout = XLSX.write(wb, {bookType:'xlsx', type:'array'}); const blob = new Blob([wbout],{type:'application/octet-stream'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download='registros_combustible.xlsx'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); });
-    function renderExcelTable(){ const tbody = document.querySelector('#table-excel tbody'); const arr = readStorage().slice().sort((a,b)=> new Date(b.timestamp)-new Date(a.timestamp)); tbody.innerHTML=''; arr.forEach(r=>{ const tr = document.createElement('tr'); tr.innerHTML = `<td>${r.timestamp}</td><td>${r.maquina}</td><td>${r.fecha}</td><td>${Number(r.acpm_qty).toFixed(2)}</td><td>${Number(r.corriente_qty).toFixed(2)}</td><td>${Number(r.urea_qty).toFixed(2)}</td><td>${formatoMoneda(r.total_precio)}</td>`; tbody.appendChild(tr); }); }
+    function renderExcelTable(){ const tbody = document.querySelector('#table-excel tbody'); const arr = readStorage().slice().sort((a,b)=> new Date(b.timestamp)-new Date(a.timestamp)); tbody.innerHTML=''; arr.forEach(r=>{ const tr = document.createElement('tr'); tr.innerHTML = `<td>${r.timestamp}</td><td>${r.maquina}</td><td>${r.fecha}</td><td>${Number(r.acpm_qty).toFixed(2)}</td><td>${Number(r.corriente_qty).toFixed(2)}</td><td>${Number(r.grasa_qty).toFixed(2)}</td><td>${Number(r.aceite2t_qty).toFixed(2)}</td><td>${Number(r.aceite4t_qty).toFixed(2)}</td><td>${Number(r.aceite_pesado_qty).toFixed(2)}</td><td>${Number(r.aceite_liviano_qty).toFixed(2)}</td><td>${Number(r.aceite_hidraulico_gl_qty).toFixed(2)}</td><td>${Number(r.aceite_hidraulico_cuarto_qty).toFixed(2)}</td><td>${Number(r.refrigerante_rojo_qty).toFixed(2)}</td><td>${Number(r.urea_qty).toFixed(2)}</td><td>${formatoMoneda(r.total_precio)}</td>`; tbody.appendChild(tr); }); }
 
     // SETTINGS: prompt and modal
     function promptSettings(){ const pw = prompt('Ingrese la contraseña para abrir Ajustes:'); if(pw === ADMIN_PASSWORD){ openSettings(); } else { alert('Contraseña incorrecta'); } }
@@ -514,6 +849,14 @@
       document.body.insertAdjacentHTML('beforeend','<div class="backdrop"></div>'); 
       priceAcpmEl.value = (SETTINGS.prices && SETTINGS.prices.ACPM) ? SETTINGS.prices.ACPM : DEFAULT_PRICES.ACPM; 
       priceCorrEl.value = (SETTINGS.prices && SETTINGS.prices.CORRIENTE) ? SETTINGS.prices.CORRIENTE : DEFAULT_PRICES.CORRIENTE; 
+      priceGrasaEl.value = (SETTINGS.prices && SETTINGS.prices.GRASA) ? SETTINGS.prices.GRASA : DEFAULT_PRICES.GRASA; 
+      priceAceite2tEl.value = (SETTINGS.prices && SETTINGS.prices.ACEITE_2T) ? SETTINGS.prices.ACEITE_2T : DEFAULT_PRICES.ACEITE_2T; 
+      priceAceite4tEl.value = (SETTINGS.prices && SETTINGS.prices.ACEITE_4T) ? SETTINGS.prices.ACEITE_4T : DEFAULT_PRICES.ACEITE_4T; 
+      priceAceitePesadoEl.value = (SETTINGS.prices && SETTINGS.prices.ACEITE_MOTOR_PESADO) ? SETTINGS.prices.ACEITE_MOTOR_PESADO : DEFAULT_PRICES.ACEITE_MOTOR_PESADO; 
+      priceAceiteLivianoEl.value = (SETTINGS.prices && SETTINGS.prices.ACEITE_MOTOR_LIVIANO) ? SETTINGS.prices.ACEITE_MOTOR_LIVIANO : DEFAULT_PRICES.ACEITE_MOTOR_LIVIANO; 
+      priceAceiteHidraulicoGlEl.value = (SETTINGS.prices && SETTINGS.prices.ACEITE_HIDRAULICO_GL) ? SETTINGS.prices.ACEITE_HIDRAULICO_GL : DEFAULT_PRICES.ACEITE_HIDRAULICO_GL; 
+      priceAceiteHidraulicoCuartoEl.value = (SETTINGS.prices && SETTINGS.prices.ACEITE_HIDRAULICO_CUARTO) ? SETTINGS.prices.ACEITE_HIDRAULICO_CUARTO : DEFAULT_PRICES.ACEITE_HIDRAULICO_CUARTO; 
+      priceRefrigeranteRojoEl.value = (SETTINGS.prices && SETTINGS.prices.REFRIGERANTE_ROJO) ? SETTINGS.prices.REFRIGERANTE_ROJO : DEFAULT_PRICES.REFRIGERANTE_ROJO; 
       priceUreaEl.value = (SETTINGS.prices && SETTINGS.prices.UREA) ? SETTINGS.prices.UREA : DEFAULT_PRICES.UREA; 
       valorContratoMCEl.value = SETTINGS.valorContratoMC || 0;
       allowAiEl.checked = SETTINGS.allowAI; 
@@ -521,7 +864,19 @@
     }
     btnCloseSettings.addEventListener('click', ()=>{ settingsModal.classList.add('hidden'); document.querySelectorAll('.backdrop').forEach(b=>b.remove()); });
     btnSaveSettings.addEventListener('click', ()=>{ 
-      SETTINGS.prices = {ACPM: parseFloat(priceAcpmEl.value)||DEFAULT_PRICES.ACPM, CORRIENTE: parseFloat(priceCorrEl.value)||DEFAULT_PRICES.CORRIENTE, UREA: parseFloat(priceUreaEl.value)||DEFAULT_PRICES.UREA }; 
+      SETTINGS.prices = {
+        ACPM: parseFloat(priceAcpmEl.value)||DEFAULT_PRICES.ACPM, 
+        CORRIENTE: parseFloat(priceCorrEl.value)||DEFAULT_PRICES.CORRIENTE, 
+        GRASA: parseFloat(priceGrasaEl.value)||DEFAULT_PRICES.GRASA, 
+        ACEITE_2T: parseFloat(priceAceite2tEl.value)||DEFAULT_PRICES.ACEITE_2T, 
+        ACEITE_4T: parseFloat(priceAceite4tEl.value)||DEFAULT_PRICES.ACEITE_4T, 
+        ACEITE_MOTOR_PESADO: parseFloat(priceAceitePesadoEl.value)||DEFAULT_PRICES.ACEITE_MOTOR_PESADO, 
+        ACEITE_MOTOR_LIVIANO: parseFloat(priceAceiteLivianoEl.value)||DEFAULT_PRICES.ACEITE_MOTOR_LIVIANO, 
+        ACEITE_HIDRAULICO_GL: parseFloat(priceAceiteHidraulicoGlEl.value)||DEFAULT_PRICES.ACEITE_HIDRAULICO_GL, 
+        ACEITE_HIDRAULICO_CUARTO: parseFloat(priceAceiteHidraulicoCuartoEl.value)||DEFAULT_PRICES.ACEITE_HIDRAULICO_CUARTO, 
+        REFRIGERANTE_ROJO: parseFloat(priceRefrigeranteRojoEl.value)||DEFAULT_PRICES.REFRIGERANTE_ROJO, 
+        UREA: parseFloat(priceUreaEl.value)||DEFAULT_PRICES.UREA
+      }; 
       SETTINGS.allowAI = allowAiEl.checked; 
       SETTINGS.openaiKey = openaiKeyEl.value.trim(); 
       SETTINGS.valorContratoMC = parseFloat(valorContratoMCEl.value) || 0;
@@ -550,9 +905,21 @@
       let totalGeneral = 0;
       const resumen = {}; 
       arr.forEach(r=>{ 
-        if(!resumen[r.maquina]) resumen[r.maquina]={acpm:0,corriente:0,urea:0,total:0}; 
+        if(!resumen[r.maquina]) resumen[r.maquina] = {
+          acpm:0, corriente:0, grasa:0, aceite2t:0, aceite4t:0, 
+          aceite_pesado:0, aceite_liviano:0, aceite_hidraulico_gl:0, 
+          aceite_hidraulico_cuarto:0, refrigerante_rojo:0, urea:0, total:0
+        }; 
         resumen[r.maquina].acpm += Number(r.acpm_qty)||0; 
         resumen[r.maquina].corriente += Number(r.corriente_qty)||0; 
+        resumen[r.maquina].grasa += Number(r.grasa_qty)||0; 
+        resumen[r.maquina].aceite2t += Number(r.aceite2t_qty)||0; 
+        resumen[r.maquina].aceite4t += Number(r.aceite4t_qty)||0; 
+        resumen[r.maquina].aceite_pesado += Number(r.aceite_pesado_qty)||0; 
+        resumen[r.maquina].aceite_liviano += Number(r.aceite_liviano_qty)||0; 
+        resumen[r.maquina].aceite_hidraulico_gl += Number(r.aceite_hidraulico_gl_qty)||0; 
+        resumen[r.maquina].aceite_hidraulico_cuarto += Number(r.aceite_hidraulico_cuarto_qty)||0; 
+        resumen[r.maquina].refrigerante_rojo += Number(r.refrigerante_rojo_qty)||0; 
         resumen[r.maquina].urea += Number(r.urea_qty)||0; 
         const valorRegistro = Number(r.total_precio)||0;
         resumen[r.maquina].total += valorRegistro;
@@ -564,11 +931,25 @@
       const valorRestante = (SETTINGS.valorContratoMC || 0) - totalGeneral;
       valorRestanteContratoEl.textContent = formatoMoneda(valorRestante);
       
-      let html = '<table class="summary-table"><thead><tr><th>Máquina</th><th>ACPM (L)</th><th>CORRIENTE (L)</th><th>UREA (L)</th><th>Valor (pesos)</th></tr></thead><tbody>';
+      let html = '<table class="summary-table"><thead><tr><th>Máquina</th><th>ACPM (GL)</th><th>CORRIENTE (GL)</th><th>GRASA (LB)</th><th>ACEITE 2T (1/4)</th><th>ACEITE 4T (1/4)</th><th>ACEITE MOTOR PESADO (1/4)</th><th>ACEITE MOTOR LIVIANO (1/4)</th><th>ACEITE HIDRAULICO (GL)</th><th>ACEITE HIDRAULICO (1/4)</th><th>REFRIGERANTE ROJO (1/4)</th><th>UREA (GL)</th><th>Valor (pesos)</th></tr></thead><tbody>';
       const labels = [], dataTotals = [], palette = ['rgba(59,130,246,0.9)','rgba(99,102,241,0.9)','rgba(16,185,129,0.9)','rgba(236,72,153,0.9)','rgba(250,204,21,0.9)'];
       for(const m in resumen){ 
         const r = resumen[m]; 
-        html += `<tr><td>${m}</td><td>${r.acpm.toFixed(2)}</td><td>${r.corriente.toFixed(2)}</td><td>${r.urea.toFixed(2)}</td><td>${formatoMoneda(r.total)}</td></tr>`; 
+        html += `<tr>
+          <td>${m}</td>
+          <td>${r.acpm.toFixed(2)}</td>
+          <td>${r.corriente.toFixed(2)}</td>
+          <td>${r.grasa.toFixed(2)}</td>
+          <td>${r.aceite2t.toFixed(2)}</td>
+          <td>${r.aceite4t.toFixed(2)}</td>
+          <td>${r.aceite_pesado.toFixed(2)}</td>
+          <td>${r.aceite_liviano.toFixed(2)}</td>
+          <td>${r.aceite_hidraulico_gl.toFixed(2)}</td>
+          <td>${r.aceite_hidraulico_cuarto.toFixed(2)}</td>
+          <td>${r.refrigerante_rojo.toFixed(2)}</td>
+          <td>${r.urea.toFixed(2)}</td>
+          <td>${formatoMoneda(r.total)}</td>
+        </tr>`; 
         labels.push(m); 
         dataTotals.push(Number(r.total.toFixed(2))); 
       }
@@ -613,7 +994,7 @@
 
     // PDF generation (kept same as previous)
     btnGeneratePdf.addEventListener('click', async ()=>{ const arr = readStorage(); if(arr.length===0){ alert('No hay datos para generar el PDF.'); return; } // simplified: reuse previous PDF builder
-      const resumen = {}; arr.forEach(r=>{ if(!resumen[r.maquina]) resumen[r.maquina]={acpm:0,corriente:0,urea:0,total:0,count:0}; resumen[r.maquina].acpm += Number(r.acpm_qty)||0; resumen[r.maquina].corriente += Number(r.corriente_qty)||0; resumen[r.maquina].urea += Number(r.urea_qty)||0; resumen[r.maquina].total += Number(r.total_precio)||0; resumen[r.maquina].count +=1; });
+      const resumen = {}; arr.forEach(r=>{ if(!resumen[r.maquina]) resumen[r.maquina]={acpm:0,corriente:0,grasa:0,aceite2t:0,aceite4t:0,aceite_pesado:0,aceite_liviano:0,aceite_hidraulico_gl:0,aceite_hidraulico_cuarto:0,refrigerante_rojo:0,urea:0,total:0,count:0}; resumen[r.maquina].acpm += Number(r.acpm_qty)||0; resumen[r.maquina].corriente += Number(r.corriente_qty)||0; resumen[r.maquina].grasa += Number(r.grasa_qty)||0; resumen[r.maquina].aceite2t += Number(r.aceite2t_qty)||0; resumen[r.maquina].aceite4t += Number(r.aceite4t_qty)||0; resumen[r.maquina].aceite_pesado += Number(r.aceite_pesado_qty)||0; resumen[r.maquina].aceite_liviano += Number(r.aceite_liviano_qty)||0; resumen[r.maquina].aceite_hidraulico_gl += Number(r.aceite_hidraulico_gl_qty)||0; resumen[r.maquina].aceite_hidraulico_cuarto += Number(r.aceite_hidraulico_cuarto_qty)||0; resumen[r.maquina].refrigerante_rojo += Number(r.refrigerante_rojo_qty)||0; resumen[r.maquina].urea += Number(r.urea_qty)||0; resumen[r.maquina].total += Number(r.total_precio)||0; resumen[r.maquina].count +=1; });
       // Build small chart image
       const tempCanvas = document.createElement('canvas'); tempCanvas.width = 1000; tempCanvas.height = 450; const ctx = tempCanvas.getContext('2d'); const labels = Object.keys(resumen); const dataTotals = labels.map(m=>resumen[m].total.toFixed(2)); new Chart(ctx, {type:'bar', data:{labels, datasets:[{label:'Valor total (pesos)', data:dataTotals, backgroundColor:['#3b82f6','#6366f1','#10b981','#ef4444','#f59e0b']}]} , options:{responsive:false,plugins:{legend:{display:false}}}}); await new Promise(r=>setTimeout(r,500)); const chartDataUrl = tempCanvas.toDataURL('image/png');
       // AI summary optional (omitted here for brevity)
@@ -626,4 +1007,5 @@
   </script>
 </body>
 </html>
+
 
