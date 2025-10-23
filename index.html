@@ -59,6 +59,11 @@
     .print-preview{background:#fff;padding:12px;border-radius:6px}
     .print-preview .copy{background:transparent;border:1px solid #e6e6e6;color:#000}
 
+    /* Total y valor restante */
+    .total-section {margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);}
+    .total-row {display: flex; justify-content: space-between; margin-bottom: 8px;}
+    .total-row.total-final {border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; margin-top: 10px; font-weight: bold;}
+
     /* Print styles: ensure each copy on its own page */
     @media print {
       @page { size: A4; margin: 20mm; }
@@ -88,7 +93,7 @@
     </div>
     <div class="center">
       <button class="btn ghost" id="btn-ir-excel">Ir a Excel (AC)</button>
-      <button class="btn ghost" id="btn-descargar-xlsx">Descargar Excel</button>
+      <button class="btn ghost" id="btn-resetar">Resetar</button>
     </div>
   </header>
 
@@ -182,6 +187,19 @@
         <canvas id="chartTotales" style="margin-top:12px;max-height:260px;background:transparent"></canvas>
 
         <div id="resumen" style="margin-top:12px"></div>
+        
+        <!-- Sección de totales agregada -->
+        <div class="total-section">
+          <h4 style="margin-top:0">Resumen Financiero</h4>
+          <div class="total-row">
+            <span>Valor total consumido:</span>
+            <span id="valor-total-consumido">$0</span>
+          </div>
+          <div class="total-row total-final">
+            <span>Valor restante del contrato MC:</span>
+            <span id="valor-restante-contrato">$0</span>
+          </div>
+        </div>
 
         <h4 style="margin-top:12px">Registros / Totales</h4>
         <div id="lista-registros" style="max-height:320px;overflow:auto;margin-top:8px"></div>
@@ -223,6 +241,10 @@
           <input type="number" id="price-corriente" step="0.1" />
           <label>Precio UREA (actual)</label>
           <input type="number" id="price-urea" step="0.1" />
+          
+          <!-- Campo agregado para el valor del contrato MC -->
+          <label style="margin-top:12px">Valor del contrato MC (pesos)</label>
+          <input type="number" id="valor-contrato-mc" step="0.01" />
 
           <label style="margin-top:12px">Opciones de exportación / IA</label>
           <div style="display:flex;gap:8px;align-items:center;margin-top:6px">
@@ -262,14 +284,27 @@
     const SETTINGS_KEY = 'combustible_settings_v1';
 
     // Load settings or defaults
-    function loadSettings(){ const sRaw = localStorage.getItem(SETTINGS_KEY); if(!sRaw) return {prices:DEFAULT_PRICES, allowAI:false, openaiKey:''}; try{return JSON.parse(sRaw);}catch(e){return {prices:DEFAULT_PRICES, allowAI:false, openaiKey:''}} }
+    function loadSettings(){ 
+      const sRaw = localStorage.getItem(SETTINGS_KEY); 
+      if(!sRaw) return {prices:DEFAULT_PRICES, allowAI:false, openaiKey:'', valorContratoMC:0}; 
+      try{
+        const settings = JSON.parse(sRaw);
+        // Asegurar que existe valorContratoMC
+        if (settings.valorContratoMC === undefined) {
+          settings.valorContratoMC = 0;
+        }
+        return settings;
+      }catch(e){
+        return {prices:DEFAULT_PRICES, allowAI:false, openaiKey:'', valorContratoMC:0};
+      } 
+    }
     function saveSettings(s){ localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); }
     let SETTINGS = loadSettings();
 
     // DOM refs
     const menuCards = document.querySelectorAll('.menu-card');
     const btnIrExcel = document.getElementById('btn-ir-excel');
-    const btnDescargarXLSX = document.getElementById('btn-descargar-xlsx');
+    const btnResetar = document.getElementById('btn-resetar');
     const btnGenerar = document.getElementById('btn-generar');
     const btnPreviewPrint = document.getElementById('btn-preview-print');
     const btnPrintCopia1 = document.getElementById('btn-print-copia1');
@@ -279,12 +314,15 @@
     const mensajeEl = document.getElementById('mensaje');
     const listaRegistros = document.getElementById('lista-registros');
     const resumenEl = document.getElementById('resumen');
-    const btnResumen = document.getElementById('btn-resumen');
     const btnGeneratePdf = document.getElementById('btn-generate-pdf');
     const chartCanvas = document.getElementById('chartTotales');
     const chartTypeSel = document.getElementById('chart-type');
     const btnToggleRecent = document.getElementById('btn-toggle-recent');
     const btnDownloadChart = document.getElementById('btn-download-chart');
+    
+    // Nuevos elementos para totales
+    const valorTotalConsumidoEl = document.getElementById('valor-total-consumido');
+    const valorRestanteContratoEl = document.getElementById('valor-restante-contrato');
 
     const settingsModal = document.getElementById('settings-modal');
     const btnCloseSettings = document.getElementById('btn-close-settings');
@@ -292,6 +330,7 @@
     const priceAcpmEl = document.getElementById('price-acpm');
     const priceCorrEl = document.getElementById('price-corriente');
     const priceUreaEl = document.getElementById('price-urea');
+    const valorContratoMCEl = document.getElementById('valor-contrato-mc');
     const allowAiEl = document.getElementById('allow-ai');
     const openaiKeyEl = document.getElementById('openai-key');
 
@@ -443,6 +482,23 @@
     btnPrintCopia1.addEventListener('click', ()=>{ if(!lastRecord){ alert('Genera un registro primero.'); return; } printSingleCopy(lastRecord,1); });
     btnPrintCopia2.addEventListener('click', ()=>{ if(!lastRecord){ alert('Genera un registro primero.'); return; } printSingleCopy(lastRecord,2); });
 
+    // Resetar datos (reemplaza la función de descargar Excel)
+    btnResetar.addEventListener('click', ()=>{ 
+      const pw = prompt('Ingrese la contraseña para resetear los datos:');
+      if(pw === ADMIN_PASSWORD){
+        if(confirm('¿Está seguro de que desea borrar todos los datos? Esta acción no se puede deshacer.')){
+          localStorage.removeItem(STORAGE_KEY);
+          alert('Todos los datos han sido borrados exitosamente.');
+          // Actualizar la interfaz
+          renderLista();
+          renderResumen();
+          location.reload();
+        }
+      } else {
+        alert('Contraseña incorrecta');
+      }
+    });
+
     // Additional controls (excel, pdf etc.) remain same as previous version
     // Excel modal protected by password
     btnIrExcel.addEventListener('click', ()=>{ const pw = prompt('Ingrese la contraseña para ver el Excel:'); if(pw === ADMIN_PASSWORD){ openExcelModal(); } else { alert('Contraseña incorrecta'); } });
@@ -453,22 +509,105 @@
 
     // SETTINGS: prompt and modal
     function promptSettings(){ const pw = prompt('Ingrese la contraseña para abrir Ajustes:'); if(pw === ADMIN_PASSWORD){ openSettings(); } else { alert('Contraseña incorrecta'); } }
-    function openSettings(){ settingsModal.classList.remove('hidden'); document.body.insertAdjacentHTML('beforeend','<div class="backdrop"></div>'); priceAcpmEl.value = (SETTINGS.prices && SETTINGS.prices.ACPM) ? SETTINGS.prices.ACPM : DEFAULT_PRICES.ACPM; priceCorrEl.value = (SETTINGS.prices && SETTINGS.prices.CORRIENTE) ? SETTINGS.prices.CORRIENTE : DEFAULT_PRICES.CORRIENTE; priceUreaEl.value = (SETTINGS.prices && SETTINGS.prices.UREA) ? SETTINGS.prices.UREA : DEFAULT_PRICES.UREA; allowAiEl.checked = SETTINGS.allowAI; openaiKeyEl.value = SETTINGS.openaiKey || ''; }
+    function openSettings(){ 
+      settingsModal.classList.remove('hidden'); 
+      document.body.insertAdjacentHTML('beforeend','<div class="backdrop"></div>'); 
+      priceAcpmEl.value = (SETTINGS.prices && SETTINGS.prices.ACPM) ? SETTINGS.prices.ACPM : DEFAULT_PRICES.ACPM; 
+      priceCorrEl.value = (SETTINGS.prices && SETTINGS.prices.CORRIENTE) ? SETTINGS.prices.CORRIENTE : DEFAULT_PRICES.CORRIENTE; 
+      priceUreaEl.value = (SETTINGS.prices && SETTINGS.prices.UREA) ? SETTINGS.prices.UREA : DEFAULT_PRICES.UREA; 
+      valorContratoMCEl.value = SETTINGS.valorContratoMC || 0;
+      allowAiEl.checked = SETTINGS.allowAI; 
+      openaiKeyEl.value = SETTINGS.openaiKey || ''; 
+    }
     btnCloseSettings.addEventListener('click', ()=>{ settingsModal.classList.add('hidden'); document.querySelectorAll('.backdrop').forEach(b=>b.remove()); });
-    btnSaveSettings.addEventListener('click', ()=>{ SETTINGS.prices = {ACPM: parseFloat(priceAcpmEl.value)||DEFAULT_PRICES.ACPM, CORRIENTE: parseFloat(priceCorrEl.value)||DEFAULT_PRICES.CORRIENTE, UREA: parseFloat(priceUreaEl.value)||DEFAULT_PRICES.UREA }; SETTINGS.allowAI = allowAiEl.checked; SETTINGS.openaiKey = openaiKeyEl.value.trim(); saveSettings(SETTINGS); applySettingsToUI(); alert('Ajustes guardados'); settingsModal.classList.add('hidden'); document.querySelectorAll('.backdrop').forEach(b=>b.remove()); });
+    btnSaveSettings.addEventListener('click', ()=>{ 
+      SETTINGS.prices = {ACPM: parseFloat(priceAcpmEl.value)||DEFAULT_PRICES.ACPM, CORRIENTE: parseFloat(priceCorrEl.value)||DEFAULT_PRICES.CORRIENTE, UREA: parseFloat(priceUreaEl.value)||DEFAULT_PRICES.UREA }; 
+      SETTINGS.allowAI = allowAiEl.checked; 
+      SETTINGS.openaiKey = openaiKeyEl.value.trim(); 
+      SETTINGS.valorContratoMC = parseFloat(valorContratoMCEl.value) || 0;
+      saveSettings(SETTINGS); 
+      applySettingsToUI(); 
+      alert('Ajustes guardados'); 
+      settingsModal.classList.add('hidden'); 
+      document.querySelectorAll('.backdrop').forEach(b=>b.remove()); 
+      renderResumen(); // Actualizar el resumen con el nuevo valor del contrato
+    });
     function applySettingsToUI(){ /* nothing to visually change on main UI; prices used internally */ }
 
     // PDF generation and charts (kept minimal here; same logic from previous version)
     let chartInst = null;
-    function renderResumen(){ const arr = readStorage(); if(arr.length===0){ resumenEl.innerHTML = '<div class="small">No hay registros.</div>'; if(chartInst){ chartInst.destroy(); chartInst=null;} return; }
-      const resumen = {}; arr.forEach(r=>{ if(!resumen[r.maquina]) resumen[r.maquina]={acpm:0,corriente:0,urea:0,total:0}; resumen[r.maquina].acpm += Number(r.acpm_qty)||0; resumen[r.maquina].corriente += Number(r.corriente_qty)||0; resumen[r.maquina].urea += Number(r.urea_qty)||0; resumen[r.maquina].total += Number(r.total_precio)||0; });
+    function renderResumen(){ 
+      const arr = readStorage(); 
+      if(arr.length===0){ 
+        resumenEl.innerHTML = '<div class="small">No hay registros.</div>'; 
+        valorTotalConsumidoEl.textContent = '$0';
+        valorRestanteContratoEl.textContent = '$0';
+        if(chartInst){ chartInst.destroy(); chartInst=null;} 
+        return; 
+      }
+      
+      // Calcular total general
+      let totalGeneral = 0;
+      const resumen = {}; 
+      arr.forEach(r=>{ 
+        if(!resumen[r.maquina]) resumen[r.maquina]={acpm:0,corriente:0,urea:0,total:0}; 
+        resumen[r.maquina].acpm += Number(r.acpm_qty)||0; 
+        resumen[r.maquina].corriente += Number(r.corriente_qty)||0; 
+        resumen[r.maquina].urea += Number(r.urea_qty)||0; 
+        const valorRegistro = Number(r.total_precio)||0;
+        resumen[r.maquina].total += valorRegistro;
+        totalGeneral += valorRegistro;
+      });
+      
+      // Actualizar totales
+      valorTotalConsumidoEl.textContent = formatoMoneda(totalGeneral);
+      const valorRestante = (SETTINGS.valorContratoMC || 0) - totalGeneral;
+      valorRestanteContratoEl.textContent = formatoMoneda(valorRestante);
+      
       let html = '<table class="summary-table"><thead><tr><th>Máquina</th><th>ACPM (L)</th><th>CORRIENTE (L)</th><th>UREA (L)</th><th>Valor (pesos)</th></tr></thead><tbody>';
       const labels = [], dataTotals = [], palette = ['rgba(59,130,246,0.9)','rgba(99,102,241,0.9)','rgba(16,185,129,0.9)','rgba(236,72,153,0.9)','rgba(250,204,21,0.9)'];
-      for(const m in resumen){ const r = resumen[m]; html += `<tr><td>${m}</td><td>${r.acpm.toFixed(2)}</td><td>${r.corriente.toFixed(2)}</td><td>${r.urea.toFixed(2)}</td><td>${formatoMoneda(r.total)}</td></tr>`; labels.push(m); dataTotals.push(Number(r.total.toFixed(2))); }
+      for(const m in resumen){ 
+        const r = resumen[m]; 
+        html += `<tr><td>${m}</td><td>${r.acpm.toFixed(2)}</td><td>${r.corriente.toFixed(2)}</td><td>${r.urea.toFixed(2)}</td><td>${formatoMoneda(r.total)}</td></tr>`; 
+        labels.push(m); 
+        dataTotals.push(Number(r.total.toFixed(2))); 
+      }
       html += '</tbody></table>';
       resumenEl.innerHTML = html;
-      const type = chartTypeSel.value || 'bar'; const ctx = chartCanvas.getContext('2d'); if(chartInst) chartInst.destroy(); chartInst = new Chart(ctx, {type, data:{labels, datasets:[{label:'Valor total (pesos)', data:dataTotals, backgroundColor:palette, borderColor:palette.map(c=>c.replace('0.9','1')), borderWidth:1}]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom'}},scales:{y:{beginAtZero:true}}}});
+      
+      const type = chartTypeSel.value || 'bar'; 
+      const ctx = chartCanvas.getContext('2d'); 
+      if(chartInst) chartInst.destroy(); 
+      chartInst = new Chart(ctx, {
+        type, 
+        data:{
+          labels, 
+          datasets:[{
+            label:'Valor total (pesos)', 
+            data:dataTotals, 
+            backgroundColor:palette, 
+            borderColor:palette.map(c=>c.replace('0.9','1')), 
+            borderWidth:1
+          }]
+        }, 
+        options:{
+          responsive:true,
+          maintainAspectRatio:false,
+          plugins:{
+            legend:{
+              display:true,
+              position:'bottom'
+            }
+          },
+          scales:{
+            y:{
+              beginAtZero:true
+            }
+          }
+        }
+      });
     }
+    
     chartTypeSel.addEventListener('change', ()=>{ renderResumen(); });
     btnDownloadChart.addEventListener('click', ()=>{ if(!chartInst){ alert('Genera el resumen primero.'); return; } chartCanvas.style.background = 'transparent'; const link = document.createElement('a'); link.download = 'grafica.png'; link.href = chartCanvas.toDataURL('image/png'); document.body.appendChild(link); link.click(); link.remove(); });
 
@@ -481,7 +620,8 @@
       const { jsPDF } = window.jspdf; const pdf = new jsPDF({unit:'pt',format:'a4'}); pdf.setFontSize(18); pdf.text('Informe Profesional - Combustible', 40, 50); pdf.setFontSize(10); pdf.text(`Generado por: Cristian · Fecha: ${new Date().toLocaleString()}`, 40, 70); pdf.addImage(chartDataUrl, 'PNG', 40, 90, 520, 250); pdf.addPage(); pdf.text('Detalles por máquina', 40, 40); pdf.save('resumen_combustible_profesional.pdf'); });
 
     // Initial renders
-    renderLista(); renderResumen();
+    renderLista(); 
+    renderResumen();
     setTimeout(()=>{ renderResumen(); },300);
   </script>
 </body>
