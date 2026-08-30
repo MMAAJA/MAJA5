@@ -1139,94 +1139,96 @@
     renderResumen();
     setTimeout(()=>{ renderResumen(); },300);
   </script>
-<script>
-  // Tu enlace oficial de Google Apps Script integrado
+
+  <script>
+  // Tu enlace de Google Apps Script
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx74ysS12KRzH2bXu7XOwKVgj6ChpC9o12NbEU_R6ASAeDunsz4TMQUHB-naUBnydUb/exec";
 
-  // 1. LEER DATOS AL ABRIR LA PÁGINA (Actualiza consolidados y gráficas para cualquier usuario)
-  async function cargarConsolidadosYGraficas() {
+  // Función para enviar los datos del formulario a Google Sheets
+  async function enviarAGoogleSheets(record) {
     try {
-      const response = await fetch(SCRIPT_URL);
-      const historial = await response.json();
-
-      if (!Array.isArray(historial)) return;
-
-      // Variables para sumar todo el historial acumulado
-      let totalDinero = 0;
-      let totalAcpm = 0;
-      let totalCorriente = 0;
-
-      historial.forEach(registro => {
-        totalDinero += registro.total || 0;
-        totalAcpm += registro.acpm || 0;
-        totalCorriente += registro.corriente || 0;
-      });
-
-      // Actualiza los cuadros resumen en tu HTML (Asegúrate de que los id coincidan con tus elementos)
-      if (document.getElementById('resumen_dinero')) {
-        document.getElementById('resumen_dinero').innerText = "$" + totalDinero.toLocaleString('es-CO');
-      }
-      if (document.getElementById('resumen_acpm')) {
-        document.getElementById('resumen_acpm').innerText = totalAcpm + " GL";
-      }
-
-    } catch (error) {
-      console.error("Error al cargar consolidados desde Google Sheets:", error);
-    }
-  }
-
-  // 2. GUARDAR RECIBO (Envia la fila horizontal con ceros en campos vacíos)
-  async function guardarEnGoogleSheets() {
-    const datos = {
-      timestamp: new Date().toISOString(),
-      codigo: document.getElementById('input_codigo')?.value || new Date().toISOString(),
-      ordenPedido: document.getElementById('input_orden')?.value || "1",
-      contrato: "SASI-007-2025",
-      fecha: document.getElementById('input_fecha')?.value || new Date().toLocaleDateString('es-CO'),
-      maquina: document.getElementById('input_vehiculo')?.value || "RETRO",
-      nombreResponsable: document.getElementById('input_responsable')?.value || "DAVID GRISALES VALENCIA",
-
-      // Conversión numérica: si está vacío o no es número, guarda 0
-      acpm_qty: parseFloat(document.getElementById('cant_acpm')?.value) || 0,
-      corriente_qty: parseFloat(document.getElementById('cant_corriente')?.value) || 0,
-      grasa_qty: parseFloat(document.getElementById('cant_grasa')?.value) || 0,
-      aceite2t_qty: parseFloat(document.getElementById('cant_aceite2t')?.value) || 0,
-      aceite4t_qty: parseFloat(document.getElementById('cant_aceite4t')?.value) || 0,
-      aceite_pesado_qty: parseFloat(document.getElementById('cant_aceite_pesado')?.value) || 0,
-      aceite_liviano_qty: parseFloat(document.getElementById('cant_aceite_liviano')?.value) || 0,
-      hidraulico_gl_qty: parseFloat(document.getElementById('cant_hidraulico_gl')?.value) || 0,
-      hidraulico_cuarto_qty: parseFloat(document.getElementById('cant_hidraulico_cuarto')?.value) || 0,
-      refrigerante_qty: parseFloat(document.getElementById('cant_refrigerante')?.value) || 0,
-      urea_qty: parseFloat(document.getElementById('cant_urea')?.value) || 0,
-
-      total_precio: parseFloat(document.getElementById('total_precio')?.value) || 0
-    };
-
-    try {
+      mensajeEl.innerHTML += ' <span style="color:#60a5fa">(Enviando a Google Sheets...)</span>';
+      
       await fetch(SCRIPT_URL, {
         method: "POST",
         mode: "cors",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(datos)
+        body: JSON.stringify(record)
       });
 
-      // Refresca automáticamente los consolidados y gráficas al guardar un nuevo recibo
-      await cargarConsolidadosYGraficas();
+      mensajeEl.innerHTML = '<div style="color:#34d399;font-weight:700">¡Registro guardado y enviado a Google Sheets con éxito! ✔</div>';
     } catch (error) {
-      console.error("Error al enviar el recibo a la nube:", error);
+      console.error("Error al enviar a Google Sheets:", error);
+      mensajeEl.innerHTML = '<div style="color:#f87171;font-weight:700">Guardado en caché local, pero falló la conexión con Google Sheets.</div>';
     }
   }
 
-  // 3. ACTIVADORES AUTOMÁTICOS
-  // Carga las gráficas/totales al entrar al enlace
-  window.addEventListener('DOMContentLoaded', cargarConsolidadosYGraficas);
+  // Evento al presionar "Generar recibo"
+  btnGenerar.addEventListener('click', ()=>{
+    const maquina = maquinaEl.value; 
+    const fecha = fechaEl.value || new Date().toISOString().slice(0,10);
+    const acpm_qty = parseFloat(acpmEl.value) || 0; 
+    const corriente_qty = parseFloat(corrienteEl.value) || 0; 
+    const grasa_qty = parseFloat(grasaEl.value) || 0; 
+    const aceite2t_qty = parseFloat(aceite2tEl.value) || 0; 
+    const aceite4t_qty = parseFloat(aceite4tEl.value) || 0; 
+    const aceite_pesado_qty = parseFloat(aceitePesadoEl.value) || 0; 
+    const aceite_liviano_qty = parseFloat(aceiteLivianoEl.value) || 0; 
+    const aceite_hidraulico_gl_qty = parseFloat(aceiteHidraulicoGlEl.value) || 0; 
+    const aceite_hidraulico_cuarto_qty = parseFloat(aceiteHidraulicoCuartoEl.value) || 0; 
+    const refrigerante_rojo_qty = parseFloat(refrigeranteRojoEl.value) || 0; 
+    const urea_qty = parseFloat(ureaEl.value) || 0; 
+    
+    const prices = SETTINGS.prices || DEFAULT_PRICES;
+    const acpm_total = acpm_qty * prices.ACPM; 
+    const corriente_total = corriente_qty * prices.CORRIENTE; 
+    const grasa_total = grasa_qty * prices.GRASA; 
+    const aceite2t_total = aceite2t_qty * prices.ACEITE_2T; 
+    const aceite4t_total = aceite4t_qty * prices.ACEITE_4T; 
+    const aceite_pesado_total = aceite_pesado_qty * prices.ACEITE_MOTOR_PESADO; 
+    const aceite_liviano_total = aceite_liviano_qty * prices.ACEITE_MOTOR_LIVIANO; 
+    const aceite_hidraulico_gl_total = aceite_hidraulico_gl_qty * prices.ACEITE_HIDRAULICO_GL; 
+    const aceite_hidraulico_cuarto_total = aceite_hidraulico_cuarto_qty * prices.ACEITE_HIDRAULICO_CUARTO; 
+    const refrigerante_rojo_total = refrigerante_rojo_qty * prices.REFRIGERANTE_ROJO; 
+    const urea_total = urea_qty * prices.UREA; 
+    
+    const total_precio = acpm_total + corriente_total + grasa_total + aceite2t_total + 
+                        aceite4t_total + aceite_pesado_total + aceite_liviano_total + 
+                        aceite_hidraulico_gl_total + aceite_hidraulico_cuarto_total + 
+                        refrigerante_rojo_total + urea_total;
+    
+    const orderNumber = getNextOrderNumber(maquina);
+    
+    const record = { 
+      timestamp: new Date().toISOString(), 
+      maquina, 
+      fecha, 
+      acpm_qty, 
+      corriente_qty, 
+      grasa_qty, 
+      aceite2t_qty, 
+      aceite4t_qty, 
+      aceite_pesado_qty, 
+      aceite_liviano_qty, 
+      aceite_hidraulico_gl_qty, 
+      aceite_hidraulico_cuarto_qty, 
+      refrigerante_rojo_qty, 
+      urea_qty, 
+      total_precio,
+      orderNumber
+    };
+    
+    // 1. Guardar en almacenamiento local/caché de la interfaz
+    addRecord(record); 
+    renderRecibos(record); 
+    renderLista(); 
+    renderResumen(); 
+    lastRecord = record;
 
-  // Escucha el botón "Generar recibo" (Ajusta 'btnGenerar' al ID exacto de tu botón)
-  document.getElementById('btnGenerar')?.addEventListener('click', function(e) {
-    e.preventDefault();
-    guardarEnGoogleSheets();
+    // 2. Enviar automáticamente a la hoja de Google Sheets
+    enviarAGoogleSheets(record);
   });
-</script>
+  </script>
 </body>
 </html>
 
