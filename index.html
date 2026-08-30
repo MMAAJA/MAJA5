@@ -1225,6 +1225,34 @@
 
     enviarAGoogleSheets(record);
   });
+
+
+
+
+    // Función para cargar los datos de Google Sheets al iniciar
+  async function cargarDatosDesdeGoogleSheets() {
+    try {
+      const res = await fetch(SCRIPT_URL);
+      const json = await res.json();
+      
+      if (json.status === "success" && Array.isArray(json.data)) {
+        // Reemplaza o complementa tus registros locales con los de Google Sheets
+        records = json.data; 
+        
+        // Actualiza la interfaz, listas y gráficas
+        renderLista();
+        renderResumen();
+        console.log("Datos cargados correctamente desde Google Sheets.");
+      }
+    } catch (error) {
+      console.error("No se pudieron cargar los datos de Google Sheets:", error);
+    }
+  }
+  
+  // Ejecutar al abrir la página
+  document.addEventListener("DOMContentLoaded", () => {
+    cargarDatosDesdeGoogleSheets();
+  });
   </script>
 </body>
 </html>
