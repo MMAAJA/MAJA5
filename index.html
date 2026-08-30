@@ -454,11 +454,12 @@
   };
   const ADMIN_PASSWORD = 'AC.ardila2006';
   const SETTINGS_KEY = 'combustible_settings_v2';
+  // ==== REEMPLAZA ESTA URL CON LA DE TU SCRIPT PUBLICADO ====
   const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz-_lv4_Gfq6exv2pMR1UpfmYimhoU7pvG-lpv2_sMK6xsgE6E1adHVyKjq-3YfSHpU/exec';
 
   // Variables globales
   let SETTINGS = loadSettings();
-  let registros = [];               // Todos los registros cargados desde Google Sheets
+  let registros = [];
   let lastRecord = null;
   let chartInst = null;
   let showTotals = false;
@@ -567,7 +568,7 @@
         // Recargar datos para actualizar la vista
         await cargarRegistros(false);
       } else {
-        mensajeEl.innerHTML = '<div style="color:#dc3545;font-weight:700">Error al guardar en Google Sheets.</div>';
+        mensajeEl.innerHTML = '<div style="color:#dc3545;font-weight:700">Error al guardar en Google Sheets: ' + (json.message || '') + '</div>';
       }
     } catch (error) {
       console.error('Error al enviar a Google Sheets:', error);
@@ -859,8 +860,6 @@
   function actualizarInterfaz() {
     renderLista();
     renderResumen();
-    // Si hay un último registro, mantenerlo visible en recibos (opcional)
-    // No lo re-renderizamos automáticamente para no perderlo.
   }
 
   // ============================================================
@@ -890,6 +889,20 @@
 
     const orderNumber = getNextOrderNumber(maquina);
 
+    // Calcular total con los precios actuales
+    const prices = SETTINGS.prices || DEFAULT_PRICES;
+    const total_precio = (acpm_qty * prices.ACPM) +
+                        (corriente_qty * prices.CORRIENTE) +
+                        (grasa_qty * prices.GRASA) +
+                        (aceite2t_qty * prices.ACEITE_2T) +
+                        (aceite4t_qty * prices.ACEITE_4T) +
+                        (aceite_pesado_qty * prices.ACEITE_MOTOR_PESADO) +
+                        (aceite_liviano_qty * prices.ACEITE_MOTOR_LIVIANO) +
+                        (aceite_hidraulico_gl_qty * prices.ACEITE_HIDRAULICO_GL) +
+                        (aceite_hidraulico_cuarto_qty * prices.ACEITE_HIDRAULICO_CUARTO) +
+                        (refrigerante_rojo_qty * prices.REFRIGERANTE_ROJO) +
+                        (urea_qty * prices.UREA);
+
     const record = {
       timestamp: new Date().toISOString(),
       maquina,
@@ -906,7 +919,7 @@
       refrigerante_rojo_qty,
       urea_qty,
       orderNumber,
-      total_precio: 0 // se recalcula en el servidor, pero lo enviamos por consistencia
+      total_precio
     };
 
     // Mostrar en pantalla el recibo localmente antes de guardar
@@ -915,7 +928,6 @@
 
     // Enviar a Google Sheets y recargar
     await enviarAGoogleSheets(record);
-    // Después de guardar, se recargan los registros y se actualiza la interfaz
   });
 
   // Limpiar formulario
@@ -1227,7 +1239,6 @@
 
 </body>
 </html>
-
 
 
 
