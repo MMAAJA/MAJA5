@@ -1,23 +1,4 @@
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <!doctype html>
 <html lang="es">
 <head>
@@ -1158,6 +1139,94 @@
     renderResumen();
     setTimeout(()=>{ renderResumen(); },300);
   </script>
+<script>
+  // Tu enlace oficial de Google Apps Script integrado
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx74ysS12KRzH2bXu7XOwKVgj6ChpC9o12NbEU_R6ASAeDunsz4TMQUHB-naUBnydUb/exec";
+
+  // 1. LEER DATOS AL ABRIR LA PÁGINA (Actualiza consolidados y gráficas para cualquier usuario)
+  async function cargarConsolidadosYGraficas() {
+    try {
+      const response = await fetch(SCRIPT_URL);
+      const historial = await response.json();
+
+      if (!Array.isArray(historial)) return;
+
+      // Variables para sumar todo el historial acumulado
+      let totalDinero = 0;
+      let totalAcpm = 0;
+      let totalCorriente = 0;
+
+      historial.forEach(registro => {
+        totalDinero += registro.total || 0;
+        totalAcpm += registro.acpm || 0;
+        totalCorriente += registro.corriente || 0;
+      });
+
+      // Actualiza los cuadros resumen en tu HTML (Asegúrate de que los id coincidan con tus elementos)
+      if (document.getElementById('resumen_dinero')) {
+        document.getElementById('resumen_dinero').innerText = "$" + totalDinero.toLocaleString('es-CO');
+      }
+      if (document.getElementById('resumen_acpm')) {
+        document.getElementById('resumen_acpm').innerText = totalAcpm + " GL";
+      }
+
+    } catch (error) {
+      console.error("Error al cargar consolidados desde Google Sheets:", error);
+    }
+  }
+
+  // 2. GUARDAR RECIBO (Envia la fila horizontal con ceros en campos vacíos)
+  async function guardarEnGoogleSheets() {
+    const datos = {
+      timestamp: new Date().toISOString(),
+      codigo: document.getElementById('input_codigo')?.value || new Date().toISOString(),
+      ordenPedido: document.getElementById('input_orden')?.value || "1",
+      contrato: "SASI-007-2025",
+      fecha: document.getElementById('input_fecha')?.value || new Date().toLocaleDateString('es-CO'),
+      maquina: document.getElementById('input_vehiculo')?.value || "RETRO",
+      nombreResponsable: document.getElementById('input_responsable')?.value || "DAVID GRISALES VALENCIA",
+
+      // Conversión numérica: si está vacío o no es número, guarda 0
+      acpm_qty: parseFloat(document.getElementById('cant_acpm')?.value) || 0,
+      corriente_qty: parseFloat(document.getElementById('cant_corriente')?.value) || 0,
+      grasa_qty: parseFloat(document.getElementById('cant_grasa')?.value) || 0,
+      aceite2t_qty: parseFloat(document.getElementById('cant_aceite2t')?.value) || 0,
+      aceite4t_qty: parseFloat(document.getElementById('cant_aceite4t')?.value) || 0,
+      aceite_pesado_qty: parseFloat(document.getElementById('cant_aceite_pesado')?.value) || 0,
+      aceite_liviano_qty: parseFloat(document.getElementById('cant_aceite_liviano')?.value) || 0,
+      hidraulico_gl_qty: parseFloat(document.getElementById('cant_hidraulico_gl')?.value) || 0,
+      hidraulico_cuarto_qty: parseFloat(document.getElementById('cant_hidraulico_cuarto')?.value) || 0,
+      refrigerante_qty: parseFloat(document.getElementById('cant_refrigerante')?.value) || 0,
+      urea_qty: parseFloat(document.getElementById('cant_urea')?.value) || 0,
+
+      total_precio: parseFloat(document.getElementById('total_precio')?.value) || 0
+    };
+
+    try {
+      await fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(datos)
+      });
+
+      // Refresca automáticamente los consolidados y gráficas al guardar un nuevo recibo
+      await cargarConsolidadosYGraficas();
+    } catch (error) {
+      console.error("Error al enviar el recibo a la nube:", error);
+    }
+  }
+
+  // 3. ACTIVADORES AUTOMÁTICOS
+  // Carga las gráficas/totales al entrar al enlace
+  window.addEventListener('DOMContentLoaded', cargarConsolidadosYGraficas);
+
+  // Escucha el botón "Generar recibo" (Ajusta 'btnGenerar' al ID exacto de tu botón)
+  document.getElementById('btnGenerar')?.addEventListener('click', function(e) {
+    e.preventDefault();
+    guardarEnGoogleSheets();
+  });
+</script>
 </body>
 </html>
 
