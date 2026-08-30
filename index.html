@@ -1140,14 +1140,14 @@
     setTimeout(()=>{ renderResumen(); },300);
   </script>
 
-  <script>
-  // Tu enlace de Google Apps Script
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxILZZdPfO8eDpdpl32T3EhIAXUgen-LNzKLmsaCEnJ_hG1au9XzqgcvAMp6DZfyrJX/exec";
 
-  // Función para enviar los datos del formulario a Google Sheets
+  <script>
+  // Pega aquí la nueva URL generada al hacer "Nueva implementación"
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzeZF63rw5ZzO8joZmQBnOiQJgCrf_gbxSFsyse_j6B45YKIVolFBtUKGARX5PGCavg/exec";
+
   async function enviarAGoogleSheets(record) {
     try {
-      mensajeEl.innerHTML += ' <span style="color:#60a5fa">(Enviando a Google Sheets...)</span>';
+      mensajeEl.innerHTML += ' <span style="color:#60a5fa">(Guardando en Excel...)</span>';
       
       await fetch(SCRIPT_URL, {
         method: "POST",
@@ -1156,14 +1156,13 @@
         body: JSON.stringify(record)
       });
 
-      mensajeEl.innerHTML = '<div style="color:#34d399;font-weight:700">¡Registro guardado y enviado a Google Sheets con éxito! ✔</div>';
+      mensajeEl.innerHTML = '<div style="color:#34d399;font-weight:700">¡Registro guardado exitosamente en Google Sheets! ✔</div>';
     } catch (error) {
       console.error("Error al enviar a Google Sheets:", error);
-      mensajeEl.innerHTML = '<div style="color:#f87171;font-weight:700">Guardado en caché local, pero falló la conexión con Google Sheets.</div>';
+      mensajeEl.innerHTML = '<div style="color:#f87171;font-weight:700">Guardado localmente, pero falló la sincronización con Google Sheets.</div>';
     }
   }
 
-  // Evento al presionar "Generar recibo"
   btnGenerar.addEventListener('click', ()=>{
     const maquina = maquinaEl.value; 
     const fecha = fechaEl.value || new Date().toISOString().slice(0,10);
@@ -1218,14 +1217,12 @@
       orderNumber
     };
     
-    // 1. Guardar en almacenamiento local/caché de la interfaz
     addRecord(record); 
     renderRecibos(record); 
     renderLista(); 
     renderResumen(); 
     lastRecord = record;
 
-    // 2. Enviar automáticamente a la hoja de Google Sheets
     enviarAGoogleSheets(record);
   });
   </script>
