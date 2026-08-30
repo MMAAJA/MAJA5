@@ -26,6 +26,7 @@
       align-items: center;
       justify-content: space-between;
       border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
     }
     .brand { display: flex; align-items: center; gap: 12px; }
     .logo {
@@ -69,9 +70,9 @@
     }
     .hidden { display: none; }
     .qty-row {
-      display: flex; gap: 10px; margin-top: 10px;
+      display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;
     }
-    .qty-row > div { flex: 1; }
+    .qty-row > div { flex: 1; min-width: 100px; }
 
     .actions {
       display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap;
@@ -122,9 +123,9 @@
     }
 
     .top-actions {
-      display: flex; justify-content: space-between; gap: 10px; align-items: center;
+      display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap;
     }
-    .center { display: flex; align-items: center; gap: 12px; }
+    .center { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 
     .chart-controls {
       display: flex; gap: 8px; align-items: center; margin-top: 10px; flex-wrap: wrap;
@@ -218,6 +219,23 @@
       .menu-grid { grid-template-columns: repeat(2,1fr); }
       .two-copies { flex-direction: column; }
     }
+
+    /* Loader */
+    .loader {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #ccc;
+      border-radius: 50%;
+      border-top-color: #0d6efd;
+      animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .sync-status {
+      font-size: 13px;
+      color: var(--muted);
+      margin-left: 8px;
+    }
   </style>
 
   <!-- Librerías -->
@@ -236,6 +254,7 @@
     </div>
   </div>
   <div class="center">
+    <button class="btn ghost" id="btn-refresh"><span style="font-size:18px;">⟳</span> Refrescar</button>
     <button class="btn ghost" id="btn-ir-excel">Ir a Excel (AC)</button>
     <button class="btn ghost" id="btn-resetar">Resetar</button>
   </div>
@@ -344,7 +363,7 @@
         <div class="total-row total-final"><span>Valor restante del contrato MC:</span><span id="valor-restante-contrato">$0</span></div>
       </div>
 
-      <h4 style="margin-top:12px">Registros / Totales</h4>
+      <h4 style="margin-top:12px">Registros / Totales <span class="sync-status" id="sync-status"></span></h4>
       <div id="lista-registros" style="max-height:320px;overflow:auto;margin-top:8px"></div>
     </div>
   </div>
@@ -469,6 +488,7 @@
   const btnDownloadChart = $('btn-download-chart');
   const valorTotalConsumidoEl = $('valor-total-consumido');
   const valorRestanteContratoEl = $('valor-restante-contrato');
+  const syncStatus = $('sync-status');
 
   // ============================================================
   // Funciones de carga/guardado de ajustes (solo precios y contrato)
@@ -487,14 +507,17 @@
   // ============================================================
   // Comunicación con Google Sheets
   // ============================================================
-  async function cargarRegistros() {
+  async function cargarRegistros(showLoader = true) {
+    if (showLoader) {
+      syncStatus.innerHTML = '<span class="loader"></span> Cargando...';
+    }
     try {
       const res = await fetch(SCRIPT_URL);
       const json = await res.json();
+      console.log('Respuesta de Google Sheets:', json);
+
       if (json.status === 'success' && Array.isArray(json.data)) {
-        registros = json.data;
-        // Asegurar que cada registro tenga campos numéricos
-        registros = registros.map(r => ({
+        registros = json.data.map(r => ({
           ...r,
           acpm_qty: parseFloat(r.acpm_qty) || 0,
           corriente_qty: parseFloat(r.corriente_qty) || 0,
@@ -510,16 +533,21 @@
           total_precio: parseFloat(r.total_precio) || 0,
           orderNumber: parseInt(r.orderNumber) || 1,
         }));
+        syncStatus.innerHTML = `✅ ${registros.length} registros`;
         actualizarInterfaz();
       } else {
-        console.warn('No se pudieron cargar datos, se usarán registros vacíos.');
+        console.warn('Datos no válidos:', json);
         registros = [];
+        syncStatus.innerHTML = '⚠️ Sin datos';
         actualizarInterfaz();
+        mensajeEl.innerHTML = '<div style="color:#dc3545;">No se pudieron cargar los datos de Google Sheets. Verifica la URL o la conexión.</div>';
       }
     } catch (error) {
       console.error('Error al cargar desde Google Sheets:', error);
       registros = [];
+      syncStatus.innerHTML = '❌ Error de red';
       actualizarInterfaz();
+      mensajeEl.innerHTML = '<div style="color:#dc3545;">Error de conexión con Google Sheets. Intenta refrescar más tarde.</div>';
     }
   }
 
@@ -533,10 +561,11 @@
         body: JSON.stringify(record)
       });
       const json = await res.json();
+      console.log('Respuesta POST:', json);
       if (json.status === 'success') {
         mensajeEl.innerHTML = '<div style="color:#198754;font-weight:700">✔ Registro guardado en Google Sheets</div>';
         // Recargar datos para actualizar la vista
-        await cargarRegistros();
+        await cargarRegistros(false);
       } else {
         mensajeEl.innerHTML = '<div style="color:#dc3545;font-weight:700">Error al guardar en Google Sheets.</div>';
       }
@@ -786,7 +815,6 @@
     </tr></thead><tbody>`;
     const labels = [], data = [];
     const palette = ['#0d6efd','#6610f2','#198754','#dc3545','#ffc107','#fd7e14'];
-    let idx = 0;
     for (const m in resumen) {
       const r = resumen[m];
       html += `<tr>
@@ -831,13 +859,18 @@
   function actualizarInterfaz() {
     renderLista();
     renderResumen();
-    // Si hay un último registro generado, volver a mostrarlo en recibos (opcional)
+    // Si hay un último registro, mantenerlo visible en recibos (opcional)
     // No lo re-renderizamos automáticamente para no perderlo.
   }
 
   // ============================================================
   // Eventos principales
   // ============================================================
+
+  // Botón Refrescar manual
+  $('btn-refresh').addEventListener('click', () => {
+    cargarRegistros(true);
+  });
 
   // Generar recibo
   $('btn-generar').addEventListener('click', async () => {
@@ -873,8 +906,7 @@
       refrigerante_rojo_qty,
       urea_qty,
       orderNumber,
-      // El total se calculará en el servidor o aquí, pero lo enviamos también
-      total_precio: 0 // lo calcula el servidor o lo ignoramos
+      total_precio: 0 // se recalcula en el servidor, pero lo enviamos por consistencia
     };
 
     // Mostrar en pantalla el recibo localmente antes de guardar
@@ -1046,7 +1078,6 @@
     pdf.addImage(chartDataUrl, 'PNG', 40, 90, 520, 250);
     pdf.addPage();
     pdf.text('Detalles por máquina', 40, 40);
-    // Agregar tabla de resumen
     let y = 60;
     pdf.setFontSize(10);
     for (const m in resumen) {
@@ -1170,13 +1201,11 @@
     renderResumen(); // actualiza valor restante
   });
 
-  // Resetar datos (borra todo en Google Sheets? No implementado, solo borra local, pero como los datos vienen de Sheets, este botón no tiene efecto real)
+  // Resetar datos (borra todo en Google Sheets? No implementado, solo aviso)
   $('btn-resetar').addEventListener('click', () => {
     const pw = prompt('Ingrese la contraseña para resetear (borrar todos los datos en Google Sheets):');
     if (pw === ADMIN_PASSWORD) {
       if (confirm('¿Está seguro? Esto borrará todos los registros en la hoja de cálculo.')) {
-        // Aquí habría que llamar a un endpoint de eliminación, pero no está disponible.
-        // Como no tenemos endpoint DELETE, solo mostramos mensaje.
         alert('Función no implementada: debes borrar los datos manualmente desde Google Sheets.');
       }
     } else {
@@ -1189,11 +1218,11 @@
 
   // Cargar datos al inicio
   (async function init() {
-    await cargarRegistros();
+    await cargarRegistros(true);
   })();
 
-  // También refrescar cada 60 segundos (opcional)
-  setInterval(() => { cargarRegistros(); }, 60000);
+  // Refrescar automático cada 60 segundos
+  setInterval(() => { cargarRegistros(false); }, 60000);
 </script>
 
 </body>
