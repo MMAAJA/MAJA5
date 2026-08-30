@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="es">
 <head>
@@ -7,1256 +6,1198 @@
   <title>Alcaldía Municipal de Jericó - Antioquia</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
   <style>
-    :root{--bg:#0f172a;--card:#0b1220;--accent:#06b6d4;--muted:#94a3b8}
-    *{box-sizing:border-box;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial}
-    body{margin:0;background:linear-gradient(180deg,#071129 0%, #081224 100%);color:#e6eef8;-webkit-font-smoothing:antialiased}
-    header{padding:22px 28px;display:flex;align-items:center;justify-content:space-between}
-    .brand{display:flex;align-items:center;gap:12px}
-    .logo{width:46px;height:46px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#3b82f6);display:flex;align-items:center;justify-content:center;color:#021025;font-weight:800}
-    h1{margin:0;font-size:18px}
+    :root {
+      --bg: #ffffff;
+      --card: #f8f9fa;
+      --accent: #0d6efd;
+      --muted: #6c757d;
+      --border: #dee2e6;
+    }
+    * { box-sizing: border-box; font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: #212529;
+      -webkit-font-smoothing: antialiased;
+    }
+    header {
+      padding: 22px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .logo {
+      width: 46px; height: 46px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), #3b82f6);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-weight: 800;
+    }
+    h1 { margin: 0; font-size: 18px; color: #0b1b33; }
+    .small { font-size: 13px; color: var(--muted); }
 
-    .container{max-width:1200px;margin:18px auto;padding:18px}
+    .container { max-width: 1200px; margin: 18px auto; padding: 18px; }
 
-    /* Menu elegante */
-    .menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:24px}
-    .menu-card{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 6px 20px rgba(2,6,23,0.6);cursor:pointer;transition:transform .16s ease, box-shadow .16s ease}
-    .menu-card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(2,6,23,0.7)}
-    .menu-card h3{margin:0 0 6px 0}
-    .menu-card p{margin:0;color:var(--muted);font-size:13px}
+    /* Menú */
+    .menu-grid {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; margin-bottom: 24px;
+    }
+    .menu-card {
+      background: var(--card); padding: 18px; border-radius: 12px;
+      border: 1px solid var(--border); cursor: pointer;
+      transition: transform .16s ease, box-shadow .16s ease;
+    }
+    .menu-card:hover { transform: translateY(-6px); box-shadow: 0 12px 28px rgba(0,0,0,0.08); }
+    .menu-card h3 { margin: 0 0 6px 0; color: #0b1b33; }
+    .menu-card p { margin: 0; color: var(--muted); font-size: 13px; }
 
-    .layout{display:grid;grid-template-columns:1fr 420px;gap:18px}
-    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+    .layout {
+      display: grid; grid-template-columns: 1fr 420px; gap: 18px;
+    }
+    .card {
+      background: var(--card); padding: 18px; border-radius: 12px;
+      border: 1px solid var(--border);
+    }
 
-    label{display:block;margin-top:10px;color:var(--muted);font-size:13px}
-    select,input[type="date"],input[type="number"],input[type="text"]{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit;margin-top:6px}
-    .hidden{display:none}
-    .qty-row{display:flex;gap:10px;margin-top:10px}
-    .qty-row > div{flex:1}
+    label {
+      display: block; margin-top: 10px; color: var(--muted); font-size: 13px;
+    }
+    select, input[type="date"], input[type="number"], input[type="text"] {
+      width: 100%; padding: 10px; border-radius: 8px;
+      border: 1px solid var(--border); background: #fff; color: #212529; margin-top: 6px;
+    }
+    .hidden { display: none; }
+    .qty-row {
+      display: flex; gap: 10px; margin-top: 10px;
+    }
+    .qty-row > div { flex: 1; }
 
-    .actions{display:flex;gap:10px;margin-top:14px}
-    .btn{padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:700}
-    .btn.primary{background:linear-gradient(90deg,var(--accent),#3b82f6);color:#031125}
-    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:#cfe9f2}
+    .actions {
+      display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap;
+    }
+    .btn {
+      padding: 10px 14px; border-radius: 10px; border: none; cursor: pointer;
+      font-weight: 700; font-size: 14px;
+    }
+    .btn.primary {
+      background: linear-gradient(90deg, var(--accent), #3b82f6);
+      color: #fff;
+    }
+    .btn.ghost {
+      background: transparent; border: 1px solid var(--border); color: #212529;
+    }
+    .btn.ghost:hover {
+      background: #e9ecef;
+    }
 
-    .two-copies{display:flex;gap:12px;margin-top:18px}
-    .copy{flex:1;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:14px;border-radius:10px;border:1px dashed rgba(255,255,255,0.04)}
-    .copy h4{margin:0 0 8px 0}
+    .two-copies {
+      display: flex; gap: 12px; margin-top: 18px; flex-wrap: wrap;
+    }
+    .copy {
+      flex: 1; background: #fff; padding: 14px; border-radius: 10px;
+      border: 1px solid var(--border); min-width: 280px;
+    }
+    .copy h4 { margin: 0 0 8px 0; }
 
-    .small{font-size:13px;color:var(--muted)}
+    .summary-table {
+      width: 100%; border-collapse: collapse; margin-top: 10px;
+      font-size: 13px;
+    }
+    .summary-table th, .summary-table td {
+      padding: 6px 8px; border-bottom: 1px solid var(--border); text-align: left;
+    }
+    .summary-table th {
+      background: #f1f3f5;
+    }
 
-    .summary-table{width:100%;border-collapse:collapse;margin-top:10px}
-    .summary-table th,.summary-table td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.03);text-align:left}
+    .excel-modal {
+      position: fixed; left: 50%; top: 50%; transform: translate(-50%,-50%);
+      width: 90%; max-width: 1200px; max-height: 80vh; overflow: auto;
+      z-index: 9999; background: #fff; border-radius: 12px;
+      padding: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999;
+    }
 
-    .excel-modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:90%;max-width:1200px;max-height:80vh;overflow:auto;z-index:9999}
-    .backdrop{position:fixed;inset:0;background:linear-gradient(180deg, rgba(2,6,23,0.6), rgba(2,6,23,0.8));z-index:999}
+    .top-actions {
+      display: flex; justify-content: space-between; gap: 10px; align-items: center;
+    }
+    .center { display: flex; align-items: center; gap: 12px; }
 
-    .top-actions{display:flex;justify-content:space-between;gap:10px;align-items:center}
-    .center{display:flex;align-items:center;gap:12px}
+    .chart-controls {
+      display: flex; gap: 8px; align-items: center; margin-top: 10px; flex-wrap: wrap;
+    }
 
-    .chart-controls{display:flex;gap:8px;align-items:center;margin-top:10px}
+    /* Print modal */
+    .print-modal {
+      position: fixed; left: 50%; top: 50%; transform: translate(-50%,-50%);
+      width: 90%; max-width: 900px; height: 80vh; overflow: auto;
+      background: #fff; color: #000; border-radius: 10px;
+      z-index: 2000; padding: 18px;
+    }
+    .print-preview {
+      background: #fff; padding: 12px; border-radius: 6px;
+    }
+    .print-preview .copy {
+      background: transparent; border: 1px solid #e6e6e6; color: #000;
+    }
 
-    /* Print preview modal */
-    .print-modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:90%;max-width:900px;height:80vh;overflow:auto;background:#fff;color:#000;border-radius:10px;z-index:2000;padding:18px}
-    .print-preview{background:#fff;padding:12px;border-radius:6px}
-    .print-preview .copy{background:transparent;border:1px solid #e6e6e6;color:#000}
+    /* Total section */
+    .total-section {
+      margin-top: 20px; padding: 15px;
+      background: #fff; border-radius: 10px; border: 1px solid var(--border);
+    }
+    .total-row {
+      display: flex; justify-content: space-between; margin-bottom: 8px;
+    }
+    .total-row.total-final {
+      border-top: 1px solid var(--border); padding-top: 10px; margin-top: 10px;
+      font-weight: bold;
+    }
 
-    /* Total y valor restante */
-    .total-section {margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);}
-    .total-row {display: flex; justify-content: space-between; margin-bottom: 8px;}
-    .total-row.total-final {border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; margin-top: 10px; font-weight: bold;}
+    /* Recibo estilos */
+    .receipt {
+      font-family: Arial, sans-serif; color: #000; background: #fff;
+      padding: 20px; margin-bottom: 20px; border: 1px solid #000;
+      position: relative;
+    }
+    .receipt-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 10px;
+    }
+    .receipt-logo {
+      flex-shrink: 0;
+    }
+    .receipt-logo img {
+      max-height: 60px; width: auto;
+    }
+    .receipt-title {
+      font-weight: bold; font-size: 16px;
+    }
+    .receipt-info {
+      font-size: 12px; text-align: right;
+    }
+    .receipt-object {
+      font-size: 12px; margin-bottom: 10px;
+    }
+    .receipt-contract {
+      display: flex; justify-content: space-between; margin-bottom: 10px;
+      font-size: 12px; flex-wrap: wrap;
+    }
+    .receipt-table {
+      width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 10px;
+    }
+    .receipt-table th, .receipt-table td {
+      border: 1px solid #000; padding: 4px; text-align: left;
+    }
+    .receipt-table th { background-color: #f0f0f0; }
+    .receipt-total {
+      font-weight: bold; text-align: right; margin-bottom: 10px;
+    }
+    .receipt-signature {
+      display: flex; justify-content: space-between; margin-bottom: 10px;
+    }
+    .receipt-footer {
+      font-size: 10px; text-align: center;
+    }
+    .page-break { page-break-before: always; }
 
-    /* Receipt styles */
-    .receipt {font-family: Arial, sans-serif; color: #000; background: #fff; padding: 20px; margin-bottom: 20px; border: 1px solid #000; position: relative;}
-    .receipt-header {display: flex; justify-content: space-between; margin-bottom: 10px;}
-    .receipt-title {font-weight: bold; font-size: 16px;}
-    .receipt-info {font-size: 12px; text-align: right;}
-    .receipt-object {font-size: 12px; margin-bottom: 10px;}
-    .receipt-contract {display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 12px;}
-    .receipt-table {width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 10px;}
-    .receipt-table th, .receipt-table td {border: 1px solid #000; padding: 4px; text-align: left;}
-    .receipt-table th {background-color: #f0f0f0;}
-    .receipt-total {font-weight: bold; text-align: right; margin-bottom: 10px;}
-    .receipt-signature {display: flex; justify-content: space-between; margin-bottom: 10px;}
-    .receipt-footer {font-size: 10px; text-align: center;}
-
-    /* Print styles: ensure each copy on its own page */
     @media print {
       @page { size: A4; margin: 20mm; }
       body * { visibility: hidden; }
       .print-window, .print-window * { visibility: visible; }
       .print-window { position: absolute; left: 0; top: 0; width: 100%; }
       .page-break { page-break-before: always; }
-      .receipt {border: 1px solid #000; margin-bottom: 20px;}
+      .receipt { border: 1px solid #000; margin-bottom: 20px; }
     }
 
-    @media(max-width:980px){.layout{grid-template-columns:1fr}.menu-grid{grid-template-columns:repeat(2,1fr)}.two-copies{flex-direction:column}}
+    @media (max-width:980px) {
+      .layout { grid-template-columns: 1fr; }
+      .menu-grid { grid-template-columns: repeat(2,1fr); }
+      .two-copies { flex-direction: column; }
+    }
   </style>
 
-  <!-- Librerías: SheetJS (XLSX), Chart.js, html2canvas, jsPDF -->
+  <!-- Librerías -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 </head>
 <body>
-  <header>
-    <div class="brand">
-      <div class="logo">CA</div>
-      <div>
-        <h1>Alcaldía Municipal de Jericó - Antioquia</h1>
-        <div class="small">Todos los derechos reservados © Cristian Ardila</div>
-      </div>
+
+<header>
+  <div class="brand">
+    <div class="logo">CA</div>
+    <div>
+      <h1>Alcaldía Municipal de Jericó - Antioquia</h1>
+      <div class="small">Todos los derechos reservados © Cristian Ardila</div>
     </div>
-    <div class="center">
-      <button class="btn ghost" id="btn-ir-excel">Ir a Excel (AC)</button>
-      <button class="btn ghost" id="btn-resetar">Resetar</button>
+  </div>
+  <div class="center">
+    <button class="btn ghost" id="btn-ir-excel">Ir a Excel (AC)</button>
+    <button class="btn ghost" id="btn-resetar">Resetar</button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="menu-grid">
+    <div class="menu-card" data-page="combustible">
+      <h3>COMBUSTIBLE</h3>
+      <p>Registro de consumos por máquina. Genera recibos e informes.</p>
     </div>
-  </header>
-
-  <div class="container">
-    <div class="menu-grid">
-      <div class="menu-card" data-page="combustible">
-        <h3>COMBUSTIBLE</h3>
-        <p>Registro de consumos por máquina. Genera recibos e informes.</p>
-      </div>
-      <div class="menu-card" data-page="mantenimiento">
-        <h3>MANTENIMIENTO</h3>
-        <p>Órdenes de trabajo, repuestos y control de costos.</p>
-      </div>
-      <div class="menu-card" id="menu-ajustes">
-        <h3>AJUSTES</h3>
-        <p>Cambia precios y opciones de exportación.</p>
-      </div>
+    <div class="menu-card" data-page="mantenimiento">
+      <h3>MANTENIMIENTO</h3>
+      <p>Órdenes de trabajo, repuestos y control de costos.</p>
     </div>
-
-    <!-- Página principal - COMBUSTIBLE -->
-    <div class="layout">
-      <div class="card" id="card-main">
-        <h2>Registro - COMBUSTIBLE</h2>
-        <label>Máquina</label>
-        <select id="maquina">
-          <option>RETRO</option>
-          <option>NIVELADORA</option>
-          <option>VIBRO</option>
-          <option>VOLQUETA</option>
-          <option>XFK75C</option>
-          <option>DQU91D</option>
-          <option>QIE55H</option>
-          <option>VCW59C</option>
-          <option>FPZ593</option>
-          <option>EKV832</option>
-          <option>BUS</option>
-          <option>GUADAÑA</option>
-          <option>DEPORTE GUADAÑA</option>
-          <option>JBO785</option>
-        </select>
-
-        <label>Fecha</label>
-        <input type="date" id="fecha" />
-
-        <p class="small" style="margin-top:12px">Materiales (ingrese solo la cantidad; los precios no se muestran en la interfaz)</p>
-        
-        <!-- Primera fila de materiales -->
-        <div class="qty-row">
-          <div>
-            <label>ACPM (GL)</label>
-            <input type="number" id="acpm" min="0" step="0.1" placeholder="0" />
-          </div>
-          <div>
-            <label>CORRIENTE (GL)</label>
-            <input type="number" id="corriente" min="0" step="0.1" placeholder="0" />
-          </div>
-          <div>
-            <label>GRASA (LB)</label>
-            <input type="number" id="grasa" min="0" step="0.1" placeholder="0" />
-          </div>
-        </div>
-        
-        <!-- Segunda fila de materiales -->
-        <div class="qty-row">
-          <div>
-            <label>ACEITE 2T (1/4)</label>
-            <input type="number" id="aceite2t" min="0" step="0.1" placeholder="0" />
-          </div>
-          <div>
-            <label>ACEITE 4T (1/4)</label>
-            <input type="number" id="aceite4t" min="0" step="0.1" placeholder="0" />
-          </div>
-          <div>
-            <label>ACEITE MOTOR PESADO (1/4)</label>
-            <input type="number" id="aceite-pesado" min="0" step="0.1" placeholder="0" />
-          </div>
-        </div>
-        
-        <!-- Tercera fila de materiales -->
-        <div class="qty-row">
-          <div>
-            <label>ACEITE MOTOR LIVIANO (1/4)</label>
-            <input type="number" id="aceite-liviano" min="0" step="0.1" placeholder="0" />
-          </div>
-          <div>
-            <label>ACEITE HIDRAULICO (GL)</label>
-            <input type="number" id="aceite-hidraulico-gl" min="0" step="0.1" placeholder="0" />
-          </div>
-          <div>
-            <label>ACEITE HIDRAULICO (1/4)</label>
-            <input type="number" id="aceite-hidraulico-cuarto" min="0" step="0.1" placeholder="0" />
-          </div>
-        </div>
-        
-        <!-- Cuarta fila de materiales -->
-        <div class="qty-row">
-          <div>
-            <label>REFRIGERANTE ROJO (1/4)</label>
-            <input type="number" id="refrigerante-rojo" min="0" step="0.1" placeholder="0" />
-          </div>
-          <div>
-            <label>UREA (GL)</label>
-            <input type="number" id="urea" min="0" step="0.1" placeholder="0" />
-          </div>
-          <div style="visibility: hidden;">
-            <!-- Espacio vacío para mantener el diseño -->
-            <label>&nbsp;</label>
-            <input type="number" disabled style="visibility: hidden;" />
-          </div>
-        </div>
-
-        <div class="actions">
-          <button class="btn primary" id="btn-generar">Generar recibo</button>
-          <button class="btn ghost" id="btn-preview-print">Imprimir (ambas copias)</button>
-          <button class="btn ghost" id="btn-clear">Limpiar formulario</button>
-        </div>
-
-        <div id="mensaje" style="margin-top:12px"></div>
-
-        <div class="two-copies" id="recibos"></div>
-
-        <div style="margin-top:10px">
-          <label>Opciones de impresión</label>
-          <div class="actions">
-            <button class="btn ghost" id="btn-print-copia1">Imprimir COPIA 1</button>
-            <button class="btn ghost" id="btn-print-copia2">Imprimir COPIA 2</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="top-actions">
-          <h3>Resumen & Gráficas</h3>
-          <div>
-            <button class="btn primary" id="btn-generate-pdf">PDF</button>
-            <button class="btn ghost" id="btn-download-chart">Descargar gráfica (PNG)</button>
-          </div>
-        </div>
-
-        <div class="chart-controls">
-          <select id="chart-type">
-            <option value="bar">Barra</option>
-            <option value="line">Línea</option>
-            <option value="pie">Pastel</option>
-            <option value="doughnut">Dona</option>
-            <option value="radar">Radar</option>
-          </select>
-          <button class="btn ghost" id="btn-toggle-recent">Ver totales globales</button>
-          <label style="margin-left:auto" class="small">Paleta: Profesional</label>
-        </div>
-
-        <canvas id="chartTotales" style="margin-top:12px;max-height:260px;background:transparent"></canvas>
-
-        <div id="resumen" style="margin-top:12px"></div>
-        
-        <!-- Sección de totales agregada -->
-        <div class="total-section">
-          <h4 style="margin-top:0">Resumen Financiero</h4>
-          <div class="total-row">
-            <span>Valor total consumido:</span>
-            <span id="valor-total-consumido">$0</span>
-          </div>
-          <div class="total-row total-final">
-            <span>Valor restante del contrato MC:</span>
-            <span id="valor-restante-contrato">$0</span>
-          </div>
-        </div>
-
-        <h4 style="margin-top:12px">Registros / Totales</h4>
-        <div id="lista-registros" style="max-height:320px;overflow:auto;margin-top:8px"></div>
-      </div>
+    <div class="menu-card" id="menu-ajustes">
+      <h3>AJUSTES</h3>
+      <p>Cambia precios y opciones de exportación.</p>
     </div>
-
-    <!-- Print Preview Modal -->
-    <div id="print-modal" class="hidden">
-      <div class="backdrop"></div>
-      <div class="print-modal" role="dialog" aria-modal="true">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <h3>Vista previa de impresión — Ambas copias</h3>
-          <div>
-            <button class="btn ghost" id="btn-close-print">Cerrar</button>
-            <button class="btn primary" id="btn-print-now">Imprimir</button>
-          </div>
-        </div>
-        <div class="print-preview" id="print-preview-content" style="min-height:60vh">
-          <!-- Aquí se muestran las dos copias con separación de página -->
-        </div>
-      </div>
-    </div>
-
-    <!-- SETTINGS modal (protegido) -->
-    <div id="settings-modal" class="hidden">
-      <div class="backdrop"></div>
-      <div class="excel-modal card">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <h3>Ajustes</h3>
-          <div>
-            <button class="btn ghost" id="btn-close-settings">Cerrar</button>
-            <button class="btn primary" id="btn-save-settings">Guardar ajustes</button>
-          </div>
-        </div>
-        <div style="margin-top:12px">
-          <label>Precio ACPM (actual)</label>
-          <input type="number" id="price-acpm" step="0.1" />
-          <label>Precio CORRIENTE (actual)</label>
-          <input type="number" id="price-corriente" step="0.1" />
-          <label>Precio GRASA (actual)</label>
-          <input type="number" id="price-grasa" step="0.1" />
-          <label>Precio ACEITE 2T (actual)</label>
-          <input type="number" id="price-aceite2t" step="0.1" />
-          <label>Precio ACEITE 4T (actual)</label>
-          <input type="number" id="price-aceite4t" step="0.1" />
-          <label>Precio ACEITE MOTOR PESADO (actual)</label>
-          <input type="number" id="price-aceite-pesado" step="0.1" />
-          <label>Precio ACEITE MOTOR LIVIANO (actual)</label>
-          <input type="number" id="price-aceite-liviano" step="0.1" />
-          <label>Precio ACEITE HIDRAULICO (GL) (actual)</label>
-          <input type="number" id="price-aceite-hidraulico-gl" step="0.1" />
-          <label>Precio ACEITE HIDRAULICO (1/4) (actual)</label>
-          <input type="number" id="price-aceite-hidraulico-cuarto" step="0.1" />
-          <label>Precio REFRIGERANTE ROJO (actual)</label>
-          <input type="number" id="price-refrigerante-rojo" step="0.1" />
-          <label>Precio UREA (actual)</label>
-          <input type="number" id="price-urea" step="0.1" />
-          
-          <!-- Campo agregado para el valor del contrato MC -->
-          <label style="margin-top:12px">Valor del contrato MC (pesos)</label>
-          <input type="number" id="valor-contrato-mc" step="0.01" />
-
-          <label style="margin-top:12px">Opciones de exportación / IA</label>
-          <div style="display:flex;gap:8px;align-items:center;margin-top:6px">
-            <input type="checkbox" id="allow-ai" /> <label class="small">Permitir generación automática de informe con IA (recomendado usar servidor)</label>
-          </div>
-          <label style="margin-top:8px">(Opcional) Clave API OpenAI para uso directo desde navegador</label>
-          <input type="text" id="openai-key" placeholder="sk-... (opcional)" />
-          <div class="small" style="margin-top:8px;color:#fca5a5">Advertencia: guardar la clave en el navegador es inseguro. Se recomienda usar un servidor proxy.</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Excel modal (protegido por contraseña) -->
-    <div id="excel-modal" class="hidden">
-      <div class="backdrop"></div>
-      <div class="excel-modal card">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <h3>Excel virtual - Registros</h3>
-          <div>
-            <button class="btn ghost" id="btn-close-excel">Cerrar</button>
-            <button class="btn primary" id="btn-export-excel">Exportar .xlsx</button>
-          </div>
-        </div>
-        <div style="margin-top:12px">
-          <table class="summary-table" id="table-excel"><thead><tr><th>Timestamp</th><th>Máquina</th><th>Fecha</th><th>ACPM (GL)</th><th>CORRIENTE (GL)</th><th>GRASA (LB)</th><th>ACEITE 2T (1/4)</th><th>ACEITE 4T (1/4)</th><th>ACEITE MOTOR PESADO (1/4)</th><th>ACEITE MOTOR LIVIANO (1/4)</th><th>ACEITE HIDRAULICO (GL)</th><th>ACEITE HIDRAULICO (1/4)</th><th>REFRIGERANTE ROJO (1/4)</th><th>UREA (GL)</th><th>Total (calculado)</th></tr></thead><tbody></tbody></table>
-        </div>
-      </div>
-    </div>
-
   </div>
 
-  <script>
-    // CONFIG defaults
-    const DEFAULT_PRICES = {
-      ACPM: 13250,
-      CORRIENTE: 20250,
-      GRASA: 16750,
-      ACEITE_2T: 34000,
-      ACEITE_4T: 35000,
-      ACEITE_MOTOR_PESADO: 40000,
-      ACEITE_MOTOR_LIVIANO: 38000,
-      ACEITE_HIDRAULICO_GL: 105000,
-      ACEITE_HIDRAULICO_CUARTO: 26000,
-      REFRIGERANTE_ROJO: 15000,
-      UREA: 29750
-    };
-    
-    const ADMIN_PASSWORD = 'AC.ardila2006'; // contraseña suministrada
-    const STORAGE_KEY = 'combustible_registros_prof_v5';
-    const SETTINGS_KEY = 'combustible_settings_v2';
-    const ORDER_COUNTER_KEY = 'combustible_order_counter_v1';
+  <!-- Página principal -->
+  <div class="layout">
+    <div class="card" id="card-main">
+      <h2>Registro - COMBUSTIBLE</h2>
+      <label>Máquina</label>
+      <select id="maquina">
+        <option>RETRO</option><option>NIVELADORA</option><option>VIBRO</option>
+        <option>VOLQUETA</option><option>XFK75C</option><option>DQU91D</option>
+        <option>QIE55H</option><option>VCW59C</option><option>FPZ593</option>
+        <option>EKV832</option><option>BUS</option><option>GUADAÑA</option>
+        <option>DEPORTE GUADAÑA</option><option>JBO785</option>
+      </select>
 
-    // Load settings or defaults
-    function loadSettings(){ 
-      const sRaw = localStorage.getItem(SETTINGS_KEY); 
-      if(!sRaw) return {prices:DEFAULT_PRICES, allowAI:false, openaiKey:'', valorContratoMC:0}; 
-      try{
-        const settings = JSON.parse(sRaw);
-        // Asegurar que existe valorContratoMC
-        if (settings.valorContratoMC === undefined) {
-          settings.valorContratoMC = 0;
-        }
-        return settings;
-      }catch(e){
-        return {prices:DEFAULT_PRICES, allowAI:false, openaiKey:'', valorContratoMC:0};
-      } 
-    }
-    
-    function saveSettings(s){ localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); }
-    
-    // Función para obtener el siguiente número de orden por máquina
-    function getNextOrderNumber(maquina) {
-      const orderCounters = JSON.parse(localStorage.getItem(ORDER_COUNTER_KEY) || '{}');
-      if (!orderCounters[maquina]) {
-        orderCounters[maquina] = 1;
-      } else {
-        orderCounters[maquina]++;
-      }
-      localStorage.setItem(ORDER_COUNTER_KEY, JSON.stringify(orderCounters));
-      return orderCounters[maquina];
-    }
-    
-    let SETTINGS = loadSettings();
+      <label>Fecha</label>
+      <input type="date" id="fecha" />
 
-    // DOM refs
-    const menuCards = document.querySelectorAll('.menu-card');
-    const btnIrExcel = document.getElementById('btn-ir-excel');
-    const btnResetar = document.getElementById('btn-resetar');
-    const btnGenerar = document.getElementById('btn-generar');
-    const btnPreviewPrint = document.getElementById('btn-preview-print');
-    const btnPrintCopia1 = document.getElementById('btn-print-copia1');
-    const btnPrintCopia2 = document.getElementById('btn-print-copia2');
-    const btnClear = document.getElementById('btn-clear');
-    const recibosEl = document.getElementById('recibos');
-    const mensajeEl = document.getElementById('mensaje');
-    const listaRegistros = document.getElementById('lista-registros');
-    const resumenEl = document.getElementById('resumen');
-    const btnGeneratePdf = document.getElementById('btn-generate-pdf');
-    const chartCanvas = document.getElementById('chartTotales');
-    const chartTypeSel = document.getElementById('chart-type');
-    const btnToggleRecent = document.getElementById('btn-toggle-recent');
-    const btnDownloadChart = document.getElementById('btn-download-chart');
-    
-    // Nuevos elementos para totales
-    const valorTotalConsumidoEl = document.getElementById('valor-total-consumido');
-    const valorRestanteContratoEl = document.getElementById('valor-restante-contrato');
+      <p class="small" style="margin-top:12px">Materiales (ingrese solo la cantidad; los precios no se muestran)</p>
 
-    const settingsModal = document.getElementById('settings-modal');
-    const btnCloseSettings = document.getElementById('btn-close-settings');
-    const btnSaveSettings = document.getElementById('btn-save-settings');
-    const priceAcpmEl = document.getElementById('price-acpm');
-    const priceCorrEl = document.getElementById('price-corriente');
-    const priceGrasaEl = document.getElementById('price-grasa');
-    const priceAceite2tEl = document.getElementById('price-aceite2t');
-    const priceAceite4tEl = document.getElementById('price-aceite4t');
-    const priceAceitePesadoEl = document.getElementById('price-aceite-pesado');
-    const priceAceiteLivianoEl = document.getElementById('price-aceite-liviano');
-    const priceAceiteHidraulicoGlEl = document.getElementById('price-aceite-hidraulico-gl');
-    const priceAceiteHidraulicoCuartoEl = document.getElementById('price-aceite-hidraulico-cuarto');
-    const priceRefrigeranteRojoEl = document.getElementById('price-refrigerante-rojo');
-    const priceUreaEl = document.getElementById('price-urea');
-    const valorContratoMCEl = document.getElementById('valor-contrato-mc');
-    const allowAiEl = document.getElementById('allow-ai');
-    const openaiKeyEl = document.getElementById('openai-key');
+      <div class="qty-row">
+        <div><label>ACPM (GL)</label><input type="number" id="acpm" min="0" step="0.1" placeholder="0" /></div>
+        <div><label>CORRIENTE (GL)</label><input type="number" id="corriente" min="0" step="0.1" placeholder="0" /></div>
+        <div><label>GRASA (LB)</label><input type="number" id="grasa" min="0" step="0.1" placeholder="0" /></div>
+      </div>
+      <div class="qty-row">
+        <div><label>ACEITE 2T (1/4)</label><input type="number" id="aceite2t" min="0" step="0.1" placeholder="0" /></div>
+        <div><label>ACEITE 4T (1/4)</label><input type="number" id="aceite4t" min="0" step="0.1" placeholder="0" /></div>
+        <div><label>ACEITE MOTOR PESADO (1/4)</label><input type="number" id="aceite-pesado" min="0" step="0.1" placeholder="0" /></div>
+      </div>
+      <div class="qty-row">
+        <div><label>ACEITE MOTOR LIVIANO (1/4)</label><input type="number" id="aceite-liviano" min="0" step="0.1" placeholder="0" /></div>
+        <div><label>ACEITE HIDRAULICO (GL)</label><input type="number" id="aceite-hidraulico-gl" min="0" step="0.1" placeholder="0" /></div>
+        <div><label>ACEITE HIDRAULICO (1/4)</label><input type="number" id="aceite-hidraulico-cuarto" min="0" step="0.1" placeholder="0" /></div>
+      </div>
+      <div class="qty-row">
+        <div><label>REFRIGERANTE ROJO (1/4)</label><input type="number" id="refrigerante-rojo" min="0" step="0.1" placeholder="0" /></div>
+        <div><label>UREA (GL)</label><input type="number" id="urea" min="0" step="0.1" placeholder="0" /></div>
+        <div style="visibility:hidden;"><label>&nbsp;</label><input type="number" disabled style="visibility:hidden;" /></div>
+      </div>
 
-    const excelModal = document.getElementById('excel-modal');
-    const btnCloseExcel = document.getElementById('btn-close-excel');
-    const btnExportExcel = document.getElementById('btn-export-excel');
+      <div class="actions">
+        <button class="btn primary" id="btn-generar">Generar recibo</button>
+        <button class="btn ghost" id="btn-preview-print">Imprimir (ambas copias)</button>
+        <button class="btn ghost" id="btn-clear">Limpiar formulario</button>
+      </div>
 
-    // Print modal refs
-    const printModal = document.getElementById('print-modal');
-    const btnClosePrint = document.getElementById('btn-close-print');
-    const btnPrintNow = document.getElementById('btn-print-now');
-    const printPreviewContent = document.getElementById('print-preview-content');
+      <div id="mensaje" style="margin-top:12px"></div>
 
-    // Form fields
-    const maquinaEl = document.getElementById('maquina');
-    const fechaEl = document.getElementById('fecha');
-    const acpmEl = document.getElementById('acpm');
-    const corrienteEl = document.getElementById('corriente');
-    const grasaEl = document.getElementById('grasa');
-    const aceite2tEl = document.getElementById('aceite2t');
-    const aceite4tEl = document.getElementById('aceite4t');
-    const aceitePesadoEl = document.getElementById('aceite-pesado');
-    const aceiteLivianoEl = document.getElementById('aceite-liviano');
-    const aceiteHidraulicoGlEl = document.getElementById('aceite-hidraulico-gl');
-    const aceiteHidraulicoCuartoEl = document.getElementById('aceite-hidraulico-cuarto');
-    const refrigeranteRojoEl = document.getElementById('refrigerante-rojo');
-    const ureaEl = document.getElementById('urea');
+      <div class="two-copies" id="recibos"></div>
 
-    // Initialize
-    fechaEl.valueAsDate = new Date();
-    applySettingsToUI();
-
-    // Menu navigation
-    menuCards.forEach(c=>{ c.addEventListener('click', ()=>{ if(c.id==='menu-ajustes'){ promptSettings(); } else if(c.dataset.page==='mantenimiento'){ alert('Sección Mantenimiento: dime los campos que quieres y la diseño.'); } else { window.scrollTo({top:document.getElementById('card-main').offsetTop - 20, behavior:'smooth'}); } }); });
-
-    // Storage helpers
-    function readStorage(){ const raw = localStorage.getItem(STORAGE_KEY); if(!raw) return []; try{return JSON.parse(raw);}catch(e){return []} }
-    function writeStorage(arr){ localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
-
-    function addRecord(r){ const arr = readStorage(); arr.push(r); writeStorage(arr); }
-
-    function formatoMoneda(v){ return '$' + Number(v).toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0}); }
-
-    // Last generated record cache (for printing preview)
-    let lastRecord = null;
-
-    // Función para formatear fecha como en el Excel (dd/mm/yyyy)
-    function formatDateForReceipt(dateString) {
-      const date = new Date(dateString);
-      return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
-    }
-
-    // Render recibos con formato profesional
-    function renderRecibos(record){ 
-      recibosEl.innerHTML = ''; 
-      ['COPIA 1','COPIA 2'].forEach((titulo, idx)=>{
-        const div = document.createElement('div'); 
-        div.className='copy';
-        div.innerHTML = generateReceiptHTML(record, titulo, idx === 0);
-        recibosEl.appendChild(div);
-      }); 
-    }
-
-    // Generar HTML para el recibo con formato profesional
-    function generateReceiptHTML(record, titulo, isCopy1) {
-      const orderNumber = record.orderNumber || 1;
-      const formattedDate = formatDateForReceipt(record.fecha);
-      
-      // Calcular totales individuales
-      const acpm_total = (record.acpm_qty || 0) * (SETTINGS.prices?.ACPM || DEFAULT_PRICES.ACPM);
-      const corriente_total = (record.corriente_qty || 0) * (SETTINGS.prices?.CORRIENTE || DEFAULT_PRICES.CORRIENTE);
-      const grasa_total = (record.grasa_qty || 0) * (SETTINGS.prices?.GRASA || DEFAULT_PRICES.GRASA);
-      const aceite2t_total = (record.aceite2t_qty || 0) * (SETTINGS.prices?.ACEITE_2T || DEFAULT_PRICES.ACEITE_2T);
-      const aceite4t_total = (record.aceite4t_qty || 0) * (SETTINGS.prices?.ACEITE_4T || DEFAULT_PRICES.ACEITE_4T);
-      const aceite_pesado_total = (record.aceite_pesado_qty || 0) * (SETTINGS.prices?.ACEITE_MOTOR_PESADO || DEFAULT_PRICES.ACEITE_MOTOR_PESADO);
-      const aceite_liviano_total = (record.aceite_liviano_qty || 0) * (SETTINGS.prices?.ACEITE_MOTOR_LIVIANO || DEFAULT_PRICES.ACEITE_MOTOR_LIVIANO);
-      const aceite_hidraulico_gl_total = (record.aceite_hidraulico_gl_qty || 0) * (SETTINGS.prices?.ACEITE_HIDRAULICO_GL || DEFAULT_PRICES.ACEITE_HIDRAULICO_GL);
-      const aceite_hidraulico_cuarto_total = (record.aceite_hidraulico_cuarto_qty || 0) * (SETTINGS.prices?.ACEITE_HIDRAULICO_CUARTO || DEFAULT_PRICES.ACEITE_HIDRAULICO_CUARTO);
-      const refrigerante_rojo_total = (record.refrigerante_rojo_qty || 0) * (SETTINGS.prices?.REFRIGERANTE_ROJO || DEFAULT_PRICES.REFRIGERANTE_ROJO);
-      const urea_total = (record.urea_qty || 0) * (SETTINGS.prices?.UREA || DEFAULT_PRICES.UREA);
-      
-      const total_precio = acpm_total + corriente_total + grasa_total + aceite2t_total + 
-                          aceite4t_total + aceite_pesado_total + aceite_liviano_total + 
-                          aceite_hidraulico_gl_total + aceite_hidraulico_cuarto_total + 
-                          refrigerante_rojo_total + urea_total;
-      
-      return `
-        <div class="receipt">
-          <div class="receipt-header">
-            <div class="receipt-title">${titulo}</div>
-            <div class="receipt-info">
-              <div>Codigo: ${record.timestamp}</div>
-              <div>Código TRD:</div>
-              <div>Vigencia:</div>
-              <div>Versión:</div>
-            </div>
-          </div>
-          <div class="receipt-object">
-            OBJETO: SUMINISTRO DE COMBUSTIBLE, LUBRICANTES, ACEITES, REFRIGERANTES, UREA Y GRASAS PARA LOS VEHÍCULOS DEL PARQUE AUTOMOTOR, GUADAÑAS Y MAQUINARIA DEL MUNICIPIO DE JERÍCÓ- ANTIOQUIA.
-          </div>
-          <div class="receipt-contract">
-            <div>CONTRATO N°: SASI-007-2025</div>
-            <div>ORDEN DE PEDIDO N°: ${orderNumber}</div>
-            <div>FECHA: ${formattedDate}</div>
-          </div>
-          <table class="receipt-table">
-            <thead>
-              <tr>
-                <th>VEHÍCULO</th>
-                <th>DESCRIPCIÓN</th>
-                <th>UNIDAD</th>
-                <th>CANTIDAD</th>
-                <th>Vr. UNITARIO</th>
-                <th>Vr. TOTAL</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>${record.maquina}</td>
-                <td>ACPM</td>
-                <td>GL</td>
-                <td>${record.acpm_qty || 0}</td>
-                <td>${formatoMoneda(SETTINGS.prices?.ACPM || DEFAULT_PRICES.ACPM)}</td>
-                <td>${formatoMoneda(acpm_total)}</td>
-              </tr>
-              <tr>
-                <td></td>
-                <td>CORRIENTE</td>
-                <td>GL</td>
-                <td>${record.corriente_qty || 0}</td>
-                <td>${formatoMoneda(SETTINGS.prices?.CORRIENTE || DEFAULT_PRICES.CORRIENTE)}</td>
-                <td>${formatoMoneda(corriente_total)}</td>
-              </tr>
-              <tr>
-                <td></td>
-                <td>GRASA</td>
-                <td>LB</td>
-                <td>${record.grasa_qty || 0}</td>
-                <td>${formatoMoneda(SETTINGS.prices?.GRASA || DEFAULT_PRICES.GRASA)}</td>
-                <td>${formatoMoneda(grasa_total)}</td>
-              </tr>
-              <tr>
-                <td></td>
-                <td>ACEITE 2T</td>
-                <td>0.25</td>
-                <td>${record.aceite2t_qty || 0}</td>
-                <td>${formatoMoneda(SETTINGS.prices?.ACEITE_2T || DEFAULT_PRICES.ACEITE_2T)}</td>
-                <td>${formatoMoneda(aceite2t_total)}</td>
-              </tr>
-              <tr>
-                <td></td>
-                <td>ACEITE 4T</td>
-                <td>0.25</td>
-                <td>${record.aceite4t_qty || 0}</td>
-                <td>${formatoMoneda(SETTINGS.prices?.ACEITE_4T || DEFAULT_PRICES.ACEITE_4T)}</td>
-                <td>${formatoMoneda(aceite4t_total)}</td>
-              </tr>
-              <tr>
-                <td></td>
-                <td>ACEITE MOTOR PESADO</td>
-                <td>0.25</td>
-                <td>${record.aceite_pesado_qty || 0}</td>
-                <td>${formatoMoneda(SETTINGS.prices?.ACEITE_MOTOR_PESADO || DEFAULT_PRICES.ACEITE_MOTOR_PESADO)}</td>
-                <td>${formatoMoneda(aceite_pesado_total)}</td>
-              </tr>
-              <tr>
-                <td></td>
-                <td>ACEITE MOTOR LIVIANO</td>
-                <td>0.25</td>
-                <td>${record.aceite_liviano_qty || 0}</td>
-                <td>${formatoMoneda(SETTINGS.prices?.ACEITE_MOTOR_LIVIANO || DEFAULT_PRICES.ACEITE_MOTOR_LIVIANO)}</td>
-                <td>${formatoMoneda(aceite_liviano_total)}</td>
-              </tr>
-              <tr>
-                <td></td>
-                <td>ACEITE HIDRAULICO</td>
-                <td>GL</td>
-                <td>${record.aceite_hidraulico_gl_qty || 0}</td>
-                <td>${formatoMoneda(SETTINGS.prices?.ACEITE_HIDRAULICO_GL || DEFAULT_PRICES.ACEITE_HIDRAULICO_GL)}</td>
-                <td>${formatoMoneda(aceite_hidraulico_gl_total)}</td>
-              </tr>
-              <tr>
-                <td></td>
-                <td>ACEITE HIDRAULICO</td>
-                <td>0.25</td>
-                <td>${record.aceite_hidraulico_cuarto_qty || 0}</td>
-                <td>${formatoMoneda(SETTINGS.prices?.ACEITE_HIDRAULICO_CUARTO || DEFAULT_PRICES.ACEITE_HIDRAULICO_CUARTO)}</td>
-                <td>${formatoMoneda(aceite_hidraulico_cuarto_total)}</td>
-              </tr>
-              <tr>
-                <td></td>
-                <td>REFRIGERANTE ROJO</td>
-                <td>0.25</td>
-                <td>${record.refrigerante_rojo_qty || 0}</td>
-                <td>${formatoMoneda(SETTINGS.prices?.REFRIGERANTE_ROJO || DEFAULT_PRICES.REFRIGERANTE_ROJO)}</td>
-                <td>${formatoMoneda(refrigerante_rojo_total)}</td>
-              </tr>
-              <tr>
-                <td></td>
-                <td>UREA</td>
-                <td>GL</td>
-                <td>${record.urea_qty || 0}</td>
-                <td>${formatoMoneda(SETTINGS.prices?.UREA || DEFAULT_PRICES.UREA)}</td>
-                <td>${formatoMoneda(urea_total)}</td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="receipt-total">VALOR TOTAL ${formatoMoneda(total_precio)}</div>
-          <div class="receipt-signature">
-            <div>NOMBRE Y APELLIDOS: DAVID GRISALES VALENCIA</div>
-            <div>FIRMA: ______________________________</div>
-          </div>
-          <div class="receipt-footer">
-            Palacio Municipal, Santiago Santamaría<br>
-            NIT: 890.981.069 - Teléfono: (604) 830523101- Código postal 056010 <br>
-            www.jerico-antioquia.gov.co
-          </div>
+      <div style="margin-top:10px">
+        <label>Opciones de impresión</label>
+        <div class="actions">
+          <button class="btn ghost" id="btn-print-copia1">Imprimir COPIA 1</button>
+          <button class="btn ghost" id="btn-print-copia2">Imprimir COPIA 2</button>
         </div>
-      `;
-    }
+      </div>
+    </div>
 
-    // Build printable HTML for two copies with page break between them
-    function buildPrintableHtml(record){
-      const style = `
-        <style>
-          body{font-family:Arial,sans-serif;color:#000;margin:20px}
-          .receipt {border:1px solid #000; padding:20px; margin-bottom:20px; position:relative;}
-          .receipt-header {display:flex; justify-content:space-between; margin-bottom:10px;}
-          .receipt-title {font-weight:bold; font-size:16px;}
-          .receipt-info {font-size:12px; text-align:right;}
-          .receipt-object {font-size:12px; margin-bottom:10px;}
-          .receipt-contract {display:flex; justify-content:space-between; margin-bottom:10px; font-size:12px;}
-          .receipt-table {width:100%; border-collapse:collapse; font-size:12px; margin-bottom:10px;}
-          .receipt-table th, .receipt-table td {border:1px solid #000; padding:4px; text-align:left;}
-          .receipt-table th {background-color:#f0f0f0;}
-          .receipt-total {font-weight:bold; text-align:right; margin-bottom:10px;}
-          .receipt-signature {display:flex; justify-content:space-between; margin-bottom:10px;}
-          .receipt-footer {font-size:10px; text-align:center;}
-          .page-break {page-break-before:always;}
-        </style>
-      `;
-      
-      const copy1 = generateReceiptHTML(record, 'COPIA 1', true);
-      const copy2 = generateReceiptHTML(record, 'COPIA 2', false);
-
-      const html = `<!doctype html><html><head><meta charset="utf-8">${style}</head><body>${copy1}<div class="page-break"></div>${copy2}</body></html>`;
-      return html;
-    }
-
-    // Open preview modal with both copies visually
-    function openPrintPreview(record){
-      lastRecord = record;
-      printPreviewContent.innerHTML = '';
-      
-      const copy1 = document.createElement('div'); 
-      copy1.innerHTML = generateReceiptHTML(record, 'COPIA 1', true);
-      
-      const copy2 = document.createElement('div'); 
-      copy2.innerHTML = generateReceiptHTML(record, 'COPIA 2', false);
-      
-      printPreviewContent.appendChild(copy1);
-      const pageBreak = document.createElement('div'); 
-      pageBreak.className = 'page-break'; 
-      pageBreak.style.height='12px'; 
-      printPreviewContent.appendChild(pageBreak);
-      printPreviewContent.appendChild(copy2);
-
-      printModal.classList.remove('hidden'); 
-      document.body.insertAdjacentHTML('beforeend','<div class="backdrop"></div>');
-    }
-
-    // Print both copies by opening a new window to ensure page-breaks and correct print preview
-    function printBothCopies(record){
-      const html = buildPrintableHtml(record);
-      const w = window.open('', '_blank');
-      w.document.open(); w.document.write(html); w.document.close();
-      // wait for content to load
-      w.onload = function(){ setTimeout(()=>{ w.focus(); w.print(); }, 300); };
-    }
-
-    // Print single copy (1 or 2)
-    function printSingleCopy(record, index){
-      const style = `
-        <style>
-          body{font-family:Arial,sans-serif;color:#000;margin:20px}
-          .receipt {border:1px solid #000; padding:20px; position:relative;}
-          .receipt-header {display:flex; justify-content:space-between; margin-bottom:10px;}
-          .receipt-title {font-weight:bold; font-size:16px;}
-          .receipt-info {font-size:12px; text-align:right;}
-          .receipt-object {font-size:12px; margin-bottom:10px;}
-          .receipt-contract {display:flex; justify-content:space-between; margin-bottom:10px; font-size:12px;}
-          .receipt-table {width:100%; border-collapse:collapse; font-size:12px; margin-bottom:10px;}
-          .receipt-table th, .receipt-table td {border:1px solid #000; padding:4px; text-align:left;}
-          .receipt-table th {background-color:#f0f0f0;}
-          .receipt-total {font-weight:bold; text-align:right; margin-bottom:10px;}
-          .receipt-signature {display:flex; justify-content:space-between; margin-bottom:10px;}
-          .receipt-footer {font-size:10px; text-align:center;}
-        </style>
-      `;
-      
-      const copyHtml = generateReceiptHTML(record, index === 1 ? 'COPIA 1' : 'COPIA 2', index === 1);
-      
-      const html = `<!doctype html><html><head><meta charset=\"utf-8\">${style}</head><body>${copyHtml}</body></html>`;
-      const w = window.open('', '_blank'); w.document.open(); w.document.write(html); w.document.close(); w.onload = ()=>{ setTimeout(()=>{ w.focus(); w.print(); },200); };
-    }
-
-    // Render lista registros
-    let showTotals = false;
-    function renderLista(){ 
-      if(showTotals){ 
-        renderTotalsGlobal(); 
-        return; 
-      } 
-      const arr = readStorage().slice().sort((a,b)=> new Date(b.timestamp) - new Date(a.timestamp)); 
-      if(arr.length===0){ 
-        listaRegistros.innerHTML = '<div class="small">No hay registros.</div>'; 
-        return; 
-      } 
-      listaRegistros.innerHTML = ''; 
-      arr.slice(0,200).forEach(r=>{ 
-        const d = document.createElement('div'); 
-        d.className='card'; 
-        d.style.marginBottom='8px'; 
-        
-        // Crear resumen de materiales para el registro
-        let materialesResumen = '';
-        if (r.acpm_qty > 0) materialesResumen += `ACPM: ${Number(r.acpm_qty).toFixed(2)} GL<br>`;
-        if (r.corriente_qty > 0) materialesResumen += `CORR: ${Number(r.corriente_qty).toFixed(2)} GL<br>`;
-        if (r.grasa_qty > 0) materialesResumen += `GRASA: ${Number(r.grasa_qty).toFixed(2)} LB<br>`;
-        if (r.aceite2t_qty > 0) materialesResumen += `ACEITE 2T: ${Number(r.aceite2t_qty).toFixed(2)} 1/4<br>`;
-        if (r.aceite4t_qty > 0) materialesResumen += `ACEITE 4T: ${Number(r.aceite4t_qty).toFixed(2)} 1/4<br>`;
-        if (r.aceite_pesado_qty > 0) materialesResumen += `ACEITE PESADO: ${Number(r.aceite_pesado_qty).toFixed(2)} 1/4<br>`;
-        if (r.aceite_liviano_qty > 0) materialesResumen += `ACEITE LIVIANO: ${Number(r.aceite_liviano_qty).toFixed(2)} 1/4<br>`;
-        if (r.aceite_hidraulico_gl_qty > 0) materialesResumen += `ACEITE HID GL: ${Number(r.aceite_hidraulico_gl_qty).toFixed(2)} GL<br>`;
-        if (r.aceite_hidraulico_cuarto_qty > 0) materialesResumen += `ACEITE HID 1/4: ${Number(r.aceite_hidraulico_cuarto_qty).toFixed(2)} 1/4<br>`;
-        if (r.refrigerante_rojo_qty > 0) materialesResumen += `REF ROJO: ${Number(r.refrigerante_rojo_qty).toFixed(2)} 1/4<br>`;
-        if (r.urea_qty > 0) materialesResumen += `UREA: ${Number(r.urea_qty).toFixed(2)} GL<br>`;
-        
-        d.innerHTML = `
-          <div style="display:flex;justify-content:space-between">
-            <div>
-              <strong>${r.maquina}</strong>
-              <div class='small'>${r.fecha} · ${new Date(r.timestamp).toLocaleString()}</div>
-              <div class='small'>Orden: ${r.orderNumber || 1}</div>
-            </div>
-            <div class='small'>${materialesResumen}</div>
-          </div>
-        `; 
-        listaRegistros.appendChild(d); 
-      }); 
-    }
-    
-    function renderTotalsGlobal(){ 
-      const arr = readStorage(); 
-      if(arr.length===0){ 
-        listaRegistros.innerHTML = '<div class="small">No hay registros.</div>'; 
-        return; 
-      } 
-      const totals = {
-        acpm:0, corriente:0, grasa:0, aceite2t:0, aceite4t:0, 
-        aceite_pesado:0, aceite_liviano:0, aceite_hidraulico_gl:0, 
-        aceite_hidraulico_cuarto:0, refrigerante_rojo:0, urea:0, money:0
-      }; 
-      arr.forEach(r=>{ 
-        totals.acpm += Number(r.acpm_qty)||0; 
-        totals.corriente += Number(r.corriente_qty)||0; 
-        totals.grasa += Number(r.grasa_qty)||0; 
-        totals.aceite2t += Number(r.aceite2t_qty)||0; 
-        totals.aceite4t += Number(r.aceite4t_qty)||0; 
-        totals.aceite_pesado += Number(r.aceite_pesado_qty)||0; 
-        totals.aceite_liviano += Number(r.aceite_liviano_qty)||0; 
-        totals.aceite_hidraulico_gl += Number(r.aceite_hidraulico_gl_qty)||0; 
-        totals.aceite_hidraulico_cuarto += Number(r.aceite_hidraulico_cuarto_qty)||0; 
-        totals.refrigerante_rojo += Number(r.refrigerante_rojo_qty)||0; 
-        totals.urea += Number(r.urea_qty)||0; 
-        totals.money += Number(r.total_precio)||0; 
-      }); 
-      listaRegistros.innerHTML = `
-        <div style='padding:12px'>
-          <div><strong>Totales globales</strong></div>
-          <div class='small' style='margin-top:8px'>
-            ${totals.acpm > 0 ? `ACPM: ${totals.acpm.toFixed(2)} GL<br>` : ''}
-            ${totals.corriente > 0 ? `CORRIENTE: ${totals.corriente.toFixed(2)} GL<br>` : ''}
-            ${totals.grasa > 0 ? `GRASA: ${totals.grasa.toFixed(2)} LB<br>` : ''}
-            ${totals.aceite2t > 0 ? `ACEITE 2T: ${totals.aceite2t.toFixed(2)} 1/4<br>` : ''}
-            ${totals.aceite4t > 0 ? `ACEITE 4T: ${totals.aceite4t.toFixed(2)} 1/4<br>` : ''}
-            ${totals.aceite_pesado > 0 ? `ACEITE MOTOR PESADO: ${totals.aceite_pesado.toFixed(2)} 1/4<br>` : ''}
-            ${totals.aceite_liviano > 0 ? `ACEITE MOTOR LIVIANO: ${totals.aceite_liviano.toFixed(2)} 1/4<br>` : ''}
-            ${totals.aceite_hidraulico_gl > 0 ? `ACEITE HIDRAULICO (GL): ${totals.aceite_hidraulico_gl.toFixed(2)} GL<br>` : ''}
-            ${totals.aceite_hidraulico_cuarto > 0 ? `ACEITE HIDRAULICO (1/4): ${totals.aceite_hidraulico_cuarto.toFixed(2)} 1/4<br>` : ''}
-            ${totals.refrigerante_rojo > 0 ? `REFRIGERANTE ROJO: ${totals.refrigerante_rojo.toFixed(2)} 1/4<br>` : ''}
-            ${totals.urea > 0 ? `UREA: ${totals.urea.toFixed(2)} GL<br>` : ''}
-          </div>
-          <div style='margin-top:8px;font-weight:800'>Valor total (pesos): ${formatoMoneda(totals.money)}</div>
+    <div class="card">
+      <div class="top-actions">
+        <h3>Resumen & Gráficas</h3>
+        <div>
+          <button class="btn primary" id="btn-generate-pdf">PDF</button>
+          <button class="btn ghost" id="btn-download-chart">Descargar gráfica (PNG)</button>
         </div>
-      `; 
-    }
+      </div>
 
-    // Generate record
-    btnGenerar.addEventListener('click', ()=>{
-      const maquina = maquinaEl.value; 
-      const fecha = fechaEl.value || new Date().toISOString().slice(0,10);
-      const acpm_qty = parseFloat(acpmEl.value) || 0; 
-      const corriente_qty = parseFloat(corrienteEl.value) || 0; 
-      const grasa_qty = parseFloat(grasaEl.value) || 0; 
-      const aceite2t_qty = parseFloat(aceite2tEl.value) || 0; 
-      const aceite4t_qty = parseFloat(aceite4tEl.value) || 0; 
-      const aceite_pesado_qty = parseFloat(aceitePesadoEl.value) || 0; 
-      const aceite_liviano_qty = parseFloat(aceiteLivianoEl.value) || 0; 
-      const aceite_hidraulico_gl_qty = parseFloat(aceiteHidraulicoGlEl.value) || 0; 
-      const aceite_hidraulico_cuarto_qty = parseFloat(aceiteHidraulicoCuartoEl.value) || 0; 
-      const refrigerante_rojo_qty = parseFloat(refrigeranteRojoEl.value) || 0; 
-      const urea_qty = parseFloat(ureaEl.value) || 0; 
-      
-      const prices = SETTINGS.prices || DEFAULT_PRICES;
-      const acpm_total = acpm_qty * prices.ACPM; 
-      const corriente_total = corriente_qty * prices.CORRIENTE; 
-      const grasa_total = grasa_qty * prices.GRASA; 
-      const aceite2t_total = aceite2t_qty * prices.ACEITE_2T; 
-      const aceite4t_total = aceite4t_qty * prices.ACEITE_4T; 
-      const aceite_pesado_total = aceite_pesado_qty * prices.ACEITE_MOTOR_PESADO; 
-      const aceite_liviano_total = aceite_liviano_qty * prices.ACEITE_MOTOR_LIVIANO; 
-      const aceite_hidraulico_gl_total = aceite_hidraulico_gl_qty * prices.ACEITE_HIDRAULICO_GL; 
-      const aceite_hidraulico_cuarto_total = aceite_hidraulico_cuarto_qty * prices.ACEITE_HIDRAULICO_CUARTO; 
-      const refrigerante_rojo_total = refrigerante_rojo_qty * prices.REFRIGERANTE_ROJO; 
-      const urea_total = urea_qty * prices.UREA; 
-      
-      const total_precio = acpm_total + corriente_total + grasa_total + aceite2t_total + 
-                          aceite4t_total + aceite_pesado_total + aceite_liviano_total + 
-                          aceite_hidraulico_gl_total + aceite_hidraulico_cuarto_total + 
-                          refrigerante_rojo_total + urea_total;
-      
-      // Obtener número de orden consecutivo para esta máquina
-      const orderNumber = getNextOrderNumber(maquina);
-      
-      const record = { 
-        timestamp: new Date().toISOString(), 
-        maquina, 
-        fecha, 
-        acpm_qty, 
-        corriente_qty, 
-        grasa_qty, 
-        aceite2t_qty, 
-        aceite4t_qty, 
-        aceite_pesado_qty, 
-        aceite_liviano_qty, 
-        aceite_hidraulico_gl_qty, 
-        aceite_hidraulico_cuarto_qty, 
-        refrigerante_rojo_qty, 
-        urea_qty, 
-        acpm_total, 
-        corriente_total, 
-        grasa_total, 
-        aceite2t_total, 
-        aceite4t_total, 
-        aceite_pesado_total, 
-        aceite_liviano_total, 
-        aceite_hidraulico_gl_total, 
-        aceite_hidraulico_cuarto_total, 
-        refrigerante_rojo_total, 
-        urea_total, 
-        total_precio,
-        orderNumber
-      };
-      
-      addRecord(record); 
-      mensajeEl.innerHTML = '<div style="color:#34d399;font-weight:700">Registro guardado ✔</div>'; 
-      renderRecibos(record); 
-      renderLista(); 
-      renderResumen(); 
-      lastRecord = record;
-    });
+      <div class="chart-controls">
+        <select id="chart-type">
+          <option value="bar">Barra</option><option value="line">Línea</option>
+          <option value="pie">Pastel</option><option value="doughnut">Dona</option>
+          <option value="radar">Radar</option>
+        </select>
+        <button class="btn ghost" id="btn-toggle-recent">Ver totales globales</button>
+        <label style="margin-left:auto" class="small">Paleta: Profesional</label>
+      </div>
 
-    // Print both copies preview
-    document.getElementById('btn-preview-print').addEventListener('click', ()=>{
-      if(!lastRecord){ alert('Genera un recibo primero para poder imprimir.'); return; }
-      openPrintPreview(lastRecord);
-    });
+      <canvas id="chartTotales" style="margin-top:12px;max-height:260px;background:transparent"></canvas>
 
-    // Print now from preview modal
-    btnPrintNow.addEventListener('click', ()=>{
-      if(!lastRecord){ alert('Registro no disponible'); return; }
-      printBothCopies(lastRecord);
-    });
-    btnClosePrint.addEventListener('click', ()=>{ printModal.classList.add('hidden'); document.querySelectorAll('.backdrop').forEach(b=>b.remove()); });
+      <div id="resumen" style="margin-top:12px"></div>
 
-    // Print single copy buttons
-    btnPrintCopia1.addEventListener('click', ()=>{ if(!lastRecord){ alert('Genera un registro primero.'); return; } printSingleCopy(lastRecord,1); });
-    btnPrintCopia2.addEventListener('click', ()=>{ if(!lastRecord){ alert('Genera un registro primero.'); return; } printSingleCopy(lastRecord,2); });
+      <div class="total-section">
+        <h4 style="margin-top:0">Resumen Financiero</h4>
+        <div class="total-row"><span>Valor total consumido:</span><span id="valor-total-consumido">$0</span></div>
+        <div class="total-row total-final"><span>Valor restante del contrato MC:</span><span id="valor-restante-contrato">$0</span></div>
+      </div>
 
-    // Resetar datos (reemplaza la función de descargar Excel)
-    btnResetar.addEventListener('click', ()=>{ 
-      const pw = prompt('Ingrese la contraseña para resetear los datos:');
-      if(pw === ADMIN_PASSWORD){
-        if(confirm('¿Está seguro de que desea borrar todos los datos? Esta acción no se puede deshacer.')){
-          localStorage.removeItem(STORAGE_KEY);
-          localStorage.removeItem(ORDER_COUNTER_KEY);
-          alert('Todos los datos han sido borrados exitosamente.');
-          // Actualizar la interfaz
-          renderLista();
-          renderResumen();
-          location.reload();
-        }
-      } else {
-        alert('Contraseña incorrecta');
-      }
-    });
+      <h4 style="margin-top:12px">Registros / Totales</h4>
+      <div id="lista-registros" style="max-height:320px;overflow:auto;margin-top:8px"></div>
+    </div>
+  </div>
 
-    // Additional controls (excel, pdf etc.) remain same as previous version
-    // Excel modal protected by password
-    btnIrExcel.addEventListener('click', ()=>{ const pw = prompt('Ingrese la contraseña para ver el Excel:'); if(pw === ADMIN_PASSWORD){ openExcelModal(); } else { alert('Contraseña incorrecta'); } });
-    function openExcelModal(){ excelModal.classList.remove('hidden'); document.body.insertAdjacentHTML('beforeend','<div class="backdrop"></div>'); renderExcelTable(); }
-    document.getElementById('btn-close-excel').addEventListener('click', ()=>{ excelModal.classList.add('hidden'); document.querySelectorAll('.backdrop').forEach(b=>b.remove()); });
-    btnExportExcel.addEventListener('click', ()=>{ const arr = readStorage(); if(arr.length===0){ alert('No hay registros para exportar.'); return; } const ws = XLSX.utils.json_to_sheet(arr); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'registros'); const wbout = XLSX.write(wb, {bookType:'xlsx', type:'array'}); const blob = new Blob([wbout],{type:'application/octet-stream'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download='registros_combustible.xlsx'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); });
-    function renderExcelTable(){ const tbody = document.querySelector('#table-excel tbody'); const arr = readStorage().slice().sort((a,b)=> new Date(b.timestamp)-new Date(a.timestamp)); tbody.innerHTML=''; arr.forEach(r=>{ const tr = document.createElement('tr'); tr.innerHTML = `<td>${r.timestamp}</td><td>${r.maquina}</td><td>${r.fecha}</td><td>${Number(r.acpm_qty).toFixed(2)}</td><td>${Number(r.corriente_qty).toFixed(2)}</td><td>${Number(r.grasa_qty).toFixed(2)}</td><td>${Number(r.aceite2t_qty).toFixed(2)}</td><td>${Number(r.aceite4t_qty).toFixed(2)}</td><td>${Number(r.aceite_pesado_qty).toFixed(2)}</td><td>${Number(r.aceite_liviano_qty).toFixed(2)}</td><td>${Number(r.aceite_hidraulico_gl_qty).toFixed(2)}</td><td>${Number(r.aceite_hidraulico_cuarto_qty).toFixed(2)}</td><td>${Number(r.refrigerante_rojo_qty).toFixed(2)}</td><td>${Number(r.urea_qty).toFixed(2)}</td><td>${formatoMoneda(r.total_precio)}</td>`; tbody.appendChild(tr); }); }
+  <!-- Print Preview Modal -->
+  <div id="print-modal" class="hidden">
+    <div class="backdrop"></div>
+    <div class="print-modal" role="dialog" aria-modal="true">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <h3>Vista previa de impresión — Ambas copias</h3>
+        <div>
+          <button class="btn ghost" id="btn-close-print">Cerrar</button>
+          <button class="btn primary" id="btn-print-now">Imprimir</button>
+        </div>
+      </div>
+      <div class="print-preview" id="print-preview-content" style="min-height:60vh"></div>
+    </div>
+  </div>
 
-    // SETTINGS: prompt and modal
-    function promptSettings(){ const pw = prompt('Ingrese la contraseña para abrir Ajustes:'); if(pw === ADMIN_PASSWORD){ openSettings(); } else { alert('Contraseña incorrecta'); } }
-    function openSettings(){ 
-      settingsModal.classList.remove('hidden'); 
-      document.body.insertAdjacentHTML('beforeend','<div class="backdrop"></div>'); 
-      priceAcpmEl.value = (SETTINGS.prices && SETTINGS.prices.ACPM) ? SETTINGS.prices.ACPM : DEFAULT_PRICES.ACPM; 
-      priceCorrEl.value = (SETTINGS.prices && SETTINGS.prices.CORRIENTE) ? SETTINGS.prices.CORRIENTE : DEFAULT_PRICES.CORRIENTE; 
-      priceGrasaEl.value = (SETTINGS.prices && SETTINGS.prices.GRASA) ? SETTINGS.prices.GRASA : DEFAULT_PRICES.GRASA; 
-      priceAceite2tEl.value = (SETTINGS.prices && SETTINGS.prices.ACEITE_2T) ? SETTINGS.prices.ACEITE_2T : DEFAULT_PRICES.ACEITE_2T; 
-      priceAceite4tEl.value = (SETTINGS.prices && SETTINGS.prices.ACEITE_4T) ? SETTINGS.prices.ACEITE_4T : DEFAULT_PRICES.ACEITE_4T; 
-      priceAceitePesadoEl.value = (SETTINGS.prices && SETTINGS.prices.ACEITE_MOTOR_PESADO) ? SETTINGS.prices.ACEITE_MOTOR_PESADO : DEFAULT_PRICES.ACEITE_MOTOR_PESADO; 
-      priceAceiteLivianoEl.value = (SETTINGS.prices && SETTINGS.prices.ACEITE_MOTOR_LIVIANO) ? SETTINGS.prices.ACEITE_MOTOR_LIVIANO : DEFAULT_PRICES.ACEITE_MOTOR_LIVIANO; 
-      priceAceiteHidraulicoGlEl.value = (SETTINGS.prices && SETTINGS.prices.ACEITE_HIDRAULICO_GL) ? SETTINGS.prices.ACEITE_HIDRAULICO_GL : DEFAULT_PRICES.ACEITE_HIDRAULICO_GL; 
-      priceAceiteHidraulicoCuartoEl.value = (SETTINGS.prices && SETTINGS.prices.ACEITE_HIDRAULICO_CUARTO) ? SETTINGS.prices.ACEITE_HIDRAULICO_CUARTO : DEFAULT_PRICES.ACEITE_HIDRAULICO_CUARTO; 
-      priceRefrigeranteRojoEl.value = (SETTINGS.prices && SETTINGS.prices.REFRIGERANTE_ROJO) ? SETTINGS.prices.REFRIGERANTE_ROJO : DEFAULT_PRICES.REFRIGERANTE_ROJO; 
-      priceUreaEl.value = (SETTINGS.prices && SETTINGS.prices.UREA) ? SETTINGS.prices.UREA : DEFAULT_PRICES.UREA; 
-      valorContratoMCEl.value = SETTINGS.valorContratoMC || 0;
-      allowAiEl.checked = SETTINGS.allowAI; 
-      openaiKeyEl.value = SETTINGS.openaiKey || ''; 
-    }
-    btnCloseSettings.addEventListener('click', ()=>{ settingsModal.classList.add('hidden'); document.querySelectorAll('.backdrop').forEach(b=>b.remove()); });
-    btnSaveSettings.addEventListener('click', ()=>{ 
-      SETTINGS.prices = {
-        ACPM: parseFloat(priceAcpmEl.value)||DEFAULT_PRICES.ACPM, 
-        CORRIENTE: parseFloat(priceCorrEl.value)||DEFAULT_PRICES.CORRIENTE, 
-        GRASA: parseFloat(priceGrasaEl.value)||DEFAULT_PRICES.GRASA, 
-        ACEITE_2T: parseFloat(priceAceite2tEl.value)||DEFAULT_PRICES.ACEITE_2T, 
-        ACEITE_4T: parseFloat(priceAceite4tEl.value)||DEFAULT_PRICES.ACEITE_4T, 
-        ACEITE_MOTOR_PESADO: parseFloat(priceAceitePesadoEl.value)||DEFAULT_PRICES.ACEITE_MOTOR_PESADO, 
-        ACEITE_MOTOR_LIVIANO: parseFloat(priceAceiteLivianoEl.value)||DEFAULT_PRICES.ACEITE_MOTOR_LIVIANO, 
-        ACEITE_HIDRAULICO_GL: parseFloat(priceAceiteHidraulicoGlEl.value)||DEFAULT_PRICES.ACEITE_HIDRAULICO_GL, 
-        ACEITE_HIDRAULICO_CUARTO: parseFloat(priceAceiteHidraulicoCuartoEl.value)||DEFAULT_PRICES.ACEITE_HIDRAULICO_CUARTO, 
-        REFRIGERANTE_ROJO: parseFloat(priceRefrigeranteRojoEl.value)||DEFAULT_PRICES.REFRIGERANTE_ROJO, 
-        UREA: parseFloat(priceUreaEl.value)||DEFAULT_PRICES.UREA
-      }; 
-      SETTINGS.allowAI = allowAiEl.checked; 
-      SETTINGS.openaiKey = openaiKeyEl.value.trim(); 
-      SETTINGS.valorContratoMC = parseFloat(valorContratoMCEl.value) || 0;
-      saveSettings(SETTINGS); 
-      applySettingsToUI(); 
-      alert('Ajustes guardados'); 
-      settingsModal.classList.add('hidden'); 
-      document.querySelectorAll('.backdrop').forEach(b=>b.remove()); 
-      renderResumen(); // Actualizar el resumen con el nuevo valor del contrato
-    });
-    function applySettingsToUI(){ /* nothing to visually change on main UI; prices used internally */ }
+  <!-- Settings modal -->
+  <div id="settings-modal" class="hidden">
+    <div class="backdrop"></div>
+    <div class="excel-modal card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h3>Ajustes</h3>
+        <div>
+          <button class="btn ghost" id="btn-close-settings">Cerrar</button>
+          <button class="btn primary" id="btn-save-settings">Guardar ajustes</button>
+        </div>
+      </div>
+      <div style="margin-top:12px">
+        <label>Precio ACPM</label><input type="number" id="price-acpm" step="0.1" />
+        <label>Precio CORRIENTE</label><input type="number" id="price-corriente" step="0.1" />
+        <label>Precio GRASA</label><input type="number" id="price-grasa" step="0.1" />
+        <label>Precio ACEITE 2T</label><input type="number" id="price-aceite2t" step="0.1" />
+        <label>Precio ACEITE 4T</label><input type="number" id="price-aceite4t" step="0.1" />
+        <label>Precio ACEITE MOTOR PESADO</label><input type="number" id="price-aceite-pesado" step="0.1" />
+        <label>Precio ACEITE MOTOR LIVIANO</label><input type="number" id="price-aceite-liviano" step="0.1" />
+        <label>Precio ACEITE HIDRAULICO (GL)</label><input type="number" id="price-aceite-hidraulico-gl" step="0.1" />
+        <label>Precio ACEITE HIDRAULICO (1/4)</label><input type="number" id="price-aceite-hidraulico-cuarto" step="0.1" />
+        <label>Precio REFRIGERANTE ROJO</label><input type="number" id="price-refrigerante-rojo" step="0.1" />
+        <label>Precio UREA</label><input type="number" id="price-urea" step="0.1" />
+        <label style="margin-top:12px">Valor del contrato MC (pesos)</label>
+        <input type="number" id="valor-contrato-mc" step="0.01" />
 
-    // PDF generation and charts (kept minimal here; same logic from previous version)
-    let chartInst = null;
-    function renderResumen(){ 
-      const arr = readStorage(); 
-      if(arr.length===0){ 
-        resumenEl.innerHTML = '<div class="small">No hay registros.</div>'; 
-        valorTotalConsumidoEl.textContent = '$0';
-        valorRestanteContratoEl.textContent = '$0';
-        if(chartInst){ chartInst.destroy(); chartInst=null;} 
-        return; 
-      }
-      
-      // Calcular total general
-      let totalGeneral = 0;
-      const resumen = {}; 
-      arr.forEach(r=>{ 
-        if(!resumen[r.maquina]) resumen[r.maquina] = {
-          acpm:0, corriente:0, grasa:0, aceite2t:0, aceite4t:0, 
-          aceite_pesado:0, aceite_liviano:0, aceite_hidraulico_gl:0, 
-          aceite_hidraulico_cuarto:0, refrigerante_rojo:0, urea:0, total:0
-        }; 
-        resumen[r.maquina].acpm += Number(r.acpm_qty)||0; 
-        resumen[r.maquina].corriente += Number(r.corriente_qty)||0; 
-        resumen[r.maquina].grasa += Number(r.grasa_qty)||0; 
-        resumen[r.maquina].aceite2t += Number(r.aceite2t_qty)||0; 
-        resumen[r.maquina].aceite4t += Number(r.aceite4t_qty)||0; 
-        resumen[r.maquina].aceite_pesado += Number(r.aceite_pesado_qty)||0; 
-        resumen[r.maquina].aceite_liviano += Number(r.aceite_liviano_qty)||0; 
-        resumen[r.maquina].aceite_hidraulico_gl += Number(r.aceite_hidraulico_gl_qty)||0; 
-        resumen[r.maquina].aceite_hidraulico_cuarto += Number(r.aceite_hidraulico_cuarto_qty)||0; 
-        resumen[r.maquina].refrigerante_rojo += Number(r.refrigerante_rojo_qty)||0; 
-        resumen[r.maquina].urea += Number(r.urea_qty)||0; 
-        const valorRegistro = Number(r.total_precio)||0;
-        resumen[r.maquina].total += valorRegistro;
-        totalGeneral += valorRegistro;
-      });
-      
-      // Actualizar totales
-      valorTotalConsumidoEl.textContent = formatoMoneda(totalGeneral);
-      const valorRestante = (SETTINGS.valorContratoMC || 0) - totalGeneral;
-      valorRestanteContratoEl.textContent = formatoMoneda(valorRestante);
-      
-      let html = '<table class="summary-table"><thead><tr><th>Máquina</th><th>ACPM (GL)</th><th>CORRIENTE (GL)</th><th>GRASA (LB)</th><th>ACEITE 2T (1/4)</th><th>ACEITE 4T (1/4)</th><th>ACEITE MOTOR PESADO (1/4)</th><th>ACEITE MOTOR LIVIANO (1/4)</th><th>ACEITE HIDRAULICO (GL)</th><th>ACEITE HIDRAULICO (1/4)</th><th>REFRIGERANTE ROJO (1/4)</th><th>UREA (GL)</th><th>Valor (pesos)</th></tr></thead><tbody>';
-      const labels = [], dataTotals = [], palette = ['rgba(59,130,246,0.9)','rgba(99,102,241,0.9)','rgba(16,185,129,0.9)','rgba(236,72,153,0.9)','rgba(250,204,21,0.9)'];
-      for(const m in resumen){ 
-        const r = resumen[m]; 
-        html += `<tr>
-          <td>${m}</td>
-          <td>${r.acpm.toFixed(2)}</td>
-          <td>${r.corriente.toFixed(2)}</td>
-          <td>${r.grasa.toFixed(2)}</td>
-          <td>${r.aceite2t.toFixed(2)}</td>
-          <td>${r.aceite4t.toFixed(2)}</td>
-          <td>${r.aceite_pesado.toFixed(2)}</td>
-          <td>${r.aceite_liviano.toFixed(2)}</td>
-          <td>${r.aceite_hidraulico_gl.toFixed(2)}</td>
-          <td>${r.aceite_hidraulico_cuarto.toFixed(2)}</td>
-          <td>${r.refrigerante_rojo.toFixed(2)}</td>
-          <td>${r.urea.toFixed(2)}</td>
-          <td>${formatoMoneda(r.total)}</td>
-        </tr>`; 
-        labels.push(m); 
-        dataTotals.push(Number(r.total.toFixed(2))); 
-      }
-      html += '</tbody></table>';
-      resumenEl.innerHTML = html;
-      
-      const type = chartTypeSel.value || 'bar'; 
-      const ctx = chartCanvas.getContext('2d'); 
-      if(chartInst) chartInst.destroy(); 
-      chartInst = new Chart(ctx, {
-        type, 
-        data:{
-          labels, 
-          datasets:[{
-            label:'Valor total (pesos)', 
-            data:dataTotals, 
-            backgroundColor:palette, 
-            borderColor:palette.map(c=>c.replace('0.9','1')), 
-            borderWidth:1
-          }]
-        }, 
-        options:{
-          responsive:true,
-          maintainAspectRatio:false,
-          plugins:{
-            legend:{
-              display:true,
-              position:'bottom'
-            }
-          },
-          scales:{
-            y:{
-              beginAtZero:true
-            }
-          }
-        }
-      });
-    }
-    
-    chartTypeSel.addEventListener('change', ()=>{ renderResumen(); });
-    btnDownloadChart.addEventListener('click', ()=>{ if(!chartInst){ alert('Genera el resumen primero.'); return; } chartCanvas.style.background = 'transparent'; const link = document.createElement('a'); link.download = 'grafica.png'; link.href = chartCanvas.toDataURL('image/png'); document.body.appendChild(link); link.click(); link.remove(); });
+        <label style="margin-top:12px">Opciones de exportación / IA</label>
+        <div style="display:flex;gap:8px;align-items:center;margin-top:6px">
+          <input type="checkbox" id="allow-ai" /> <label class="small">Permitir generación automática de informe con IA</label>
+        </div>
+        <label style="margin-top:8px">Clave API OpenAI (opcional)</label>
+        <input type="text" id="openai-key" placeholder="sk-... (opcional)" />
+        <div class="small" style="margin-top:8px;color:#dc3545">Advertencia: guardar la clave en el navegador es inseguro.</div>
+      </div>
+    </div>
+  </div>
 
-    // PDF generation (kept same as previous)
-    btnGeneratePdf.addEventListener('click', async ()=>{ const arr = readStorage(); if(arr.length===0){ alert('No hay datos para generar el PDF.'); return; } // simplified: reuse previous PDF builder
-      const resumen = {}; arr.forEach(r=>{ if(!resumen[r.maquina]) resumen[r.maquina]={acpm:0,corriente:0,grasa:0,aceite2t:0,aceite4t:0,aceite_pesado:0,aceite_liviano:0,aceite_hidraulico_gl:0,aceite_hidraulico_cuarto:0,refrigerante_rojo:0,urea:0,total:0,count:0}; resumen[r.maquina].acpm += Number(r.acpm_qty)||0; resumen[r.maquina].corriente += Number(r.corriente_qty)||0; resumen[r.maquina].grasa += Number(r.grasa_qty)||0; resumen[r.maquina].aceite2t += Number(r.aceite2t_qty)||0; resumen[r.maquina].aceite4t += Number(r.aceite4t_qty)||0; resumen[r.maquina].aceite_pesado += Number(r.aceite_pesado_qty)||0; resumen[r.maquina].aceite_liviano += Number(r.aceite_liviano_qty)||0; resumen[r.maquina].aceite_hidraulico_gl += Number(r.aceite_hidraulico_gl_qty)||0; resumen[r.maquina].aceite_hidraulico_cuarto += Number(r.aceite_hidraulico_cuarto_qty)||0; resumen[r.maquina].refrigerante_rojo += Number(r.refrigerante_rojo_qty)||0; resumen[r.maquina].urea += Number(r.urea_qty)||0; resumen[r.maquina].total += Number(r.total_precio)||0; resumen[r.maquina].count +=1; });
-      // Build small chart image
-      const tempCanvas = document.createElement('canvas'); tempCanvas.width = 1000; tempCanvas.height = 450; const ctx = tempCanvas.getContext('2d'); const labels = Object.keys(resumen); const dataTotals = labels.map(m=>resumen[m].total.toFixed(2)); new Chart(ctx, {type:'bar', data:{labels, datasets:[{label:'Valor total (pesos)', data:dataTotals, backgroundColor:['#3b82f6','#6366f1','#10b981','#ef4444','#f59e0b']}]} , options:{responsive:false,plugins:{legend:{display:false}}}}); await new Promise(r=>setTimeout(r,500)); const chartDataUrl = tempCanvas.toDataURL('image/png');
-      // AI summary optional (omitted here for brevity)
-      const { jsPDF } = window.jspdf; const pdf = new jsPDF({unit:'pt',format:'a4'}); pdf.setFontSize(18); pdf.text('Informe Profesional - Combustible', 40, 50); pdf.setFontSize(10); pdf.text(`Generado por: Cristian · Fecha: ${new Date().toLocaleString()}`, 40, 70); pdf.addImage(chartDataUrl, 'PNG', 40, 90, 520, 250); pdf.addPage(); pdf.text('Detalles por máquina', 40, 40); pdf.save('resumen_combustible_profesional.pdf'); });
+  <!-- Excel modal -->
+  <div id="excel-modal" class="hidden">
+    <div class="backdrop"></div>
+    <div class="excel-modal card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h3>Excel virtual - Registros</h3>
+        <div>
+          <button class="btn ghost" id="btn-close-excel">Cerrar</button>
+          <button class="btn primary" id="btn-export-excel">Exportar .xlsx</button>
+        </div>
+      </div>
+      <div style="margin-top:12px;overflow:auto">
+        <table class="summary-table" id="table-excel">
+          <thead><tr><th>Timestamp</th><th>Máquina</th><th>Fecha</th><th>ACPM</th><th>CORRIENTE</th><th>GRASA</th><th>2T</th><th>4T</th><th>PESADO</th><th>LIVIANO</th><th>HID GL</th><th>HID 1/4</th><th>REF ROJO</th><th>UREA</th><th>Total</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
 
-    // Initial renders
-    renderLista(); 
-    renderResumen();
-    setTimeout(()=>{ renderResumen(); },300);
-  </script>
+<script>
+  // ============================================================
+  // CONFIGURACIÓN
+  // ============================================================
+  const DEFAULT_PRICES = {
+    ACPM: 13250, CORRIENTE: 20250, GRASA: 16750,
+    ACEITE_2T: 34000, ACEITE_4T: 35000,
+    ACEITE_MOTOR_PESADO: 40000, ACEITE_MOTOR_LIVIANO: 38000,
+    ACEITE_HIDRAULICO_GL: 105000, ACEITE_HIDRAULICO_CUARTO: 26000,
+    REFRIGERANTE_ROJO: 15000, UREA: 29750
+  };
+  const ADMIN_PASSWORD = 'AC.ardila2006';
+  const SETTINGS_KEY = 'combustible_settings_v2';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwrPDZMp9jwQos2jnzCC58cITe-03xtbXYCKzfgQCq-yhY8ZjrgmQtGMG0XWGkUf2vP/exec';
 
+  // Variables globales
+  let SETTINGS = loadSettings();
+  let registros = [];               // Todos los registros cargados desde Google Sheets
+  let lastRecord = null;
+  let chartInst = null;
+  let showTotals = false;
 
-  <script>
-  // Pega aquí la nueva URL generada al hacer "Nueva implementación"
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwrPDZMp9jwQos2jnzCC58cITe-03xtbXYCKzfgQCq-yhY8ZjrgmQtGMG0XWGkUf2vP/exec";
+  // DOM refs
+  const $ = id => document.getElementById(id);
+  const maquinaEl = $('maquina');
+  const fechaEl = $('fecha');
+  const acpmEl = $('acpm');
+  const corrienteEl = $('corriente');
+  const grasaEl = $('grasa');
+  const aceite2tEl = $('aceite2t');
+  const aceite4tEl = $('aceite4t');
+  const aceitePesadoEl = $('aceite-pesado');
+  const aceiteLivianoEl = $('aceite-liviano');
+  const aceiteHidGlEl = $('aceite-hidraulico-gl');
+  const aceiteHidCuartoEl = $('aceite-hidraulico-cuarto');
+  const refRojoEl = $('refrigerante-rojo');
+  const ureaEl = $('urea');
+  const mensajeEl = $('mensaje');
+  const recibosEl = $('recibos');
+  const listaRegistros = $('lista-registros');
+  const resumenEl = $('resumen');
+  const chartCanvas = $('chartTotales');
+  const chartTypeSel = $('chart-type');
+  const btnToggleRecent = $('btn-toggle-recent');
+  const btnDownloadChart = $('btn-download-chart');
+  const valorTotalConsumidoEl = $('valor-total-consumido');
+  const valorRestanteContratoEl = $('valor-restante-contrato');
 
-  async function enviarAGoogleSheets(record) {
+  // ============================================================
+  // Funciones de carga/guardado de ajustes (solo precios y contrato)
+  // ============================================================
+  function loadSettings() {
+    const raw = localStorage.getItem(SETTINGS_KEY);
+    if (!raw) return { prices: { ...DEFAULT_PRICES }, allowAI: false, openaiKey: '', valorContratoMC: 0 };
     try {
-      mensajeEl.innerHTML += ' <span style="color:#60a5fa">(Guardando en Excel...)</span>';
-      
-      await fetch(SCRIPT_URL, {
-        method: "POST",
-        mode: "cors",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(record)
-      });
-
-      mensajeEl.innerHTML = '<div style="color:#34d399;font-weight:700">¡Registro guardado exitosamente en Google Sheets! ✔</div>';
-    } catch (error) {
-      console.error("Error al enviar a Google Sheets:", error);
-      mensajeEl.innerHTML = '<div style="color:#f87171;font-weight:700">Guardado localmente, pero falló la sincronización con Google Sheets.</div>';
-    }
+      const s = JSON.parse(raw);
+      if (s.valorContratoMC === undefined) s.valorContratoMC = 0;
+      return s;
+    } catch { return { prices: { ...DEFAULT_PRICES }, allowAI: false, openaiKey: '', valorContratoMC: 0 }; }
   }
+  function saveSettings(s) { localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); }
 
-  btnGenerar.addEventListener('click', ()=>{
-    const maquina = maquinaEl.value; 
-    const fecha = fechaEl.value || new Date().toISOString().slice(0,10);
-    const acpm_qty = parseFloat(acpmEl.value) || 0; 
-    const corriente_qty = parseFloat(corrienteEl.value) || 0; 
-    const grasa_qty = parseFloat(grasaEl.value) || 0; 
-    const aceite2t_qty = parseFloat(aceite2tEl.value) || 0; 
-    const aceite4t_qty = parseFloat(aceite4tEl.value) || 0; 
-    const aceite_pesado_qty = parseFloat(aceitePesadoEl.value) || 0; 
-    const aceite_liviano_qty = parseFloat(aceiteLivianoEl.value) || 0; 
-    const aceite_hidraulico_gl_qty = parseFloat(aceiteHidraulicoGlEl.value) || 0; 
-    const aceite_hidraulico_cuarto_qty = parseFloat(aceiteHidraulicoCuartoEl.value) || 0; 
-    const refrigerante_rojo_qty = parseFloat(refrigeranteRojoEl.value) || 0; 
-    const urea_qty = parseFloat(ureaEl.value) || 0; 
-    
-    const prices = SETTINGS.prices || DEFAULT_PRICES;
-    const acpm_total = acpm_qty * prices.ACPM; 
-    const corriente_total = corriente_qty * prices.CORRIENTE; 
-    const grasa_total = grasa_qty * prices.GRASA; 
-    const aceite2t_total = aceite2t_qty * prices.ACEITE_2T; 
-    const aceite4t_total = aceite4t_qty * prices.ACEITE_4T; 
-    const aceite_pesado_total = aceite_pesado_qty * prices.ACEITE_MOTOR_PESADO; 
-    const aceite_liviano_total = aceite_liviano_qty * prices.ACEITE_MOTOR_LIVIANO; 
-    const aceite_hidraulico_gl_total = aceite_hidraulico_gl_qty * prices.ACEITE_HIDRAULICO_GL; 
-    const aceite_hidraulico_cuarto_total = aceite_hidraulico_cuarto_qty * prices.ACEITE_HIDRAULICO_CUARTO; 
-    const refrigerante_rojo_total = refrigerante_rojo_qty * prices.REFRIGERANTE_ROJO; 
-    const urea_total = urea_qty * prices.UREA; 
-    
-    const total_precio = acpm_total + corriente_total + grasa_total + aceite2t_total + 
-                        aceite4t_total + aceite_pesado_total + aceite_liviano_total + 
-                        aceite_hidraulico_gl_total + aceite_hidraulico_cuarto_total + 
-                        refrigerante_rojo_total + urea_total;
-    
-    const orderNumber = getNextOrderNumber(maquina);
-    
-    const record = { 
-      timestamp: new Date().toISOString(), 
-      maquina, 
-      fecha, 
-      acpm_qty, 
-      corriente_qty, 
-      grasa_qty, 
-      aceite2t_qty, 
-      aceite4t_qty, 
-      aceite_pesado_qty, 
-      aceite_liviano_qty, 
-      aceite_hidraulico_gl_qty, 
-      aceite_hidraulico_cuarto_qty, 
-      refrigerante_rojo_qty, 
-      urea_qty, 
-      total_precio,
-      orderNumber
-    };
-    
-    addRecord(record); 
-    renderRecibos(record); 
-    renderLista(); 
-    renderResumen(); 
-    lastRecord = record;
-
-    enviarAGoogleSheets(record);
-  });
-
-
-
-
-    // Función para cargar los datos de Google Sheets al iniciar
-  async function cargarDatosDesdeGoogleSheets() {
+  // ============================================================
+  // Comunicación con Google Sheets
+  // ============================================================
+  async function cargarRegistros() {
     try {
       const res = await fetch(SCRIPT_URL);
       const json = await res.json();
-      
-      if (json.status === "success" && Array.isArray(json.data)) {
-        // Reemplaza o complementa tus registros locales con los de Google Sheets
-        records = json.data; 
-        
-        // Actualiza la interfaz, listas y gráficas
-        renderLista();
-        renderResumen();
-        console.log("Datos cargados correctamente desde Google Sheets.");
+      if (json.status === 'success' && Array.isArray(json.data)) {
+        registros = json.data;
+        // Asegurar que cada registro tenga campos numéricos
+        registros = registros.map(r => ({
+          ...r,
+          acpm_qty: parseFloat(r.acpm_qty) || 0,
+          corriente_qty: parseFloat(r.corriente_qty) || 0,
+          grasa_qty: parseFloat(r.grasa_qty) || 0,
+          aceite2t_qty: parseFloat(r.aceite2t_qty) || 0,
+          aceite4t_qty: parseFloat(r.aceite4t_qty) || 0,
+          aceite_pesado_qty: parseFloat(r.aceite_pesado_qty) || 0,
+          aceite_liviano_qty: parseFloat(r.aceite_liviano_qty) || 0,
+          aceite_hidraulico_gl_qty: parseFloat(r.aceite_hidraulico_gl_qty) || 0,
+          aceite_hidraulico_cuarto_qty: parseFloat(r.aceite_hidraulico_cuarto_qty) || 0,
+          refrigerante_rojo_qty: parseFloat(r.refrigerante_rojo_qty) || 0,
+          urea_qty: parseFloat(r.urea_qty) || 0,
+          total_precio: parseFloat(r.total_precio) || 0,
+          orderNumber: parseInt(r.orderNumber) || 1,
+        }));
+        actualizarInterfaz();
+      } else {
+        console.warn('No se pudieron cargar datos, se usarán registros vacíos.');
+        registros = [];
+        actualizarInterfaz();
       }
     } catch (error) {
-      console.error("No se pudieron cargar los datos de Google Sheets:", error);
+      console.error('Error al cargar desde Google Sheets:', error);
+      registros = [];
+      actualizarInterfaz();
     }
   }
-  
-  // Ejecutar al abrir la página
-  document.addEventListener("DOMContentLoaded", () => {
-    cargarDatosDesdeGoogleSheets();
+
+  async function enviarAGoogleSheets(record) {
+    try {
+      mensajeEl.innerHTML += ' <span style="color:#0d6efd;">(Guardando en Excel...)</span>';
+      const res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(record)
+      });
+      const json = await res.json();
+      if (json.status === 'success') {
+        mensajeEl.innerHTML = '<div style="color:#198754;font-weight:700">✔ Registro guardado en Google Sheets</div>';
+        // Recargar datos para actualizar la vista
+        await cargarRegistros();
+      } else {
+        mensajeEl.innerHTML = '<div style="color:#dc3545;font-weight:700">Error al guardar en Google Sheets.</div>';
+      }
+    } catch (error) {
+      console.error('Error al enviar a Google Sheets:', error);
+      mensajeEl.innerHTML = '<div style="color:#dc3545;font-weight:700">Error de red al guardar en Google Sheets.</div>';
+    }
+  }
+
+  // ============================================================
+  // Funciones de ayuda y formato
+  // ============================================================
+  function formatoMoneda(v) {
+    return '$' + Number(v).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
+
+  function formatDateForReceipt(dateString) {
+    const d = new Date(dateString);
+    return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
+  }
+
+  // Obtener siguiente número de orden para una máquina (basado en registros actuales)
+  function getNextOrderNumber(maquina) {
+    const filtrados = registros.filter(r => r.maquina === maquina);
+    if (filtrados.length === 0) return 1;
+    const maxOrder = Math.max(...filtrados.map(r => parseInt(r.orderNumber) || 0));
+    return maxOrder + 1;
+  }
+
+  // ============================================================
+  // Generación de HTML del recibo (con logo)
+  // ============================================================
+  function generateReceiptHTML(record, titulo) {
+    const orderNumber = record.orderNumber || 1;
+    const formattedDate = formatDateForReceipt(record.fecha);
+    const prices = SETTINGS.prices || DEFAULT_PRICES;
+
+    const acpm_total = (record.acpm_qty || 0) * prices.ACPM;
+    const corriente_total = (record.corriente_qty || 0) * prices.CORRIENTE;
+    const grasa_total = (record.grasa_qty || 0) * prices.GRASA;
+    const aceite2t_total = (record.aceite2t_qty || 0) * prices.ACEITE_2T;
+    const aceite4t_total = (record.aceite4t_qty || 0) * prices.ACEITE_4T;
+    const aceite_pesado_total = (record.aceite_pesado_qty || 0) * prices.ACEITE_MOTOR_PESADO;
+    const aceite_liviano_total = (record.aceite_liviano_qty || 0) * prices.ACEITE_MOTOR_LIVIANO;
+    const aceite_hid_gl_total = (record.aceite_hidraulico_gl_qty || 0) * prices.ACEITE_HIDRAULICO_GL;
+    const aceite_hid_cuarto_total = (record.aceite_hidraulico_cuarto_qty || 0) * prices.ACEITE_HIDRAULICO_CUARTO;
+    const ref_rojo_total = (record.refrigerante_rojo_qty || 0) * prices.REFRIGERANTE_ROJO;
+    const urea_total = (record.urea_qty || 0) * prices.UREA;
+    const total_precio = acpm_total + corriente_total + grasa_total + aceite2t_total +
+                         aceite4t_total + aceite_pesado_total + aceite_liviano_total +
+                         aceite_hid_gl_total + aceite_hid_cuarto_total + ref_rojo_total + urea_total;
+
+    // Logo de ejemplo (reemplaza la URL por la de tu logo)
+    const logoUrl = 'https://via.placeholder.com/100x60/0d6efd/ffffff?text=Logo';
+
+    return `
+      <div class="receipt">
+        <div class="receipt-header">
+          <div class="receipt-logo">
+            <img src="${logoUrl}" alt="Logo empresa" />
+          </div>
+          <div style="flex:1; text-align:center;">
+            <div class="receipt-title">${titulo}</div>
+          </div>
+          <div class="receipt-info">
+            <div>Código: ${record.timestamp}</div>
+            <div>Código TRD:</div>
+            <div>Vigencia:</div>
+            <div>Versión:</div>
+          </div>
+        </div>
+        <div class="receipt-object">
+          OBJETO: SUMINISTRO DE COMBUSTIBLE, LUBRICANTES, ACEITES, REFRIGERANTES, UREA Y GRASAS PARA LOS VEHÍCULOS DEL PARQUE AUTOMOTOR, GUADAÑAS Y MAQUINARIA DEL MUNICIPIO DE JERÍCÓ- ANTIOQUIA.
+        </div>
+        <div class="receipt-contract">
+          <div>CONTRATO N°: SASI-007-2025</div>
+          <div>ORDEN DE PEDIDO N°: ${orderNumber}</div>
+          <div>FECHA: ${formattedDate}</div>
+        </div>
+        <table class="receipt-table">
+          <thead><tr><th>VEHÍCULO</th><th>DESCRIPCIÓN</th><th>UNIDAD</th><th>CANTIDAD</th><th>Vr. UNITARIO</th><th>Vr. TOTAL</th></tr></thead>
+          <tbody>
+            <tr><td>${record.maquina}</td><td>ACPM</td><td>GL</td><td>${record.acpm_qty || 0}</td><td>${formatoMoneda(prices.ACPM)}</td><td>${formatoMoneda(acpm_total)}</td></tr>
+            <tr><td></td><td>CORRIENTE</td><td>GL</td><td>${record.corriente_qty || 0}</td><td>${formatoMoneda(prices.CORRIENTE)}</td><td>${formatoMoneda(corriente_total)}</td></tr>
+            <tr><td></td><td>GRASA</td><td>LB</td><td>${record.grasa_qty || 0}</td><td>${formatoMoneda(prices.GRASA)}</td><td>${formatoMoneda(grasa_total)}</td></tr>
+            <tr><td></td><td>ACEITE 2T</td><td>0.25</td><td>${record.aceite2t_qty || 0}</td><td>${formatoMoneda(prices.ACEITE_2T)}</td><td>${formatoMoneda(aceite2t_total)}</td></tr>
+            <tr><td></td><td>ACEITE 4T</td><td>0.25</td><td>${record.aceite4t_qty || 0}</td><td>${formatoMoneda(prices.ACEITE_4T)}</td><td>${formatoMoneda(aceite4t_total)}</td></tr>
+            <tr><td></td><td>ACEITE MOTOR PESADO</td><td>0.25</td><td>${record.aceite_pesado_qty || 0}</td><td>${formatoMoneda(prices.ACEITE_MOTOR_PESADO)}</td><td>${formatoMoneda(aceite_pesado_total)}</td></tr>
+            <tr><td></td><td>ACEITE MOTOR LIVIANO</td><td>0.25</td><td>${record.aceite_liviano_qty || 0}</td><td>${formatoMoneda(prices.ACEITE_MOTOR_LIVIANO)}</td><td>${formatoMoneda(aceite_liviano_total)}</td></tr>
+            <tr><td></td><td>ACEITE HIDRAULICO</td><td>GL</td><td>${record.aceite_hidraulico_gl_qty || 0}</td><td>${formatoMoneda(prices.ACEITE_HIDRAULICO_GL)}</td><td>${formatoMoneda(aceite_hid_gl_total)}</td></tr>
+            <tr><td></td><td>ACEITE HIDRAULICO</td><td>0.25</td><td>${record.aceite_hidraulico_cuarto_qty || 0}</td><td>${formatoMoneda(prices.ACEITE_HIDRAULICO_CUARTO)}</td><td>${formatoMoneda(aceite_hid_cuarto_total)}</td></tr>
+            <tr><td></td><td>REFRIGERANTE ROJO</td><td>0.25</td><td>${record.refrigerante_rojo_qty || 0}</td><td>${formatoMoneda(prices.REFRIGERANTE_ROJO)}</td><td>${formatoMoneda(ref_rojo_total)}</td></tr>
+            <tr><td></td><td>UREA</td><td>GL</td><td>${record.urea_qty || 0}</td><td>${formatoMoneda(prices.UREA)}</td><td>${formatoMoneda(urea_total)}</td></tr>
+          </tbody>
+        </table>
+        <div class="receipt-total">VALOR TOTAL ${formatoMoneda(total_precio)}</div>
+        <div class="receipt-signature">
+          <div>NOMBRE Y APELLIDOS: DAVID GRISALES VALENCIA</div>
+          <div>FIRMA: ______________________________</div>
+        </div>
+        <div class="receipt-footer">
+          Palacio Municipal, Santiago Santamaría<br>
+          NIT: 890.981.069 - Teléfono: (604) 830523101- Código postal 056010 <br>
+          www.jerico-antioquia.gov.co
+        </div>
+      </div>
+    `;
+  }
+
+  function renderRecibos(record) {
+    recibosEl.innerHTML = '';
+    ['COPIA 1', 'COPIA 2'].forEach(titulo => {
+      const div = document.createElement('div');
+      div.className = 'copy';
+      div.innerHTML = generateReceiptHTML(record, titulo);
+      recibosEl.appendChild(div);
+    });
+  }
+
+  // ============================================================
+  // Renderizado de lista y resumen (usando registros globales)
+  // ============================================================
+  function renderLista() {
+    if (showTotals) {
+      renderTotalesGlobal();
+      return;
+    }
+    if (!registros.length) {
+      listaRegistros.innerHTML = '<div class="small">No hay registros.</div>';
+      return;
+    }
+    const sorted = [...registros].sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+    listaRegistros.innerHTML = '';
+    sorted.slice(0, 200).forEach(r => {
+      const d = document.createElement('div');
+      d.className = 'card';
+      d.style.marginBottom = '8px';
+      let materiales = '';
+      if (r.acpm_qty) materiales += `ACPM: ${Number(r.acpm_qty).toFixed(2)} GL<br>`;
+      if (r.corriente_qty) materiales += `CORR: ${Number(r.corriente_qty).toFixed(2)} GL<br>`;
+      if (r.grasa_qty) materiales += `GRASA: ${Number(r.grasa_qty).toFixed(2)} LB<br>`;
+      if (r.aceite2t_qty) materiales += `2T: ${Number(r.aceite2t_qty).toFixed(2)} 1/4<br>`;
+      if (r.aceite4t_qty) materiales += `4T: ${Number(r.aceite4t_qty).toFixed(2)} 1/4<br>`;
+      if (r.aceite_pesado_qty) materiales += `PESADO: ${Number(r.aceite_pesado_qty).toFixed(2)} 1/4<br>`;
+      if (r.aceite_liviano_qty) materiales += `LIVIANO: ${Number(r.aceite_liviano_qty).toFixed(2)} 1/4<br>`;
+      if (r.aceite_hidraulico_gl_qty) materiales += `HID GL: ${Number(r.aceite_hidraulico_gl_qty).toFixed(2)} GL<br>`;
+      if (r.aceite_hidraulico_cuarto_qty) materiales += `HID 1/4: ${Number(r.aceite_hidraulico_cuarto_qty).toFixed(2)} 1/4<br>`;
+      if (r.refrigerante_rojo_qty) materiales += `REF ROJO: ${Number(r.refrigerante_rojo_qty).toFixed(2)} 1/4<br>`;
+      if (r.urea_qty) materiales += `UREA: ${Number(r.urea_qty).toFixed(2)} GL<br>`;
+      d.innerHTML = `
+        <div style="display:flex;justify-content:space-between">
+          <div>
+            <strong>${r.maquina}</strong>
+            <div class="small">${r.fecha} · ${new Date(r.timestamp).toLocaleString()}</div>
+            <div class="small">Orden: ${r.orderNumber || 1}</div>
+          </div>
+          <div class="small">${materiales}</div>
+        </div>
+      `;
+      listaRegistros.appendChild(d);
+    });
+  }
+
+  function renderTotalesGlobal() {
+    if (!registros.length) {
+      listaRegistros.innerHTML = '<div class="small">No hay registros.</div>';
+      return;
+    }
+    const totals = { acpm:0, corriente:0, grasa:0, aceite2t:0, aceite4t:0,
+      aceite_pesado:0, aceite_liviano:0, aceite_hidraulico_gl:0,
+      aceite_hidraulico_cuarto:0, refrigerante_rojo:0, urea:0, money:0 };
+    registros.forEach(r => {
+      totals.acpm += Number(r.acpm_qty)||0;
+      totals.corriente += Number(r.corriente_qty)||0;
+      totals.grasa += Number(r.grasa_qty)||0;
+      totals.aceite2t += Number(r.aceite2t_qty)||0;
+      totals.aceite4t += Number(r.aceite4t_qty)||0;
+      totals.aceite_pesado += Number(r.aceite_pesado_qty)||0;
+      totals.aceite_liviano += Number(r.aceite_liviano_qty)||0;
+      totals.aceite_hidraulico_gl += Number(r.aceite_hidraulico_gl_qty)||0;
+      totals.aceite_hidraulico_cuarto += Number(r.aceite_hidraulico_cuarto_qty)||0;
+      totals.refrigerante_rojo += Number(r.refrigerante_rojo_qty)||0;
+      totals.urea += Number(r.urea_qty)||0;
+      totals.money += Number(r.total_precio)||0;
+    });
+    listaRegistros.innerHTML = `
+      <div style="padding:12px">
+        <div><strong>Totales globales</strong></div>
+        <div class="small" style="margin-top:8px">
+          ${totals.acpm ? `ACPM: ${totals.acpm.toFixed(2)} GL<br>` : ''}
+          ${totals.corriente ? `CORRIENTE: ${totals.corriente.toFixed(2)} GL<br>` : ''}
+          ${totals.grasa ? `GRASA: ${totals.grasa.toFixed(2)} LB<br>` : ''}
+          ${totals.aceite2t ? `ACEITE 2T: ${totals.aceite2t.toFixed(2)} 1/4<br>` : ''}
+          ${totals.aceite4t ? `ACEITE 4T: ${totals.aceite4t.toFixed(2)} 1/4<br>` : ''}
+          ${totals.aceite_pesado ? `PESADO: ${totals.aceite_pesado.toFixed(2)} 1/4<br>` : ''}
+          ${totals.aceite_liviano ? `LIVIANO: ${totals.aceite_liviano.toFixed(2)} 1/4<br>` : ''}
+          ${totals.aceite_hidraulico_gl ? `HID GL: ${totals.aceite_hidraulico_gl.toFixed(2)} GL<br>` : ''}
+          ${totals.aceite_hidraulico_cuarto ? `HID 1/4: ${totals.aceite_hidraulico_cuarto.toFixed(2)} 1/4<br>` : ''}
+          ${totals.refrigerante_rojo ? `REF ROJO: ${totals.refrigerante_rojo.toFixed(2)} 1/4<br>` : ''}
+          ${totals.urea ? `UREA: ${totals.urea.toFixed(2)} GL<br>` : ''}
+        </div>
+        <div style="margin-top:8px;font-weight:800">Valor total (pesos): ${formatoMoneda(totals.money)}</div>
+      </div>
+    `;
+  }
+
+  function renderResumen() {
+    if (!registros.length) {
+      resumenEl.innerHTML = '<div class="small">No hay registros.</div>';
+      valorTotalConsumidoEl.textContent = '$0';
+      valorRestanteContratoEl.textContent = '$0';
+      if (chartInst) { chartInst.destroy(); chartInst = null; }
+      return;
+    }
+
+    const resumen = {};
+    let totalGeneral = 0;
+    registros.forEach(r => {
+      const m = r.maquina;
+      if (!resumen[m]) {
+        resumen[m] = { acpm:0, corriente:0, grasa:0, aceite2t:0, aceite4t:0,
+          aceite_pesado:0, aceite_liviano:0, aceite_hidraulico_gl:0,
+          aceite_hidraulico_cuarto:0, refrigerante_rojo:0, urea:0, total:0 };
+      }
+      resumen[m].acpm += Number(r.acpm_qty)||0;
+      resumen[m].corriente += Number(r.corriente_qty)||0;
+      resumen[m].grasa += Number(r.grasa_qty)||0;
+      resumen[m].aceite2t += Number(r.aceite2t_qty)||0;
+      resumen[m].aceite4t += Number(r.aceite4t_qty)||0;
+      resumen[m].aceite_pesado += Number(r.aceite_pesado_qty)||0;
+      resumen[m].aceite_liviano += Number(r.aceite_liviano_qty)||0;
+      resumen[m].aceite_hidraulico_gl += Number(r.aceite_hidraulico_gl_qty)||0;
+      resumen[m].aceite_hidraulico_cuarto += Number(r.aceite_hidraulico_cuarto_qty)||0;
+      resumen[m].refrigerante_rojo += Number(r.refrigerante_rojo_qty)||0;
+      resumen[m].urea += Number(r.urea_qty)||0;
+      resumen[m].total += Number(r.total_precio)||0;
+      totalGeneral += Number(r.total_precio)||0;
+    });
+
+    valorTotalConsumidoEl.textContent = formatoMoneda(totalGeneral);
+    const restante = (SETTINGS.valorContratoMC || 0) - totalGeneral;
+    valorRestanteContratoEl.textContent = formatoMoneda(restante);
+
+    let html = `<table class="summary-table"><thead><tr>
+      <th>Máquina</th><th>ACPM</th><th>CORR</th><th>GRASA</th><th>2T</th><th>4T</th>
+      <th>PESADO</th><th>LIVIANO</th><th>HID GL</th><th>HID 1/4</th><th>REF ROJO</th><th>UREA</th><th>Valor</th>
+    </tr></thead><tbody>`;
+    const labels = [], data = [];
+    const palette = ['#0d6efd','#6610f2','#198754','#dc3545','#ffc107','#fd7e14'];
+    let idx = 0;
+    for (const m in resumen) {
+      const r = resumen[m];
+      html += `<tr>
+        <td>${m}</td><td>${r.acpm.toFixed(2)}</td><td>${r.corriente.toFixed(2)}</td>
+        <td>${r.grasa.toFixed(2)}</td><td>${r.aceite2t.toFixed(2)}</td><td>${r.aceite4t.toFixed(2)}</td>
+        <td>${r.aceite_pesado.toFixed(2)}</td><td>${r.aceite_liviano.toFixed(2)}</td>
+        <td>${r.aceite_hidraulico_gl.toFixed(2)}</td><td>${r.aceite_hidraulico_cuarto.toFixed(2)}</td>
+        <td>${r.refrigerante_rojo.toFixed(2)}</td><td>${r.urea.toFixed(2)}</td>
+        <td>${formatoMoneda(r.total)}</td>
+      </tr>`;
+      labels.push(m);
+      data.push(r.total);
+    }
+    html += '</tbody></table>';
+    resumenEl.innerHTML = html;
+
+    // Chart
+    const type = chartTypeSel.value || 'bar';
+    const ctx = chartCanvas.getContext('2d');
+    if (chartInst) chartInst.destroy();
+    chartInst = new Chart(ctx, {
+      type,
+      data: {
+        labels,
+        datasets: [{
+          label: 'Valor total (pesos)',
+          data,
+          backgroundColor: palette.slice(0, labels.length),
+          borderColor: palette.slice(0, labels.length).map(c => c),
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: true, position: 'bottom' } },
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+  }
+
+  function actualizarInterfaz() {
+    renderLista();
+    renderResumen();
+    // Si hay un último registro generado, volver a mostrarlo en recibos (opcional)
+    // No lo re-renderizamos automáticamente para no perderlo.
+  }
+
+  // ============================================================
+  // Eventos principales
+  // ============================================================
+
+  // Generar recibo
+  $('btn-generar').addEventListener('click', async () => {
+    const maquina = maquinaEl.value;
+    const fecha = fechaEl.value || new Date().toISOString().slice(0,10);
+    const acpm_qty = parseFloat(acpmEl.value) || 0;
+    const corriente_qty = parseFloat(corrienteEl.value) || 0;
+    const grasa_qty = parseFloat(grasaEl.value) || 0;
+    const aceite2t_qty = parseFloat(aceite2tEl.value) || 0;
+    const aceite4t_qty = parseFloat(aceite4tEl.value) || 0;
+    const aceite_pesado_qty = parseFloat(aceitePesadoEl.value) || 0;
+    const aceite_liviano_qty = parseFloat(aceiteLivianoEl.value) || 0;
+    const aceite_hidraulico_gl_qty = parseFloat(aceiteHidGlEl.value) || 0;
+    const aceite_hidraulico_cuarto_qty = parseFloat(aceiteHidCuartoEl.value) || 0;
+    const refrigerante_rojo_qty = parseFloat(refRojoEl.value) || 0;
+    const urea_qty = parseFloat(ureaEl.value) || 0;
+
+    const orderNumber = getNextOrderNumber(maquina);
+
+    const record = {
+      timestamp: new Date().toISOString(),
+      maquina,
+      fecha,
+      acpm_qty,
+      corriente_qty,
+      grasa_qty,
+      aceite2t_qty,
+      aceite4t_qty,
+      aceite_pesado_qty,
+      aceite_liviano_qty,
+      aceite_hidraulico_gl_qty,
+      aceite_hidraulico_cuarto_qty,
+      refrigerante_rojo_qty,
+      urea_qty,
+      orderNumber,
+      // El total se calculará en el servidor o aquí, pero lo enviamos también
+      total_precio: 0 // lo calcula el servidor o lo ignoramos
+    };
+
+    // Mostrar en pantalla el recibo localmente antes de guardar
+    renderRecibos(record);
+    lastRecord = record;
+
+    // Enviar a Google Sheets y recargar
+    await enviarAGoogleSheets(record);
+    // Después de guardar, se recargan los registros y se actualiza la interfaz
   });
-  </script>
+
+  // Limpiar formulario
+  $('btn-clear').addEventListener('click', () => {
+    acpmEl.value = ''; corrienteEl.value = ''; grasaEl.value = '';
+    aceite2tEl.value = ''; aceite4tEl.value = ''; aceitePesadoEl.value = '';
+    aceiteLivianoEl.value = ''; aceiteHidGlEl.value = ''; aceiteHidCuartoEl.value = '';
+    refRojoEl.value = ''; ureaEl.value = '';
+    mensajeEl.innerHTML = '';
+  });
+
+  // Vista previa de impresión
+  $('btn-preview-print').addEventListener('click', () => {
+    if (!lastRecord) { alert('Genera un recibo primero.'); return; }
+    const modal = $('print-modal');
+    const content = $('print-preview-content');
+    content.innerHTML = '';
+    const c1 = document.createElement('div');
+    c1.innerHTML = generateReceiptHTML(lastRecord, 'COPIA 1');
+    const c2 = document.createElement('div');
+    c2.innerHTML = generateReceiptHTML(lastRecord, 'COPIA 2');
+    content.appendChild(c1);
+    const br = document.createElement('div');
+    br.className = 'page-break';
+    br.style.height = '12px';
+    content.appendChild(br);
+    content.appendChild(c2);
+    modal.classList.remove('hidden');
+  });
+
+  $('btn-close-print').addEventListener('click', () => {
+    $('print-modal').classList.add('hidden');
+  });
+
+  $('btn-print-now').addEventListener('click', () => {
+    if (!lastRecord) return;
+    const html = buildPrintableHtml(lastRecord);
+    const w = window.open('', '_blank');
+    w.document.open(); w.document.write(html); w.document.close();
+    w.onload = () => setTimeout(() => { w.focus(); w.print(); }, 300);
+  });
+
+  function buildPrintableHtml(record) {
+    const style = `
+      <style>
+        body{font-family:Arial,sans-serif;color:#000;margin:20px}
+        .receipt {border:1px solid #000; padding:20px; margin-bottom:20px; position:relative;}
+        .receipt-header {display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;}
+        .receipt-logo {flex-shrink:0;}
+        .receipt-logo img {max-height:60px; width:auto;}
+        .receipt-title {font-weight:bold; font-size:16px;}
+        .receipt-info {font-size:12px; text-align:right;}
+        .receipt-object {font-size:12px; margin-bottom:10px;}
+        .receipt-contract {display:flex; justify-content:space-between; margin-bottom:10px; font-size:12px; flex-wrap:wrap;}
+        .receipt-table {width:100%; border-collapse:collapse; font-size:12px; margin-bottom:10px;}
+        .receipt-table th, .receipt-table td {border:1px solid #000; padding:4px; text-align:left;}
+        .receipt-table th {background-color:#f0f0f0;}
+        .receipt-total {font-weight:bold; text-align:right; margin-bottom:10px;}
+        .receipt-signature {display:flex; justify-content:space-between; margin-bottom:10px;}
+        .receipt-footer {font-size:10px; text-align:center;}
+        .page-break {page-break-before:always;}
+      </style>
+    `;
+    return `<!doctype html><html><head><meta charset="utf-8">${style}</head><body>
+      ${generateReceiptHTML(record, 'COPIA 1')}
+      <div class="page-break"></div>
+      ${generateReceiptHTML(record, 'COPIA 2')}
+    </body></html>`;
+  }
+
+  // Imprimir copias individuales
+  $('btn-print-copia1').addEventListener('click', () => {
+    if (!lastRecord) { alert('Genera un recibo primero.'); return; }
+    const html = buildSingleCopyHtml(lastRecord, 'COPIA 1');
+    const w = window.open('', '_blank');
+    w.document.open(); w.document.write(html); w.document.close();
+    w.onload = () => setTimeout(() => { w.focus(); w.print(); }, 300);
+  });
+  $('btn-print-copia2').addEventListener('click', () => {
+    if (!lastRecord) { alert('Genera un recibo primero.'); return; }
+    const html = buildSingleCopyHtml(lastRecord, 'COPIA 2');
+    const w = window.open('', '_blank');
+    w.document.open(); w.document.write(html); w.document.close();
+    w.onload = () => setTimeout(() => { w.focus(); w.print(); }, 300);
+  });
+
+  function buildSingleCopyHtml(record, titulo) {
+    const style = `
+      <style>
+        body{font-family:Arial,sans-serif;color:#000;margin:20px}
+        .receipt {border:1px solid #000; padding:20px; position:relative;}
+        .receipt-header {display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;}
+        .receipt-logo {flex-shrink:0;}
+        .receipt-logo img {max-height:60px; width:auto;}
+        .receipt-title {font-weight:bold; font-size:16px;}
+        .receipt-info {font-size:12px; text-align:right;}
+        .receipt-object {font-size:12px; margin-bottom:10px;}
+        .receipt-contract {display:flex; justify-content:space-between; margin-bottom:10px; font-size:12px; flex-wrap:wrap;}
+        .receipt-table {width:100%; border-collapse:collapse; font-size:12px; margin-bottom:10px;}
+        .receipt-table th, .receipt-table td {border:1px solid #000; padding:4px; text-align:left;}
+        .receipt-table th {background-color:#f0f0f0;}
+        .receipt-total {font-weight:bold; text-align:right; margin-bottom:10px;}
+        .receipt-signature {display:flex; justify-content:space-between; margin-bottom:10px;}
+        .receipt-footer {font-size:10px; text-align:center;}
+      </style>
+    `;
+    return `<!doctype html><html><head><meta charset="utf-8">${style}</head><body>
+      ${generateReceiptHTML(record, titulo)}
+    </body></html>`;
+  }
+
+  // Alternar vista de totales globales
+  btnToggleRecent.addEventListener('click', () => {
+    showTotals = !showTotals;
+    btnToggleRecent.textContent = showTotals ? 'Ver registros individuales' : 'Ver totales globales';
+    renderLista();
+  });
+
+  // Cambiar tipo de gráfica
+  chartTypeSel.addEventListener('change', renderResumen);
+
+  // Descargar gráfica PNG
+  btnDownloadChart.addEventListener('click', () => {
+    if (!chartInst) { alert('Primero genera datos.'); return; }
+    const link = document.createElement('a');
+    link.download = 'grafica.png';
+    link.href = chartCanvas.toDataURL('image/png');
+    document.body.appendChild(link); link.click(); link.remove();
+  });
+
+  // PDF (resumen simple)
+  $('btn-generate-pdf').addEventListener('click', async () => {
+    if (!registros.length) { alert('No hay datos para el PDF.'); return; }
+    // Generar gráfica temporal
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = 1000; tempCanvas.height = 450;
+    const ctx = tempCanvas.getContext('2d');
+    const resumen = {};
+    registros.forEach(r => {
+      const m = r.maquina;
+      if (!resumen[m]) resumen[m] = 0;
+      resumen[m] += Number(r.total_precio) || 0;
+    });
+    const labels = Object.keys(resumen);
+    const data = labels.map(m => resumen[m]);
+    new Chart(ctx, {
+      type: 'bar',
+      data: { labels, datasets: [{ label: 'Valor total (pesos)', data, backgroundColor: ['#0d6efd','#6610f2','#198754','#dc3545','#ffc107'] }] },
+      options: { responsive: false, plugins: { legend: { display: false } } }
+    });
+    await new Promise(r => setTimeout(r, 500));
+    const chartDataUrl = tempCanvas.toDataURL('image/png');
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ unit: 'pt', format: 'a4' });
+    pdf.setFontSize(18);
+    pdf.text('Informe Profesional - Combustible', 40, 50);
+    pdf.setFontSize(10);
+    pdf.text(`Generado por: Cristian · Fecha: ${new Date().toLocaleString()}`, 40, 70);
+    pdf.addImage(chartDataUrl, 'PNG', 40, 90, 520, 250);
+    pdf.addPage();
+    pdf.text('Detalles por máquina', 40, 40);
+    // Agregar tabla de resumen
+    let y = 60;
+    pdf.setFontSize(10);
+    for (const m in resumen) {
+      pdf.text(`${m}: ${formatoMoneda(resumen[m])}`, 40, y);
+      y += 16;
+    }
+    pdf.save('resumen_combustible_profesional.pdf');
+  });
+
+  // Excel modal (con contraseña)
+  $('btn-ir-excel').addEventListener('click', () => {
+    const pw = prompt('Ingrese la contraseña para ver el Excel:');
+    if (pw === ADMIN_PASSWORD) {
+      $('excel-modal').classList.remove('hidden');
+      renderExcelTable();
+    } else {
+      alert('Contraseña incorrecta');
+    }
+  });
+  $('btn-close-excel').addEventListener('click', () => {
+    $('excel-modal').classList.add('hidden');
+  });
+  $('btn-export-excel').addEventListener('click', () => {
+    if (!registros.length) { alert('No hay registros.'); return; }
+    const ws = XLSX.utils.json_to_sheet(registros);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'registros');
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([wbout], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'registros_combustible.xlsx';
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  });
+
+  function renderExcelTable() {
+    const tbody = document.querySelector('#table-excel tbody');
+    tbody.innerHTML = '';
+    const sorted = [...registros].sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+    sorted.forEach(r => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${r.timestamp}</td><td>${r.maquina}</td><td>${r.fecha}</td>
+        <td>${Number(r.acpm_qty).toFixed(2)}</td><td>${Number(r.corriente_qty).toFixed(2)}</td>
+        <td>${Number(r.grasa_qty).toFixed(2)}</td><td>${Number(r.aceite2t_qty).toFixed(2)}</td>
+        <td>${Number(r.aceite4t_qty).toFixed(2)}</td><td>${Number(r.aceite_pesado_qty).toFixed(2)}</td>
+        <td>${Number(r.aceite_liviano_qty).toFixed(2)}</td>
+        <td>${Number(r.aceite_hidraulico_gl_qty).toFixed(2)}</td>
+        <td>${Number(r.aceite_hidraulico_cuarto_qty).toFixed(2)}</td>
+        <td>${Number(r.refrigerante_rojo_qty).toFixed(2)}</td>
+        <td>${Number(r.urea_qty).toFixed(2)}</td>
+        <td>${formatoMoneda(r.total_precio)}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // Menú de navegación
+  document.querySelectorAll('.menu-card').forEach(c => {
+    c.addEventListener('click', () => {
+      if (c.id === 'menu-ajustes') {
+        const pw = prompt('Ingrese la contraseña para abrir Ajustes:');
+        if (pw === ADMIN_PASSWORD) {
+          abrirSettings();
+        } else {
+          alert('Contraseña incorrecta');
+        }
+      } else if (c.dataset.page === 'mantenimiento') {
+        alert('Sección Mantenimiento: puedes agregar los campos que necesites.');
+      } else {
+        window.scrollTo({ top: document.getElementById('card-main').offsetTop - 20, behavior: 'smooth' });
+      }
+    });
+  });
+
+  // Settings
+  function abrirSettings() {
+    $('settings-modal').classList.remove('hidden');
+    const s = SETTINGS;
+    $('price-acpm').value = s.prices?.ACPM || DEFAULT_PRICES.ACPM;
+    $('price-corriente').value = s.prices?.CORRIENTE || DEFAULT_PRICES.CORRIENTE;
+    $('price-grasa').value = s.prices?.GRASA || DEFAULT_PRICES.GRASA;
+    $('price-aceite2t').value = s.prices?.ACEITE_2T || DEFAULT_PRICES.ACEITE_2T;
+    $('price-aceite4t').value = s.prices?.ACEITE_4T || DEFAULT_PRICES.ACEITE_4T;
+    $('price-aceite-pesado').value = s.prices?.ACEITE_MOTOR_PESADO || DEFAULT_PRICES.ACEITE_MOTOR_PESADO;
+    $('price-aceite-liviano').value = s.prices?.ACEITE_MOTOR_LIVIANO || DEFAULT_PRICES.ACEITE_MOTOR_LIVIANO;
+    $('price-aceite-hidraulico-gl').value = s.prices?.ACEITE_HIDRAULICO_GL || DEFAULT_PRICES.ACEITE_HIDRAULICO_GL;
+    $('price-aceite-hidraulico-cuarto').value = s.prices?.ACEITE_HIDRAULICO_CUARTO || DEFAULT_PRICES.ACEITE_HIDRAULICO_CUARTO;
+    $('price-refrigerante-rojo').value = s.prices?.REFRIGERANTE_ROJO || DEFAULT_PRICES.REFRIGERANTE_ROJO;
+    $('price-urea').value = s.prices?.UREA || DEFAULT_PRICES.UREA;
+    $('valor-contrato-mc').value = s.valorContratoMC || 0;
+    $('allow-ai').checked = s.allowAI || false;
+    $('openai-key').value = s.openaiKey || '';
+  }
+
+  $('btn-close-settings').addEventListener('click', () => {
+    $('settings-modal').classList.add('hidden');
+  });
+
+  $('btn-save-settings').addEventListener('click', () => {
+    SETTINGS.prices = {
+      ACPM: parseFloat($('price-acpm').value) || DEFAULT_PRICES.ACPM,
+      CORRIENTE: parseFloat($('price-corriente').value) || DEFAULT_PRICES.CORRIENTE,
+      GRASA: parseFloat($('price-grasa').value) || DEFAULT_PRICES.GRASA,
+      ACEITE_2T: parseFloat($('price-aceite2t').value) || DEFAULT_PRICES.ACEITE_2T,
+      ACEITE_4T: parseFloat($('price-aceite4t').value) || DEFAULT_PRICES.ACEITE_4T,
+      ACEITE_MOTOR_PESADO: parseFloat($('price-aceite-pesado').value) || DEFAULT_PRICES.ACEITE_MOTOR_PESADO,
+      ACEITE_MOTOR_LIVIANO: parseFloat($('price-aceite-liviano').value) || DEFAULT_PRICES.ACEITE_MOTOR_LIVIANO,
+      ACEITE_HIDRAULICO_GL: parseFloat($('price-aceite-hidraulico-gl').value) || DEFAULT_PRICES.ACEITE_HIDRAULICO_GL,
+      ACEITE_HIDRAULICO_CUARTO: parseFloat($('price-aceite-hidraulico-cuarto').value) || DEFAULT_PRICES.ACEITE_HIDRAULICO_CUARTO,
+      REFRIGERANTE_ROJO: parseFloat($('price-refrigerante-rojo').value) || DEFAULT_PRICES.REFRIGERANTE_ROJO,
+      UREA: parseFloat($('price-urea').value) || DEFAULT_PRICES.UREA
+    };
+    SETTINGS.valorContratoMC = parseFloat($('valor-contrato-mc').value) || 0;
+    SETTINGS.allowAI = $('allow-ai').checked;
+    SETTINGS.openaiKey = $('openai-key').value.trim();
+    saveSettings(SETTINGS);
+    alert('Ajustes guardados.');
+    $('settings-modal').classList.add('hidden');
+    renderResumen(); // actualiza valor restante
+  });
+
+  // Resetar datos (borra todo en Google Sheets? No implementado, solo borra local, pero como los datos vienen de Sheets, este botón no tiene efecto real)
+  $('btn-resetar').addEventListener('click', () => {
+    const pw = prompt('Ingrese la contraseña para resetear (borrar todos los datos en Google Sheets):');
+    if (pw === ADMIN_PASSWORD) {
+      if (confirm('¿Está seguro? Esto borrará todos los registros en la hoja de cálculo.')) {
+        // Aquí habría que llamar a un endpoint de eliminación, pero no está disponible.
+        // Como no tenemos endpoint DELETE, solo mostramos mensaje.
+        alert('Función no implementada: debes borrar los datos manualmente desde Google Sheets.');
+      }
+    } else {
+      alert('Contraseña incorrecta');
+    }
+  });
+
+  // Inicializar fecha
+  fechaEl.valueAsDate = new Date();
+
+  // Cargar datos al inicio
+  (async function init() {
+    await cargarRegistros();
+  })();
+
+  // También refrescar cada 60 segundos (opcional)
+  setInterval(() => { cargarRegistros(); }, 60000);
+</script>
+
 </body>
 </html>
-
 
 
 
