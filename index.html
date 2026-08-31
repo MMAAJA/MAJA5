@@ -173,7 +173,9 @@
       flex-shrink: 0;
     }
     .receipt-logo img {
-      max-height: 60px; width: auto;
+      max-height: 50px;  /* Ajuste de tamaño: no demasiado grande */
+      width: auto;
+      display: block;
     }
     .receipt-title {
       font-weight: bold; font-size: 16px;
@@ -624,7 +626,7 @@
   }
 
   // ============================================================
-  // Recibo HTML (con logo funcional de texto)
+  // Recibo HTML (con logo desde la misma carpeta)
   // ============================================================
   function generateReceiptHTML(record, titulo) {
     const orderNumber = record.orderNumber || 1;
@@ -646,15 +648,8 @@
                          aceite4t_total + aceite_pesado_total + aceite_liviano_total +
                          aceite_hid_gl_total + aceite_hid_cuarto_total + ref_rojo_total + urea_total;
 
-    // LOGO: usa un placeholder de texto para que siempre funcione.
-    // Para usar tu imagen, reemplaza el <div> por <img src="tu-url">
-    const logoHtml = `
-      <div style="background: #0d6efd; color: white; padding: 8px 12px; border-radius: 6px; font-weight: bold; font-size: 14px;">
-        LOGO
-      </div>
-    `;
-    // Si quieres usar tu imagen de Google Drive, descomenta esta línea y comenta la de arriba:
-    // const logoHtml = '<img src="https://drive.google.com/uc?export=view&id=1TEvL74WNmiZbbME9qYjjB6n62eDuA7lf" alt="Logo" style="max-height:60px;" />';
+    // Logo desde la misma carpeta (ruta relativa)
+    const logoHtml = `<img src="images.png" alt="Logo" />`;
 
     return `
       <div class="receipt">
@@ -913,7 +908,7 @@
         .receipt {border:1px solid #000; padding:20px; margin-bottom:20px; position:relative;}
         .receipt-header {display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;}
         .receipt-logo {flex-shrink:0;}
-        .receipt-logo img {max-height:60px; width:auto;}
+        .receipt-logo img {max-height:50px; width:auto;}
         .receipt-title {font-weight:bold; font-size:16px;}
         .receipt-info {font-size:12px; text-align:right;}
         .receipt-object {font-size:12px; margin-bottom:10px;}
@@ -941,7 +936,7 @@
         .receipt {border:1px solid #000; padding:20px; position:relative;}
         .receipt-header {display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;}
         .receipt-logo {flex-shrink:0;}
-        .receipt-logo img {max-height:60px; width:auto;}
+        .receipt-logo img {max-height:50px; width:auto;}
         .receipt-title {font-weight:bold; font-size:16px;}
         .receipt-info {font-size:12px; text-align:right;}
         .receipt-object {font-size:12px; margin-bottom:10px;}
@@ -1271,4 +1266,3 @@
 </script>
 </body>
 </html>
-
