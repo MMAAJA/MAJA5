@@ -130,6 +130,12 @@
     .chart-controls {
       display: flex; gap: 8px; align-items: center; margin-top: 10px; flex-wrap: wrap;
     }
+    .filter-row {
+      display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .filter-row label { margin: 0; }
+    .filter-row input { width: auto; flex: 1; min-width: 120px; }
 
     /* Print modal */
     .print-modal {
@@ -343,6 +349,16 @@
         </div>
       </div>
 
+      <!-- Filtro de fechas -->
+      <div class="filter-row">
+        <label>Desde:</label>
+        <input type="date" id="fecha-inicio" />
+        <label>Hasta:</label>
+        <input type="date" id="fecha-fin" />
+        <button class="btn ghost" id="btn-aplicar-filtro">Aplicar filtro</button>
+        <button class="btn ghost" id="btn-limpiar-filtro">Limpiar</button>
+      </div>
+
       <div class="chart-controls">
         <select id="chart-type">
           <option value="bar">Barra</option><option value="line">Línea</option>
@@ -359,8 +375,10 @@
 
       <div class="total-section">
         <h4 style="margin-top:0">Resumen Financiero</h4>
-        <div class="total-row"><span>Valor total consumido:</span><span id="valor-total-consumido">$0</span></div>
+        <div class="total-row"><span>Valor total consumido (global):</span><span id="valor-total-consumido">$0</span></div>
+        <div class="total-row"><span>Valor total consumido (filtrado):</span><span id="valor-total-filtrado">$0</span></div>
         <div class="total-row total-final"><span>Valor restante del contrato MC:</span><span id="valor-restante-contrato">$0</span></div>
+        <div class="total-row" style="font-size:12px;color:var(--muted)"><span>Valor del contrato:</span><span id="valor-contrato-mostrado">$0</span></div>
       </div>
 
       <h4 style="margin-top:12px">Registros / Totales <span class="sync-status" id="sync-status"></span></h4>
@@ -406,7 +424,7 @@
         <label>Precio ACEITE HIDRAULICO (1/4)</label><input type="number" id="price-aceite-hidraulico-cuarto" step="0.1" />
         <label>Precio REFRIGERANTE ROJO</label><input type="number" id="price-refrigerante-rojo" step="0.1" />
         <label>Precio UREA</label><input type="number" id="price-urea" step="0.1" />
-        <label style="margin-top:12px">Valor del contrato MC (pesos)</label>
+        <label style="margin-top:12px">Valor del contrato MC (pesos) - (opcional, se usará el de la hoja si existe)</label>
         <input type="number" id="valor-contrato-mc" step="0.01" />
 
         <label style="margin-top:12px">Opciones de exportación / IA</label>
@@ -459,7 +477,9 @@
 
   // Variables globales
   let SETTINGS = loadSettings();
-  let registros = [];
+  let registros = [];               // Todos los registros (sin filtrar)
+  let registrosFiltrados = [];      // Registros filtrados por fecha
+  let valorContrato = 0;            // Valor del contrato desde la hoja
   let lastRecord = null;
   let chartInst = null;
   let showTotals = false;
@@ -488,11 +508,15 @@
   const btnToggleRecent = $('btn-toggle-recent');
   const btnDownloadChart = $('btn-download-chart');
   const valorTotalConsumidoEl = $('valor-total-consumido');
+  const valorTotalFiltradoEl = $('valor-total-filtrado');
   const valorRestanteContratoEl = $('valor-restante-contrato');
+  const valorContratoMostradoEl = $('valor-contrato-mostrado');
   const syncStatus = $('sync-status');
+  const fechaInicio = $('fecha-inicio');
+  const fechaFin = $('fecha-fin');
 
   // ============================================================
-  // Funciones de carga/guardado de ajustes (solo precios y contrato)
+  // Funciones de carga/guardado de ajustes (precios y contrato local)
   // ============================================================
   function loadSettings() {
     const raw = localStorage.getItem(SETTINGS_KEY);
@@ -534,11 +558,18 @@
           total_precio: parseFloat(r.total_precio) || 0,
           orderNumber: parseInt(r.orderNumber) || 1,
         }));
+        // Guardar valor del contrato desde la hoja
+        valorContrato = json.valorContrato || 0;
+        // Si no viene de la hoja, usar el de settings (por compatibilidad)
+        if (valorContrato === 0 && SETTINGS.valorContratoMC) {
+          valorContrato = SETTINGS.valorContratoMC;
+        }
         syncStatus.innerHTML = `✅ ${registros.length} registros`;
-        actualizarInterfaz();
+        aplicarFiltro(); // Esto actualiza la interfaz con el filtro
       } else {
         console.warn('Datos no válidos:', json);
         registros = [];
+        registrosFiltrados = [];
         syncStatus.innerHTML = '⚠️ Sin datos';
         actualizarInterfaz();
         mensajeEl.innerHTML = '<div style="color:#dc3545;">No se pudieron cargar los datos de Google Sheets. Verifica la URL o la conexión.</div>';
@@ -546,6 +577,7 @@
     } catch (error) {
       console.error('Error al cargar desde Google Sheets:', error);
       registros = [];
+      registrosFiltrados = [];
       syncStatus.innerHTML = '❌ Error de red';
       actualizarInterfaz();
       mensajeEl.innerHTML = '<div style="color:#dc3545;">Error de conexión con Google Sheets. Intenta refrescar más tarde.</div>';
@@ -565,7 +597,6 @@
       console.log('Respuesta POST:', json);
       if (json.status === 'success') {
         mensajeEl.innerHTML = '<div style="color:#198754;font-weight:700">✔ Registro guardado en Google Sheets</div>';
-        // Recargar datos para actualizar la vista
         await cargarRegistros(false);
       } else {
         mensajeEl.innerHTML = '<div style="color:#dc3545;font-weight:700">Error al guardar en Google Sheets: ' + (json.message || '') + '</div>';
@@ -588,12 +619,37 @@
     return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
   }
 
-  // Obtener siguiente número de orden para una máquina (basado en registros actuales)
   function getNextOrderNumber(maquina) {
     const filtrados = registros.filter(r => r.maquina === maquina);
     if (filtrados.length === 0) return 1;
     const maxOrder = Math.max(...filtrados.map(r => parseInt(r.orderNumber) || 0));
     return maxOrder + 1;
+  }
+
+  // ============================================================
+  // Filtro por fechas
+  // ============================================================
+  function aplicarFiltro() {
+    const inicio = fechaInicio.value;
+    const fin = fechaFin.value;
+    if (!inicio && !fin) {
+      registrosFiltrados = [...registros];
+    } else {
+      registrosFiltrados = registros.filter(r => {
+        if (!r.fecha) return true;
+        if (inicio && r.fecha < inicio) return false;
+        if (fin && r.fecha > fin) return false;
+        return true;
+      });
+    }
+    actualizarInterfaz();
+  }
+
+  function limpiarFiltro() {
+    fechaInicio.value = '';
+    fechaFin.value = '';
+    registrosFiltrados = [...registros];
+    actualizarInterfaz();
   }
 
   // ============================================================
@@ -619,8 +675,7 @@
                          aceite4t_total + aceite_pesado_total + aceite_liviano_total +
                          aceite_hid_gl_total + aceite_hid_cuarto_total + ref_rojo_total + urea_total;
 
-    // Logo de ejemplo (reemplaza la URL por la de tu logo)
-    const logoUrl = 'https://via.placeholder.com/100x60/0d6efd/ffffff?text=Logo';
+    const logoUrl = 'https://es.vexels.com/png-svg/vista-previa/166382/lenguaje-de-programacion-html-plano';
 
     return `
       <div class="receipt">
@@ -687,18 +742,19 @@
   }
 
   // ============================================================
-  // Renderizado de lista y resumen (usando registros globales)
+  // Renderizado de lista y resumen (usando registrosFiltrados)
   // ============================================================
   function renderLista() {
     if (showTotals) {
       renderTotalesGlobal();
       return;
     }
-    if (!registros.length) {
-      listaRegistros.innerHTML = '<div class="small">No hay registros.</div>';
+    const datos = registrosFiltrados;
+    if (!datos.length) {
+      listaRegistros.innerHTML = '<div class="small">No hay registros en este rango.</div>';
       return;
     }
-    const sorted = [...registros].sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+    const sorted = [...datos].sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
     listaRegistros.innerHTML = '';
     sorted.slice(0, 200).forEach(r => {
       const d = document.createElement('div');
@@ -731,14 +787,15 @@
   }
 
   function renderTotalesGlobal() {
-    if (!registros.length) {
-      listaRegistros.innerHTML = '<div class="small">No hay registros.</div>';
+    const datos = registrosFiltrados;
+    if (!datos.length) {
+      listaRegistros.innerHTML = '<div class="small">No hay registros en este rango.</div>';
       return;
     }
     const totals = { acpm:0, corriente:0, grasa:0, aceite2t:0, aceite4t:0,
       aceite_pesado:0, aceite_liviano:0, aceite_hidraulico_gl:0,
       aceite_hidraulico_cuarto:0, refrigerante_rojo:0, urea:0, money:0 };
-    registros.forEach(r => {
+    datos.forEach(r => {
       totals.acpm += Number(r.acpm_qty)||0;
       totals.corriente += Number(r.corriente_qty)||0;
       totals.grasa += Number(r.grasa_qty)||0;
@@ -754,7 +811,7 @@
     });
     listaRegistros.innerHTML = `
       <div style="padding:12px">
-        <div><strong>Totales globales</strong></div>
+        <div><strong>Totales globales (filtrados)</strong></div>
         <div class="small" style="margin-top:8px">
           ${totals.acpm ? `ACPM: ${totals.acpm.toFixed(2)} GL<br>` : ''}
           ${totals.corriente ? `CORRIENTE: ${totals.corriente.toFixed(2)} GL<br>` : ''}
@@ -774,17 +831,24 @@
   }
 
   function renderResumen() {
-    if (!registros.length) {
-      resumenEl.innerHTML = '<div class="small">No hay registros.</div>';
-      valorTotalConsumidoEl.textContent = '$0';
-      valorRestanteContratoEl.textContent = '$0';
+    const datos = registrosFiltrados;
+    if (!datos.length) {
+      resumenEl.innerHTML = '<div class="small">No hay registros en este rango.</div>';
       if (chartInst) { chartInst.destroy(); chartInst = null; }
+      // Actualizar totales globales (sin filtrar)
+      const totalGlobal = registros.reduce((sum, r) => sum + (r.total_precio || 0), 0);
+      valorTotalConsumidoEl.textContent = formatoMoneda(totalGlobal);
+      valorTotalFiltradoEl.textContent = '$0';
+      const restante = valorContrato - totalGlobal;
+      valorRestanteContratoEl.textContent = formatoMoneda(restante);
+      valorContratoMostradoEl.textContent = formatoMoneda(valorContrato);
       return;
     }
 
+    // Calcular resumen para los datos filtrados
     const resumen = {};
-    let totalGeneral = 0;
-    registros.forEach(r => {
+    let totalFiltrado = 0;
+    datos.forEach(r => {
       const m = r.maquina;
       if (!resumen[m]) {
         resumen[m] = { acpm:0, corriente:0, grasa:0, aceite2t:0, aceite4t:0,
@@ -803,13 +867,18 @@
       resumen[m].refrigerante_rojo += Number(r.refrigerante_rojo_qty)||0;
       resumen[m].urea += Number(r.urea_qty)||0;
       resumen[m].total += Number(r.total_precio)||0;
-      totalGeneral += Number(r.total_precio)||0;
+      totalFiltrado += Number(r.total_precio)||0;
     });
 
-    valorTotalConsumidoEl.textContent = formatoMoneda(totalGeneral);
-    const restante = (SETTINGS.valorContratoMC || 0) - totalGeneral;
+    // Totales globales (sin filtrar)
+    const totalGlobal = registros.reduce((sum, r) => sum + (r.total_precio || 0), 0);
+    valorTotalConsumidoEl.textContent = formatoMoneda(totalGlobal);
+    valorTotalFiltradoEl.textContent = formatoMoneda(totalFiltrado);
+    const restante = valorContrato - totalGlobal;
     valorRestanteContratoEl.textContent = formatoMoneda(restante);
+    valorContratoMostradoEl.textContent = formatoMoneda(valorContrato);
 
+    // Tabla resumen para datos filtrados
     let html = `<table class="summary-table"><thead><tr>
       <th>Máquina</th><th>ACPM</th><th>CORR</th><th>GRASA</th><th>2T</th><th>4T</th>
       <th>PESADO</th><th>LIVIANO</th><th>HID GL</th><th>HID 1/4</th><th>REF ROJO</th><th>UREA</th><th>Valor</th>
@@ -832,7 +901,7 @@
     html += '</tbody></table>';
     resumenEl.innerHTML = html;
 
-    // Chart
+    // Gráfica con datos filtrados
     const type = chartTypeSel.value || 'bar';
     const ctx = chartCanvas.getContext('2d');
     if (chartInst) chartInst.destroy();
@@ -841,7 +910,7 @@
       data: {
         labels,
         datasets: [{
-          label: 'Valor total (pesos)',
+          label: 'Valor total (pesos) - filtrado',
           data,
           backgroundColor: palette.slice(0, labels.length),
           borderColor: palette.slice(0, labels.length).map(c => c),
@@ -871,6 +940,13 @@
     cargarRegistros(true);
   });
 
+  // Filtros
+  $('btn-aplicar-filtro').addEventListener('click', aplicarFiltro);
+  $('btn-limpiar-filtro').addEventListener('click', limpiarFiltro);
+  // Al cambiar fechas, aplicar automáticamente (opcional)
+  fechaInicio.addEventListener('change', aplicarFiltro);
+  fechaFin.addEventListener('change', aplicarFiltro);
+
   // Generar recibo
   $('btn-generar').addEventListener('click', async () => {
     const maquina = maquinaEl.value;
@@ -889,7 +965,6 @@
 
     const orderNumber = getNextOrderNumber(maquina);
 
-    // Calcular total con los precios actuales
     const prices = SETTINGS.prices || DEFAULT_PRICES;
     const total_precio = (acpm_qty * prices.ACPM) +
                         (corriente_qty * prices.CORRIENTE) +
@@ -922,11 +997,8 @@
       total_precio
     };
 
-    // Mostrar en pantalla el recibo localmente antes de guardar
     renderRecibos(record);
     lastRecord = record;
-
-    // Enviar a Google Sheets y recargar
     await enviarAGoogleSheets(record);
   });
 
@@ -1039,7 +1111,7 @@
     </body></html>`;
   }
 
-  // Alternar vista de totales globales
+  // Alternar vista de totales globales (filtrados)
   btnToggleRecent.addEventListener('click', () => {
     showTotals = !showTotals;
     btnToggleRecent.textContent = showTotals ? 'Ver registros individuales' : 'Ver totales globales';
@@ -1058,15 +1130,15 @@
     document.body.appendChild(link); link.click(); link.remove();
   });
 
-  // PDF (resumen simple)
+  // PDF (resumen filtrado)
   $('btn-generate-pdf').addEventListener('click', async () => {
-    if (!registros.length) { alert('No hay datos para el PDF.'); return; }
-    // Generar gráfica temporal
+    const datos = registrosFiltrados;
+    if (!datos.length) { alert('No hay datos en el rango seleccionado.'); return; }
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = 1000; tempCanvas.height = 450;
     const ctx = tempCanvas.getContext('2d');
     const resumen = {};
-    registros.forEach(r => {
+    datos.forEach(r => {
       const m = r.maquina;
       if (!resumen[m]) resumen[m] = 0;
       resumen[m] += Number(r.total_precio) || 0;
@@ -1075,7 +1147,7 @@
     const data = labels.map(m => resumen[m]);
     new Chart(ctx, {
       type: 'bar',
-      data: { labels, datasets: [{ label: 'Valor total (pesos)', data, backgroundColor: ['#0d6efd','#6610f2','#198754','#dc3545','#ffc107'] }] },
+      data: { labels, datasets: [{ label: 'Valor total (pesos) - filtrado', data, backgroundColor: ['#0d6efd','#6610f2','#198754','#dc3545','#ffc107'] }] },
       options: { responsive: false, plugins: { legend: { display: false } } }
     });
     await new Promise(r => setTimeout(r, 500));
@@ -1084,19 +1156,20 @@
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({ unit: 'pt', format: 'a4' });
     pdf.setFontSize(18);
-    pdf.text('Informe Profesional - Combustible', 40, 50);
+    pdf.text('Informe Profesional - Combustible (Filtrado)', 40, 50);
     pdf.setFontSize(10);
     pdf.text(`Generado por: Cristian · Fecha: ${new Date().toLocaleString()}`, 40, 70);
-    pdf.addImage(chartDataUrl, 'PNG', 40, 90, 520, 250);
+    pdf.text(`Rango: ${fechaInicio.value || 'inicio'} - ${fechaFin.value || 'fin'}`, 40, 85);
+    pdf.addImage(chartDataUrl, 'PNG', 40, 100, 520, 250);
     pdf.addPage();
-    pdf.text('Detalles por máquina', 40, 40);
+    pdf.text('Detalles por máquina (filtrado)', 40, 40);
     let y = 60;
     pdf.setFontSize(10);
     for (const m in resumen) {
       pdf.text(`${m}: ${formatoMoneda(resumen[m])}`, 40, y);
       y += 16;
     }
-    pdf.save('resumen_combustible_profesional.pdf');
+    pdf.save('resumen_combustible_filtrado.pdf');
   });
 
   // Excel modal (con contraseña)
@@ -1205,12 +1278,17 @@
       UREA: parseFloat($('price-urea').value) || DEFAULT_PRICES.UREA
     };
     SETTINGS.valorContratoMC = parseFloat($('valor-contrato-mc').value) || 0;
+    // Si el usuario guarda un valor aquí, se usará como respaldo, pero la prioridad es el valor de la hoja.
     SETTINGS.allowAI = $('allow-ai').checked;
     SETTINGS.openaiKey = $('openai-key').value.trim();
     saveSettings(SETTINGS);
     alert('Ajustes guardados.');
     $('settings-modal').classList.add('hidden');
-    renderResumen(); // actualiza valor restante
+    // Si el valor del contrato no viene de la hoja, actualizarlo
+    if (!valorContrato) {
+      valorContrato = SETTINGS.valorContratoMC;
+    }
+    renderResumen();
   });
 
   // Resetar datos (borra todo en Google Sheets? No implementado, solo aviso)
