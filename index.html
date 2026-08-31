@@ -40,7 +40,6 @@
 
     .container { max-width: 1200px; margin: 18px auto; padding: 18px; }
 
-    /* Menú */
     .menu-grid {
       display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; margin-bottom: 24px;
     }
@@ -99,7 +98,6 @@
       flex: 1; background: #fff; padding: 14px; border-radius: 10px;
       border: 1px solid var(--border); min-width: 280px;
     }
-    .copy h4 { margin: 0 0 8px 0; }
 
     .summary-table {
       width: 100%; border-collapse: collapse; margin-top: 10px;
@@ -137,7 +135,6 @@
     .filter-row label { margin: 0; }
     .filter-row input { width: auto; flex: 1; min-width: 120px; }
 
-    /* Print modal */
     .print-modal {
       position: fixed; left: 50%; top: 50%; transform: translate(-50%,-50%);
       width: 90%; max-width: 900px; height: 80vh; overflow: auto;
@@ -151,7 +148,6 @@
       background: transparent; border: 1px solid #e6e6e6; color: #000;
     }
 
-    /* Total section */
     .total-section {
       margin-top: 20px; padding: 15px;
       background: #fff; border-radius: 10px; border: 1px solid var(--border);
@@ -164,7 +160,6 @@
       font-weight: bold;
     }
 
-    /* Recibo estilos */
     .receipt {
       font-family: Arial, sans-serif; color: #000; background: #fff;
       padding: 20px; margin-bottom: 20px; border: 1px solid #000;
@@ -226,7 +221,6 @@
       .two-copies { flex-direction: column; }
     }
 
-    /* Loader */
     .loader {
       display: inline-block;
       width: 16px;
@@ -244,7 +238,6 @@
     }
   </style>
 
-  <!-- Librerías -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -282,7 +275,6 @@
     </div>
   </div>
 
-  <!-- Página principal -->
   <div class="layout">
     <div class="card" id="card-main">
       <h2>Registro - COMBUSTIBLE</h2>
@@ -349,7 +341,6 @@
         </div>
       </div>
 
-      <!-- Filtro de fechas -->
       <div class="filter-row">
         <label>Desde:</label>
         <input type="date" id="fecha-inicio" />
@@ -424,9 +415,8 @@
         <label>Precio ACEITE HIDRAULICO (1/4)</label><input type="number" id="price-aceite-hidraulico-cuarto" step="0.1" />
         <label>Precio REFRIGERANTE ROJO</label><input type="number" id="price-refrigerante-rojo" step="0.1" />
         <label>Precio UREA</label><input type="number" id="price-urea" step="0.1" />
-        <label style="margin-top:12px">Valor del contrato MC (pesos) - (opcional, se usará el de la hoja si existe)</label>
+        <label style="margin-top:12px">Valor del contrato MC (pesos)</label>
         <input type="number" id="valor-contrato-mc" step="0.01" />
-
         <label style="margin-top:12px">Opciones de exportación / IA</label>
         <div style="display:flex;gap:8px;align-items:center;margin-top:6px">
           <input type="checkbox" id="allow-ai" /> <label class="small">Permitir generación automática de informe con IA</label>
@@ -475,7 +465,6 @@
   // ==== REEMPLAZA ESTA URL CON LA DE TU SCRIPT PUBLICADO ====
   const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz-_lv4_Gfq6exv2pMR1UpfmYimhoU7pvG-lpv2_sMK6xsgE6E1adHVyKjq-3YfSHpU/exec';
 
-  // Variables globales
   let SETTINGS = loadSettings();
   let registros = [];
   let registrosFiltrados = [];
@@ -484,7 +473,6 @@
   let chartInst = null;
   let showTotals = false;
 
-  // DOM refs
   const $ = id => document.getElementById(id);
   const maquinaEl = $('maquina');
   const fechaEl = $('fecha');
@@ -515,9 +503,6 @@
   const fechaInicio = $('fecha-inicio');
   const fechaFin = $('fecha-fin');
 
-  // ============================================================
-  // Funciones de carga/guardado de ajustes
-  // ============================================================
   function loadSettings() {
     const raw = localStorage.getItem(SETTINGS_KEY);
     if (!raw) return { prices: { ...DEFAULT_PRICES }, allowAI: false, openaiKey: '', valorContratoMC: 0 };
@@ -530,17 +515,14 @@
   function saveSettings(s) { localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); }
 
   // ============================================================
-  // Comunicación con Google Sheets
+  // Google Sheets
   // ============================================================
   async function cargarRegistros(showLoader = true) {
-    if (showLoader) {
-      syncStatus.innerHTML = '<span class="loader"></span> Cargando...';
-    }
+    if (showLoader) syncStatus.innerHTML = '<span class="loader"></span> Cargando...';
     try {
       const res = await fetch(SCRIPT_URL);
       const json = await res.json();
-      console.log('Respuesta de Google Sheets:', json);
-
+      console.log('Respuesta:', json);
       if (json.status === 'success' && Array.isArray(json.data)) {
         registros = json.data.map(r => ({
           ...r,
@@ -559,32 +541,27 @@
           orderNumber: parseInt(r.orderNumber) || 1,
         }));
         valorContrato = json.valorContrato || 0;
-        if (valorContrato === 0 && SETTINGS.valorContratoMC) {
-          valorContrato = SETTINGS.valorContratoMC;
-        }
+        if (valorContrato === 0 && SETTINGS.valorContratoMC) valorContrato = SETTINGS.valorContratoMC;
         syncStatus.innerHTML = `✅ ${registros.length} registros`;
         aplicarFiltro();
       } else {
-        console.warn('Datos no válidos:', json);
-        registros = [];
-        registrosFiltrados = [];
+        registros = []; registrosFiltrados = [];
         syncStatus.innerHTML = '⚠️ Sin datos';
         actualizarInterfaz();
-        mensajeEl.innerHTML = '<div style="color:#dc3545;">No se pudieron cargar los datos de Google Sheets. Verifica la URL o la conexión.</div>';
+        mensajeEl.innerHTML = '<div style="color:#dc3545;">No se pudieron cargar los datos de Google Sheets.</div>';
       }
     } catch (error) {
-      console.error('Error al cargar desde Google Sheets:', error);
-      registros = [];
-      registrosFiltrados = [];
+      console.error(error);
+      registros = []; registrosFiltrados = [];
       syncStatus.innerHTML = '❌ Error de red';
       actualizarInterfaz();
-      mensajeEl.innerHTML = '<div style="color:#dc3545;">Error de conexión con Google Sheets. Intenta refrescar más tarde.</div>';
+      mensajeEl.innerHTML = '<div style="color:#dc3545;">Error de conexión con Google Sheets.</div>';
     }
   }
 
   async function enviarAGoogleSheets(record) {
     try {
-      mensajeEl.innerHTML += ' <span style="color:#0d6efd;">(Guardando en Excel...)</span>';
+      mensajeEl.innerHTML += ' <span style="color:#0d6efd;">(Guardando...)</span>';
       const res = await fetch(SCRIPT_URL, {
         method: 'POST',
         mode: 'cors',
@@ -592,31 +569,28 @@
         body: JSON.stringify(record)
       });
       const json = await res.json();
-      console.log('Respuesta POST:', json);
       if (json.status === 'success') {
-        mensajeEl.innerHTML = '<div style="color:#198754;font-weight:700">✔ Registro guardado en Google Sheets</div>';
+        mensajeEl.innerHTML = '<div style="color:#198754;font-weight:700">✔ Registro guardado</div>';
         await cargarRegistros(false);
       } else {
-        mensajeEl.innerHTML = '<div style="color:#dc3545;font-weight:700">Error al guardar en Google Sheets: ' + (json.message || '') + '</div>';
+        mensajeEl.innerHTML = '<div style="color:#dc3545;">Error al guardar.</div>';
       }
     } catch (error) {
-      console.error('Error al enviar a Google Sheets:', error);
-      mensajeEl.innerHTML = '<div style="color:#dc3545;font-weight:700">Error de red al guardar en Google Sheets.</div>';
+      console.error(error);
+      mensajeEl.innerHTML = '<div style="color:#dc3545;">Error de red al guardar.</div>';
     }
   }
 
   // ============================================================
-  // Funciones de ayuda
+  // Utilidades
   // ============================================================
   function formatoMoneda(v) {
     return '$' + Number(v).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   }
-
   function formatDateForReceipt(dateString) {
     const d = new Date(dateString);
     return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
   }
-
   function getNextOrderNumber(maquina) {
     const filtrados = registros.filter(r => r.maquina === maquina);
     if (filtrados.length === 0) return 1;
@@ -625,7 +599,7 @@
   }
 
   // ============================================================
-  // Filtro por fechas
+  // Filtro
   // ============================================================
   function aplicarFiltro() {
     const inicio = fechaInicio.value;
@@ -642,7 +616,6 @@
     }
     actualizarInterfaz();
   }
-
   function limpiarFiltro() {
     fechaInicio.value = '';
     fechaFin.value = '';
@@ -651,7 +624,7 @@
   }
 
   // ============================================================
-  // Generación de HTML del recibo (con logo CORREGIDO)
+  // Recibo HTML (con logo funcional de texto)
   // ============================================================
   function generateReceiptHTML(record, titulo) {
     const orderNumber = record.orderNumber || 1;
@@ -673,14 +646,21 @@
                          aceite4t_total + aceite_pesado_total + aceite_liviano_total +
                          aceite_hid_gl_total + aceite_hid_cuarto_total + ref_rojo_total + urea_total;
 
-    // === LOGO CORREGIDO (URL directa de Google Drive) ===
-    const logoUrl = 'https://drive.google.com/uc?export=view&id=1TEvL74WNmiZbbME9qYjjB6n62eDuA7lf';
+    // LOGO: usa un placeholder de texto para que siempre funcione.
+    // Para usar tu imagen, reemplaza el <div> por <img src="tu-url">
+    const logoHtml = `
+      <div style="background: #0d6efd; color: white; padding: 8px 12px; border-radius: 6px; font-weight: bold; font-size: 14px;">
+        LOGO
+      </div>
+    `;
+    // Si quieres usar tu imagen de Google Drive, descomenta esta línea y comenta la de arriba:
+    // const logoHtml = '<img src="https://drive.google.com/uc?export=view&id=1TEvL74WNmiZbbME9qYjjB6n62eDuA7lf" alt="Logo" style="max-height:60px;" />';
 
     return `
       <div class="receipt">
         <div class="receipt-header">
           <div class="receipt-logo">
-            <img src="${logoUrl}" alt="Logo empresa" />
+            ${logoHtml}
           </div>
           <div style="flex:1; text-align:center;">
             <div class="receipt-title">${titulo}</div>
@@ -741,7 +721,7 @@
   }
 
   // ============================================================
-  // Renderizado de lista y resumen (con filtros)
+  // Renderizado
   // ============================================================
   function renderLista() {
     if (showTotals) {
@@ -837,8 +817,7 @@
       const totalGlobal = registros.reduce((sum, r) => sum + (r.total_precio || 0), 0);
       valorTotalConsumidoEl.textContent = formatoMoneda(totalGlobal);
       valorTotalFiltradoEl.textContent = '$0';
-      const restante = valorContrato - totalGlobal;
-      valorRestanteContratoEl.textContent = formatoMoneda(restante);
+      valorRestanteContratoEl.textContent = formatoMoneda(valorContrato - totalGlobal);
       valorContratoMostradoEl.textContent = formatoMoneda(valorContrato);
       return;
     }
@@ -870,8 +849,7 @@
     const totalGlobal = registros.reduce((sum, r) => sum + (r.total_precio || 0), 0);
     valorTotalConsumidoEl.textContent = formatoMoneda(totalGlobal);
     valorTotalFiltradoEl.textContent = formatoMoneda(totalFiltrado);
-    const restante = valorContrato - totalGlobal;
-    valorRestanteContratoEl.textContent = formatoMoneda(restante);
+    valorRestanteContratoEl.textContent = formatoMoneda(valorContrato - totalGlobal);
     valorContratoMostradoEl.textContent = formatoMoneda(valorContrato);
 
     let html = `<table class="summary-table"><thead><tr>
@@ -926,18 +904,75 @@
   }
 
   // ============================================================
+  // Funciones de impresión
+  // ============================================================
+  function buildPrintableHtml(record) {
+    const style = `
+      <style>
+        body{font-family:Arial,sans-serif;color:#000;margin:20px}
+        .receipt {border:1px solid #000; padding:20px; margin-bottom:20px; position:relative;}
+        .receipt-header {display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;}
+        .receipt-logo {flex-shrink:0;}
+        .receipt-logo img {max-height:60px; width:auto;}
+        .receipt-title {font-weight:bold; font-size:16px;}
+        .receipt-info {font-size:12px; text-align:right;}
+        .receipt-object {font-size:12px; margin-bottom:10px;}
+        .receipt-contract {display:flex; justify-content:space-between; margin-bottom:10px; font-size:12px; flex-wrap:wrap;}
+        .receipt-table {width:100%; border-collapse:collapse; font-size:12px; margin-bottom:10px;}
+        .receipt-table th, .receipt-table td {border:1px solid #000; padding:4px; text-align:left;}
+        .receipt-table th {background-color:#f0f0f0;}
+        .receipt-total {font-weight:bold; text-align:right; margin-bottom:10px;}
+        .receipt-signature {display:flex; justify-content:space-between; margin-bottom:10px;}
+        .receipt-footer {font-size:10px; text-align:center;}
+        .page-break {page-break-before:always;}
+      </style>
+    `;
+    return `<!doctype html><html><head><meta charset="utf-8">${style}</head><body>
+      ${generateReceiptHTML(record, 'COPIA 1')}
+      <div class="page-break"></div>
+      ${generateReceiptHTML(record, 'COPIA 2')}
+    </body></html>`;
+  }
+
+  function buildSingleCopyHtml(record, titulo) {
+    const style = `
+      <style>
+        body{font-family:Arial,sans-serif;color:#000;margin:20px}
+        .receipt {border:1px solid #000; padding:20px; position:relative;}
+        .receipt-header {display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;}
+        .receipt-logo {flex-shrink:0;}
+        .receipt-logo img {max-height:60px; width:auto;}
+        .receipt-title {font-weight:bold; font-size:16px;}
+        .receipt-info {font-size:12px; text-align:right;}
+        .receipt-object {font-size:12px; margin-bottom:10px;}
+        .receipt-contract {display:flex; justify-content:space-between; margin-bottom:10px; font-size:12px; flex-wrap:wrap;}
+        .receipt-table {width:100%; border-collapse:collapse; font-size:12px; margin-bottom:10px;}
+        .receipt-table th, .receipt-table td {border:1px solid #000; padding:4px; text-align:left;}
+        .receipt-table th {background-color:#f0f0f0;}
+        .receipt-total {font-weight:bold; text-align:right; margin-bottom:10px;}
+        .receipt-signature {display:flex; justify-content:space-between; margin-bottom:10px;}
+        .receipt-footer {font-size:10px; text-align:center;}
+      </style>
+    `;
+    return `<!doctype html><html><head><meta charset="utf-8">${style}</head><body>
+      ${generateReceiptHTML(record, titulo)}
+    </body></html>`;
+  }
+
+  // ============================================================
   // Eventos
   // ============================================================
 
-  $('btn-refresh').addEventListener('click', () => {
-    cargarRegistros(true);
-  });
+  // Refrescar
+  $('btn-refresh').addEventListener('click', () => cargarRegistros(true));
 
+  // Filtros
   $('btn-aplicar-filtro').addEventListener('click', aplicarFiltro);
   $('btn-limpiar-filtro').addEventListener('click', limpiarFiltro);
   fechaInicio.addEventListener('change', aplicarFiltro);
   fechaFin.addEventListener('change', aplicarFiltro);
 
+  // Generar recibo
   $('btn-generar').addEventListener('click', async () => {
     const maquina = maquinaEl.value;
     const fecha = fechaEl.value || new Date().toISOString().slice(0,10);
@@ -969,21 +1004,12 @@
 
     const record = {
       timestamp: new Date().toISOString(),
-      maquina,
-      fecha,
-      acpm_qty,
-      corriente_qty,
-      grasa_qty,
-      aceite2t_qty,
-      aceite4t_qty,
-      aceite_pesado_qty,
-      aceite_liviano_qty,
-      aceite_hidraulico_gl_qty,
-      aceite_hidraulico_cuarto_qty,
-      refrigerante_rojo_qty,
-      urea_qty,
-      orderNumber,
-      total_precio
+      maquina, fecha,
+      acpm_qty, corriente_qty, grasa_qty,
+      aceite2t_qty, aceite4t_qty, aceite_pesado_qty, aceite_liviano_qty,
+      aceite_hidraulico_gl_qty, aceite_hidraulico_cuarto_qty,
+      refrigerante_rojo_qty, urea_qty,
+      orderNumber, total_precio
     };
 
     renderRecibos(record);
@@ -991,6 +1017,7 @@
     await enviarAGoogleSheets(record);
   });
 
+  // Limpiar
   $('btn-clear').addEventListener('click', () => {
     acpmEl.value = ''; corrienteEl.value = ''; grasaEl.value = '';
     aceite2tEl.value = ''; aceite4tEl.value = ''; aceitePesadoEl.value = '';
@@ -999,11 +1026,249 @@
     mensajeEl.innerHTML = '';
   });
 
-  // ... resto de eventos (impresión, PDF, Excel, settings, etc.) son idénticos al código anterior.
-  // Para no alargar, te los he dejado igual; solo cambia el logo.
-  // Si quieres la versión completa con todos los eventos, puedo enviarla, pero este ya es funcional.
+  // Vista previa de impresión
+  $('btn-preview-print').addEventListener('click', () => {
+    if (!lastRecord) { alert('Genera un recibo primero.'); return; }
+    const modal = $('print-modal');
+    const content = $('print-preview-content');
+    content.innerHTML = '';
+    const c1 = document.createElement('div');
+    c1.innerHTML = generateReceiptHTML(lastRecord, 'COPIA 1');
+    const c2 = document.createElement('div');
+    c2.innerHTML = generateReceiptHTML(lastRecord, 'COPIA 2');
+    content.appendChild(c1);
+    const br = document.createElement('div');
+    br.className = 'page-break';
+    br.style.height = '12px';
+    content.appendChild(br);
+    content.appendChild(c2);
+    modal.classList.remove('hidden');
+  });
+
+  $('btn-close-print').addEventListener('click', () => {
+    $('print-modal').classList.add('hidden');
+  });
+
+  $('btn-print-now').addEventListener('click', () => {
+    if (!lastRecord) return;
+    const html = buildPrintableHtml(lastRecord);
+    const w = window.open('', '_blank');
+    if (!w) { alert('Permite ventanas emergentes para imprimir.'); return; }
+    w.document.open(); w.document.write(html); w.document.close();
+    w.onload = () => setTimeout(() => { w.focus(); w.print(); }, 500);
+  });
+
+  // Imprimir copias individuales
+  $('btn-print-copia1').addEventListener('click', () => {
+    if (!lastRecord) { alert('Genera un recibo primero.'); return; }
+    const html = buildSingleCopyHtml(lastRecord, 'COPIA 1');
+    const w = window.open('', '_blank');
+    if (!w) { alert('Permite ventanas emergentes para imprimir.'); return; }
+    w.document.open(); w.document.write(html); w.document.close();
+    w.onload = () => setTimeout(() => { w.focus(); w.print(); }, 500);
+  });
+
+  $('btn-print-copia2').addEventListener('click', () => {
+    if (!lastRecord) { alert('Genera un recibo primero.'); return; }
+    const html = buildSingleCopyHtml(lastRecord, 'COPIA 2');
+    const w = window.open('', '_blank');
+    if (!w) { alert('Permite ventanas emergentes para imprimir.'); return; }
+    w.document.open(); w.document.write(html); w.document.close();
+    w.onload = () => setTimeout(() => { w.focus(); w.print(); }, 500);
+  });
+
+  // Alternar totales globales
+  btnToggleRecent.addEventListener('click', () => {
+    showTotals = !showTotals;
+    btnToggleRecent.textContent = showTotals ? 'Ver registros individuales' : 'Ver totales globales';
+    renderLista();
+  });
+
+  // Cambiar tipo de gráfica
+  chartTypeSel.addEventListener('change', renderResumen);
+
+  // Descargar gráfica PNG
+  btnDownloadChart.addEventListener('click', () => {
+    if (!chartInst) { alert('Primero genera datos.'); return; }
+    const link = document.createElement('a');
+    link.download = 'grafica.png';
+    link.href = chartCanvas.toDataURL('image/png');
+    document.body.appendChild(link); link.click(); link.remove();
+  });
+
+  // PDF
+  $('btn-generate-pdf').addEventListener('click', async () => {
+    const datos = registrosFiltrados;
+    if (!datos.length) { alert('No hay datos en el rango seleccionado.'); return; }
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = 1000; tempCanvas.height = 450;
+    const ctx = tempCanvas.getContext('2d');
+    const resumen = {};
+    datos.forEach(r => {
+      const m = r.maquina;
+      if (!resumen[m]) resumen[m] = 0;
+      resumen[m] += Number(r.total_precio) || 0;
+    });
+    const labels = Object.keys(resumen);
+    const data = labels.map(m => resumen[m]);
+    new Chart(ctx, {
+      type: 'bar',
+      data: { labels, datasets: [{ label: 'Valor total (pesos) - filtrado', data, backgroundColor: ['#0d6efd','#6610f2','#198754','#dc3545','#ffc107'] }] },
+      options: { responsive: false, plugins: { legend: { display: false } } }
+    });
+    await new Promise(r => setTimeout(r, 500));
+    const chartDataUrl = tempCanvas.toDataURL('image/png');
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ unit: 'pt', format: 'a4' });
+    pdf.setFontSize(18);
+    pdf.text('Informe Profesional - Combustible (Filtrado)', 40, 50);
+    pdf.setFontSize(10);
+    pdf.text(`Generado por: Cristian · Fecha: ${new Date().toLocaleString()}`, 40, 70);
+    pdf.text(`Rango: ${fechaInicio.value || 'inicio'} - ${fechaFin.value || 'fin'}`, 40, 85);
+    pdf.addImage(chartDataUrl, 'PNG', 40, 100, 520, 250);
+    pdf.addPage();
+    pdf.text('Detalles por máquina (filtrado)', 40, 40);
+    let y = 60;
+    pdf.setFontSize(10);
+    for (const m in resumen) {
+      pdf.text(`${m}: ${formatoMoneda(resumen[m])}`, 40, y);
+      y += 16;
+    }
+    pdf.save('resumen_combustible_filtrado.pdf');
+  });
+
+  // Excel modal
+  $('btn-ir-excel').addEventListener('click', () => {
+    const pw = prompt('Ingrese la contraseña para ver el Excel:');
+    if (pw === ADMIN_PASSWORD) {
+      $('excel-modal').classList.remove('hidden');
+      renderExcelTable();
+    } else {
+      alert('Contraseña incorrecta');
+    }
+  });
+  $('btn-close-excel').addEventListener('click', () => {
+    $('excel-modal').classList.add('hidden');
+  });
+  $('btn-export-excel').addEventListener('click', () => {
+    if (!registros.length) { alert('No hay registros.'); return; }
+    const ws = XLSX.utils.json_to_sheet(registros);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'registros');
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([wbout], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'registros_combustible.xlsx';
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  });
+
+  function renderExcelTable() {
+    const tbody = document.querySelector('#table-excel tbody');
+    tbody.innerHTML = '';
+    const sorted = [...registros].sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+    sorted.forEach(r => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${r.timestamp}</td><td>${r.maquina}</td><td>${r.fecha}</td>
+        <td>${Number(r.acpm_qty).toFixed(2)}</td><td>${Number(r.corriente_qty).toFixed(2)}</td>
+        <td>${Number(r.grasa_qty).toFixed(2)}</td><td>${Number(r.aceite2t_qty).toFixed(2)}</td>
+        <td>${Number(r.aceite4t_qty).toFixed(2)}</td><td>${Number(r.aceite_pesado_qty).toFixed(2)}</td>
+        <td>${Number(r.aceite_liviano_qty).toFixed(2)}</td>
+        <td>${Number(r.aceite_hidraulico_gl_qty).toFixed(2)}</td>
+        <td>${Number(r.aceite_hidraulico_cuarto_qty).toFixed(2)}</td>
+        <td>${Number(r.refrigerante_rojo_qty).toFixed(2)}</td>
+        <td>${Number(r.urea_qty).toFixed(2)}</td>
+        <td>${formatoMoneda(r.total_precio)}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // Menú
+  document.querySelectorAll('.menu-card').forEach(c => {
+    c.addEventListener('click', () => {
+      if (c.id === 'menu-ajustes') {
+        const pw = prompt('Ingrese la contraseña para abrir Ajustes:');
+        if (pw === ADMIN_PASSWORD) abrirSettings();
+        else alert('Contraseña incorrecta');
+      } else if (c.dataset.page === 'mantenimiento') {
+        alert('Sección Mantenimiento: puedes agregar los campos que necesites.');
+      } else {
+        window.scrollTo({ top: document.getElementById('card-main').offsetTop - 20, behavior: 'smooth' });
+      }
+    });
+  });
+
+  // Settings
+  function abrirSettings() {
+    $('settings-modal').classList.remove('hidden');
+    const s = SETTINGS;
+    $('price-acpm').value = s.prices?.ACPM || DEFAULT_PRICES.ACPM;
+    $('price-corriente').value = s.prices?.CORRIENTE || DEFAULT_PRICES.CORRIENTE;
+    $('price-grasa').value = s.prices?.GRASA || DEFAULT_PRICES.GRASA;
+    $('price-aceite2t').value = s.prices?.ACEITE_2T || DEFAULT_PRICES.ACEITE_2T;
+    $('price-aceite4t').value = s.prices?.ACEITE_4T || DEFAULT_PRICES.ACEITE_4T;
+    $('price-aceite-pesado').value = s.prices?.ACEITE_MOTOR_PESADO || DEFAULT_PRICES.ACEITE_MOTOR_PESADO;
+    $('price-aceite-liviano').value = s.prices?.ACEITE_MOTOR_LIVIANO || DEFAULT_PRICES.ACEITE_MOTOR_LIVIANO;
+    $('price-aceite-hidraulico-gl').value = s.prices?.ACEITE_HIDRAULICO_GL || DEFAULT_PRICES.ACEITE_HIDRAULICO_GL;
+    $('price-aceite-hidraulico-cuarto').value = s.prices?.ACEITE_HIDRAULICO_CUARTO || DEFAULT_PRICES.ACEITE_HIDRAULICO_CUARTO;
+    $('price-refrigerante-rojo').value = s.prices?.REFRIGERANTE_ROJO || DEFAULT_PRICES.REFRIGERANTE_ROJO;
+    $('price-urea').value = s.prices?.UREA || DEFAULT_PRICES.UREA;
+    $('valor-contrato-mc').value = s.valorContratoMC || 0;
+    $('allow-ai').checked = s.allowAI || false;
+    $('openai-key').value = s.openaiKey || '';
+  }
+
+  $('btn-close-settings').addEventListener('click', () => {
+    $('settings-modal').classList.add('hidden');
+  });
+
+  $('btn-save-settings').addEventListener('click', () => {
+    SETTINGS.prices = {
+      ACPM: parseFloat($('price-acpm').value) || DEFAULT_PRICES.ACPM,
+      CORRIENTE: parseFloat($('price-corriente').value) || DEFAULT_PRICES.CORRIENTE,
+      GRASA: parseFloat($('price-grasa').value) || DEFAULT_PRICES.GRASA,
+      ACEITE_2T: parseFloat($('price-aceite2t').value) || DEFAULT_PRICES.ACEITE_2T,
+      ACEITE_4T: parseFloat($('price-aceite4t').value) || DEFAULT_PRICES.ACEITE_4T,
+      ACEITE_MOTOR_PESADO: parseFloat($('price-aceite-pesado').value) || DEFAULT_PRICES.ACEITE_MOTOR_PESADO,
+      ACEITE_MOTOR_LIVIANO: parseFloat($('price-aceite-liviano').value) || DEFAULT_PRICES.ACEITE_MOTOR_LIVIANO,
+      ACEITE_HIDRAULICO_GL: parseFloat($('price-aceite-hidraulico-gl').value) || DEFAULT_PRICES.ACEITE_HIDRAULICO_GL,
+      ACEITE_HIDRAULICO_CUARTO: parseFloat($('price-aceite-hidraulico-cuarto').value) || DEFAULT_PRICES.ACEITE_HIDRAULICO_CUARTO,
+      REFRIGERANTE_ROJO: parseFloat($('price-refrigerante-rojo').value) || DEFAULT_PRICES.REFRIGERANTE_ROJO,
+      UREA: parseFloat($('price-urea').value) || DEFAULT_PRICES.UREA
+    };
+    SETTINGS.valorContratoMC = parseFloat($('valor-contrato-mc').value) || 0;
+    SETTINGS.allowAI = $('allow-ai').checked;
+    SETTINGS.openaiKey = $('openai-key').value.trim();
+    saveSettings(SETTINGS);
+    if (!valorContrato) valorContrato = SETTINGS.valorContratoMC;
+    alert('Ajustes guardados.');
+    $('settings-modal').classList.add('hidden');
+    renderResumen();
+  });
+
+  // Resetar
+  $('btn-resetar').addEventListener('click', () => {
+    const pw = prompt('Ingrese la contraseña para resetear:');
+    if (pw === ADMIN_PASSWORD) {
+      if (confirm('¿Está seguro? Esto borrará todos los registros en la hoja de cálculo.')) {
+        alert('Función no implementada: debes borrar los datos manualmente desde Google Sheets.');
+      }
+    } else {
+      alert('Contraseña incorrecta');
+    }
+  });
+
+  // Inicializar
+  fechaEl.valueAsDate = new Date();
+  (async function init() {
+    await cargarRegistros(true);
+  })();
+  setInterval(() => cargarRegistros(false), 60000);
 </script>
 </body>
 </html>
-
 
