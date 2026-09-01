@@ -91,13 +91,93 @@
       background: #e9ecef;
     }
 
+    /* ========================================================== */
+    /* RECIBOS COMPACTOS - OCUPAN POCO ESPACIO                      */
+    /* ========================================================== */
     .two-copies {
-      display: flex; gap: 12px; margin-top: 18px; flex-wrap: wrap;
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+      flex-wrap: wrap;
     }
     .copy {
-      flex: 1; background: #fff; padding: 14px; border-radius: 10px;
-      border: 1px solid var(--border); min-width: 280px;
+      flex: 1 1 45%;
+      min-width: 280px;
+      background: #fff;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      overflow-x: auto;
     }
+    .copy .receipt {
+      border: 1px solid #ccc;
+      padding: 6px 8px;
+      margin: 0;
+      background: #fff;
+      font-size: 9px;
+    }
+    .copy .receipt-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 2px;
+    }
+    .copy .receipt-logo img {
+      max-height: 30px;
+      width: auto;
+    }
+    .copy .receipt-title {
+      font-size: 11px;
+      font-weight: bold;
+    }
+    .copy .receipt-info {
+      font-size: 7px;
+      text-align: right;
+      line-height: 1.2;
+    }
+    .copy .receipt-object {
+      font-size: 7px;
+      margin-bottom: 2px;
+    }
+    .copy .receipt-contract {
+      font-size: 8px;
+      margin-bottom: 2px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2px 8px;
+    }
+    .copy .receipt-table {
+      font-size: 7px;
+      border-collapse: collapse;
+      width: 100%;
+      margin-bottom: 2px;
+    }
+    .copy .receipt-table th,
+    .copy .receipt-table td {
+      border: 1px solid #000;
+      padding: 1px 3px;
+      text-align: left;
+    }
+    .copy .receipt-table th {
+      background-color: #f0f0f0;
+    }
+    .copy .receipt-total {
+      font-size: 8px;
+      font-weight: bold;
+      text-align: right;
+      margin-bottom: 2px;
+    }
+    .copy .receipt-signature {
+      font-size: 8px;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 2px;
+    }
+    .copy .receipt-footer {
+      font-size: 6px;
+      text-align: center;
+      line-height: 1.2;
+    }
+    /* ========================================================== */
 
     .summary-table {
       width: 100%; border-collapse: collapse; margin-top: 10px;
@@ -160,67 +240,44 @@
       font-weight: bold;
     }
 
-    .receipt {
-      font-family: Arial, sans-serif; color: #000; background: #fff;
-      padding: 20px; margin-bottom: 20px; border: 1px solid #000;
-      position: relative;
-    }
-    .receipt-header {
-      display: flex; justify-content: space-between; align-items: center;
+    /* Estilos para la vista previa de impresión (se mantienen) */
+    .print-preview .receipt {
+      border: 1px solid #000;
+      padding: 12px;
       margin-bottom: 10px;
+      font-size: 10px;
     }
-    .receipt-logo {
-      flex-shrink: 0;
+    .print-preview .receipt-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
     }
-    .receipt-logo img {
-      max-height: 50px;  /* Ajuste de tamaño: no demasiado grande */
-      width: auto;
-      display: block;
+    .print-preview .receipt-logo img {
+      max-height: 45px;
     }
-    .receipt-title {
-      font-weight: bold; font-size: 16px;
+    .print-preview .receipt-table {
+      font-size: 9px;
     }
-    .receipt-info {
-      font-size: 12px; text-align: right;
+    .print-preview .receipt-table th,
+    .print-preview .receipt-table td {
+      padding: 3px 5px;
     }
-    .receipt-object {
-      font-size: 12px; margin-bottom: 10px;
-    }
-    .receipt-contract {
-      display: flex; justify-content: space-between; margin-bottom: 10px;
-      font-size: 12px; flex-wrap: wrap;
-    }
-    .receipt-table {
-      width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 10px;
-    }
-    .receipt-table th, .receipt-table td {
-      border: 1px solid #000; padding: 4px; text-align: left;
-    }
-    .receipt-table th { background-color: #f0f0f0; }
-    .receipt-total {
-      font-weight: bold; text-align: right; margin-bottom: 10px;
-    }
-    .receipt-signature {
-      display: flex; justify-content: space-between; margin-bottom: 10px;
-    }
-    .receipt-footer {
-      font-size: 10px; text-align: center;
-    }
-    .page-break { page-break-before: always; }
 
     @media print {
-      @page { size: A4; margin: 20mm; }
+      @page { size: A4; margin: 15mm; }
       body * { visibility: hidden; }
       .print-window, .print-window * { visibility: visible; }
       .print-window { position: absolute; left: 0; top: 0; width: 100%; }
       .page-break { page-break-before: always; }
-      .receipt { border: 1px solid #000; margin-bottom: 20px; }
+      .receipt { border: 1px solid #000; margin-bottom: 15px; }
     }
 
     @media (max-width:980px) {
       .layout { grid-template-columns: 1fr; }
       .menu-grid { grid-template-columns: repeat(2,1fr); }
       .two-copies { flex-direction: column; }
+      .copy { flex: 1 1 100%; }
     }
 
     .loader {
@@ -323,6 +380,7 @@
 
       <div id="mensaje" style="margin-top:12px"></div>
 
+      <!-- RECIBOS COMPACTOS -->
       <div class="two-copies" id="recibos"></div>
 
       <div style="margin-top:10px">
@@ -648,15 +706,12 @@
                          aceite4t_total + aceite_pesado_total + aceite_liviano_total +
                          aceite_hid_gl_total + aceite_hid_cuarto_total + ref_rojo_total + urea_total;
 
-    // Logo desde la misma carpeta (ruta relativa)
     const logoHtml = `<img src="images.png" alt="Logo" />`;
 
     return `
       <div class="receipt">
         <div class="receipt-header">
-          <div class="receipt-logo">
-            ${logoHtml}
-          </div>
+          <div class="receipt-logo">${logoHtml}</div>
           <div style="flex:1; text-align:center;">
             <div class="receipt-title">${titulo}</div>
           </div>
@@ -905,20 +960,20 @@
     const style = `
       <style>
         body{font-family:Arial,sans-serif;color:#000;margin:20px}
-        .receipt {border:1px solid #000; padding:20px; margin-bottom:20px; position:relative;}
-        .receipt-header {display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;}
+        .receipt {border:1px solid #000; padding:12px; margin-bottom:15px; position:relative;}
+        .receipt-header {display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;}
         .receipt-logo {flex-shrink:0;}
-        .receipt-logo img {max-height:50px; width:auto;}
-        .receipt-title {font-weight:bold; font-size:16px;}
-        .receipt-info {font-size:12px; text-align:right;}
-        .receipt-object {font-size:12px; margin-bottom:10px;}
-        .receipt-contract {display:flex; justify-content:space-between; margin-bottom:10px; font-size:12px; flex-wrap:wrap;}
-        .receipt-table {width:100%; border-collapse:collapse; font-size:12px; margin-bottom:10px;}
-        .receipt-table th, .receipt-table td {border:1px solid #000; padding:4px; text-align:left;}
+        .receipt-logo img {max-height:45px; width:auto;}
+        .receipt-title {font-weight:bold; font-size:14px;}
+        .receipt-info {font-size:10px; text-align:right;}
+        .receipt-object {font-size:9px; margin-bottom:4px;}
+        .receipt-contract {display:flex; justify-content:space-between; margin-bottom:4px; font-size:10px; flex-wrap:wrap;}
+        .receipt-table {width:100%; border-collapse:collapse; font-size:9px; margin-bottom:4px;}
+        .receipt-table th, .receipt-table td {border:1px solid #000; padding:3px 5px; text-align:left;}
         .receipt-table th {background-color:#f0f0f0;}
-        .receipt-total {font-weight:bold; text-align:right; margin-bottom:10px;}
-        .receipt-signature {display:flex; justify-content:space-between; margin-bottom:10px;}
-        .receipt-footer {font-size:10px; text-align:center;}
+        .receipt-total {font-weight:bold; text-align:right; margin-bottom:4px;}
+        .receipt-signature {display:flex; justify-content:space-between; margin-bottom:4px;}
+        .receipt-footer {font-size:8px; text-align:center;}
         .page-break {page-break-before:always;}
       </style>
     `;
@@ -933,20 +988,20 @@
     const style = `
       <style>
         body{font-family:Arial,sans-serif;color:#000;margin:20px}
-        .receipt {border:1px solid #000; padding:20px; position:relative;}
-        .receipt-header {display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;}
+        .receipt {border:1px solid #000; padding:12px; position:relative;}
+        .receipt-header {display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;}
         .receipt-logo {flex-shrink:0;}
-        .receipt-logo img {max-height:50px; width:auto;}
-        .receipt-title {font-weight:bold; font-size:16px;}
-        .receipt-info {font-size:12px; text-align:right;}
-        .receipt-object {font-size:12px; margin-bottom:10px;}
-        .receipt-contract {display:flex; justify-content:space-between; margin-bottom:10px; font-size:12px; flex-wrap:wrap;}
-        .receipt-table {width:100%; border-collapse:collapse; font-size:12px; margin-bottom:10px;}
-        .receipt-table th, .receipt-table td {border:1px solid #000; padding:4px; text-align:left;}
+        .receipt-logo img {max-height:45px; width:auto;}
+        .receipt-title {font-weight:bold; font-size:14px;}
+        .receipt-info {font-size:10px; text-align:right;}
+        .receipt-object {font-size:9px; margin-bottom:4px;}
+        .receipt-contract {display:flex; justify-content:space-between; margin-bottom:4px; font-size:10px; flex-wrap:wrap;}
+        .receipt-table {width:100%; border-collapse:collapse; font-size:9px; margin-bottom:4px;}
+        .receipt-table th, .receipt-table td {border:1px solid #000; padding:3px 5px; text-align:left;}
         .receipt-table th {background-color:#f0f0f0;}
-        .receipt-total {font-weight:bold; text-align:right; margin-bottom:10px;}
-        .receipt-signature {display:flex; justify-content:space-between; margin-bottom:10px;}
-        .receipt-footer {font-size:10px; text-align:center;}
+        .receipt-total {font-weight:bold; text-align:right; margin-bottom:4px;}
+        .receipt-signature {display:flex; justify-content:space-between; margin-bottom:4px;}
+        .receipt-footer {font-size:8px; text-align:center;}
       </style>
     `;
     return `<!doctype html><html><head><meta charset="utf-8">${style}</head><body>
@@ -1264,5 +1319,6 @@
   })();
   setInterval(() => cargarRegistros(false), 60000);
 </script>
+
 </body>
 </html>
