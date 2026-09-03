@@ -514,11 +514,17 @@
   // CONFIGURACIÓN
   // ============================================================
   const DEFAULT_PRICES = {
-    ACPM: 13250, CORRIENTE: 20250, GRASA: 16750,
-    ACEITE_2T: 34000, ACEITE_4T: 35000,
-    ACEITE_MOTOR_PESADO: 40000, ACEITE_MOTOR_LIVIANO: 38000,
-    ACEITE_HIDRAULICO_GL: 105000, ACEITE_HIDRAULICO_CUARTO: 26000,
-    REFRIGERANTE_ROJO: 15000, UREA: 29750
+    ACPM: 14239, 
+    CORRIENTE: 21237, 
+    GRASA: 17426, 
+    ACEITE_2T: 32612, 
+    ACEITE_4T: 31479, 
+    ACEITE_MOTOR_PESADO: 35073, 
+    ACEITE_MOTOR_LIVIANO: 37040, 
+    ACEITE_HIDRAULICO_GL: 96948, 
+    ACEITE_HIDRAULICO_CUARTO: 25086, 
+    REFRIGERANTE_ROJO: 14578, 
+    UREA: 24234    
   };
   const ADMIN_PASSWORD = 'AC.ardila2006';
   const SETTINGS_KEY = 'combustible_settings_v2';
@@ -565,7 +571,7 @@
 
   function loadSettings() {
     const raw = localStorage.getItem(SETTINGS_KEY);
-    if (!raw) return { prices: { ...DEFAULT_PRICES }, allowAI: false, openaiKey: '', valorContratoMC: 0 };
+    if (!raw) return { prices: { ...DEFAULT_PRICES }, allowAI: false, openaiKey: '', valorContratoMC: 49025340 };
     try {
       const s = JSON.parse(raw);
       if (s.valorContratoMC === undefined) s.valorContratoMC = 0;
