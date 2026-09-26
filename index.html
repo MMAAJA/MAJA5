@@ -295,6 +295,47 @@
       color: var(--muted);
       margin-left: 8px;
     }
+    /* Estado de guardado: evita dobles clics y deja claro que el registro se está procesando */
+    .saving-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.45);
+    }
+    .saving-overlay.hidden { display: none; }
+    .saving-box {
+      width: min(92%, 420px);
+      background: #fff;
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    }
+    .saving-box .loader {
+      width: 32px;
+      height: 32px;
+      border-width: 3px;
+      margin-bottom: 12px;
+    }
+    .saving-title {
+      font-weight: 800;
+      color: #0b1b33;
+      font-size: 17px;
+    }
+    .saving-text {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    .btn:disabled,
+    select:disabled,
+    input:disabled {
+      cursor: not-allowed;
+    }
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -302,6 +343,13 @@
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 </head>
 <body>
+  <div id="saving-overlay" class="saving-overlay hidden" aria-live="polite" aria-busy="true">
+    <div class="saving-box">
+      <span class="loader"></span>
+      <div class="saving-title">Guardando registro…</div>
+      <div class="saving-text">Por favor espera. No vuelvas a presionar “Generar recibo” hasta que termine el proceso.</div>
+    </div>
+  </div>
 
 <header>
   <div class="brand">
@@ -538,6 +586,7 @@
   let lastRecord = null;
   let chartInst = null;
   let showTotals = false;
+  let isSaving = false;
 
   const $ = id => document.getElementById(id);
   const maquinaEl = $('maquina');
@@ -568,6 +617,15 @@
   const syncStatus = $('sync-status');
   const fechaInicio = $('fecha-inicio');
   const fechaFin = $('fecha-fin');
+  const btnGenerar = $('btn-generar');
+  const savingOverlay = $('saving-overlay');
+
+  const formControls = [
+    maquinaEl, fechaEl,
+    acpmEl, corrienteEl, grasaEl, aceite2tEl, aceite4tEl,
+    aceitePesadoEl, aceiteLivianoEl, aceiteHidGlEl, aceiteHidCuartoEl,
+    refRojoEl, ureaEl
+  ];
 
   function loadSettings() {
     const raw = localStorage.getItem(SETTINGS_KEY);
@@ -611,39 +669,96 @@
         syncStatus.innerHTML = `✅ ${registros.length} registros`;
         aplicarFiltro();
       } else {
-        registros = []; registrosFiltrados = [];
-        syncStatus.innerHTML = '⚠️ Sin datos';
-        actualizarInterfaz();
-        mensajeEl.innerHTML = '<div style="color:#dc3545;">No se pudieron cargar los datos de Google Sheets.</div>';
+        if (showLoader) {
+          registros = []; registrosFiltrados = [];
+          syncStatus.innerHTML = '⚠️ Sin datos';
+          actualizarInterfaz();
+          mensajeEl.innerHTML = '<div style="color:#dc3545;">No se pudieron cargar los datos de Google Sheets.</div>';
+        } else {
+          syncStatus.innerHTML = '⚠️ Guardado; sincronización pendiente';
+        }
       }
     } catch (error) {
       console.error(error);
-      registros = []; registrosFiltrados = [];
-      syncStatus.innerHTML = '❌ Error de red';
-      actualizarInterfaz();
-      mensajeEl.innerHTML = '<div style="color:#dc3545;">Error de conexión con Google Sheets.</div>';
+      if (showLoader) {
+        registros = []; registrosFiltrados = [];
+        syncStatus.innerHTML = '❌ Error de red';
+        actualizarInterfaz();
+        mensajeEl.innerHTML = '<div style="color:#dc3545;">Error de conexión con Google Sheets.</div>';
+      } else {
+        syncStatus.innerHTML = '⚠️ Guardado; sincronización pendiente';
+      }
     }
+  }
+
+  function setSavingState(saving) {
+    isSaving = saving;
+    savingOverlay.classList.toggle('hidden', !saving);
+    btnGenerar.disabled = saving;
+    formControls.forEach(el => { el.disabled = saving; });
+  }
+
+  function limpiarCamposCantidad() {
+    acpmEl.value = '';
+    corrienteEl.value = '';
+    grasaEl.value = '';
+    aceite2tEl.value = '';
+    aceite4tEl.value = '';
+    aceitePesadoEl.value = '';
+    aceiteLivianoEl.value = '';
+    aceiteHidGlEl.value = '';
+    aceiteHidCuartoEl.value = '';
+    refRojoEl.value = '';
+    ureaEl.value = '';
   }
 
   async function enviarAGoogleSheets(record) {
     try {
-      mensajeEl.innerHTML += ' <span style="color:#0d6efd;">(Guardando...)</span>';
-      const res = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        mode: 'cors',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(record)
-      });
-      const json = await res.json();
-      if (json.status === 'success') {
-        mensajeEl.innerHTML = '<div style="color:#198754;font-weight:700">✔ Registro guardado</div>';
-        await cargarRegistros(false);
-      } else {
-        mensajeEl.innerHTML = '<div style="color:#dc3545;">Error al guardar.</div>';
+      mensajeEl.innerHTML = '<span style="color:#0d6efd;">(Guardando...)</span>';
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+      let res;
+      try {
+        res = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(record),
+          signal: controller.signal
+        });
+      } finally {
+        clearTimeout(timeoutId);
       }
+
+      const json = await res.json();
+
+      if (json.status !== 'success') {
+        throw new Error('Google Sheets no confirmó el guardado.');
+      }
+
+      // Actualización inmediata: el usuario no tiene que esperar una nueva descarga completa.
+      registros = [record, ...registros];
+      aplicarFiltro();
+
+      mensajeEl.innerHTML = '<div style="color:#198754;font-weight:700">✔ Registro guardado</div>';
+
+      // Sincronización posterior en segundo plano.
+      cargarRegistros(false).catch(error => {
+        console.warn('La sincronización posterior quedó pendiente:', error);
+        syncStatus.innerHTML = '⚠️ Guardado; sincronización pendiente';
+      });
+
+      return true;
     } catch (error) {
       console.error(error);
-      mensajeEl.innerHTML = '<div style="color:#dc3545;">Error de red al guardar.</div>';
+      if (error && error.name === 'AbortError') {
+        mensajeEl.innerHTML = '<div style="color:#dc3545;">La conexión está tardando demasiado. El guardado no pudo confirmarse.</div>';
+      } else {
+        mensajeEl.innerHTML = '<div style="color:#dc3545;">Error de red al guardar. Verifica la conexión antes de intentar nuevamente.</div>';
+      }
+      return false;
     }
   }
 
@@ -1030,6 +1145,9 @@
 
   // Generar recibo
   $('btn-generar').addEventListener('click', async () => {
+    // Protección contra doble/triple clic mientras Google Sheets responde.
+    if (isSaving) return;
+
     const maquina = maquinaEl.value;
     const fecha = fechaEl.value || new Date().toISOString().slice(0,10);
     const acpm_qty = parseFloat(acpmEl.value) || 0;
@@ -1068,17 +1186,26 @@
       orderNumber, total_precio
     };
 
+    // Se genera una sola vez y el recibo queda disponible para imprimir.
     renderRecibos(record);
     lastRecord = record;
-    await enviarAGoogleSheets(record);
+
+    setSavingState(true);
+
+    const guardado = await enviarAGoogleSheets(record);
+
+    if (guardado) {
+      // Evita que el siguiente registro herede cantidades del anterior.
+      limpiarCamposCantidad();
+    }
+
+    setSavingState(false);
   });
 
   // Limpiar
   $('btn-clear').addEventListener('click', () => {
-    acpmEl.value = ''; corrienteEl.value = ''; grasaEl.value = '';
-    aceite2tEl.value = ''; aceite4tEl.value = ''; aceitePesadoEl.value = '';
-    aceiteLivianoEl.value = ''; aceiteHidGlEl.value = ''; aceiteHidCuartoEl.value = '';
-    refRojoEl.value = ''; ureaEl.value = '';
+    if (isSaving) return;
+    limpiarCamposCantidad();
     mensajeEl.innerHTML = '';
   });
 
