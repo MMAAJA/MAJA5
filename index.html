@@ -1,1457 +1,1850 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Alcaldía Municipal de Jericó - Antioquia</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b2447">
+  <meta name="description" content="Panel de gestión de combustible, lubricantes y mantenimiento del parque automotor municipal.">
+  <title>Gestión de Combustible | Alcaldía Municipal de Jericó</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
   <style>
-    :root {
-      --bg: #ffffff;
-      --card: #f8f9fa;
-      --accent: #0d6efd;
-      --muted: #6c757d;
-      --border: #dee2e6;
-    }
-    * { box-sizing: border-box; font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: #212529;
-      -webkit-font-smoothing: antialiased;
-    }
-    header {
-      padding: 22px 28px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--border);
-      flex-wrap: wrap;
-    }
-    .brand { display: flex; align-items: center; gap: 12px; }
-    .logo {
-      width: 46px; height: 46px; border-radius: 10px;
-      background: linear-gradient(135deg, var(--accent), #3b82f6);
-      display: flex; align-items: center; justify-content: center;
-      color: #fff; font-weight: 800;
-    }
-    h1 { margin: 0; font-size: 18px; color: #0b1b33; }
-    .small { font-size: 13px; color: var(--muted); }
-
-    .container { max-width: 1200px; margin: 18px auto; padding: 18px; }
-
-    .menu-grid {
-      display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; margin-bottom: 24px;
-    }
-    .menu-card {
-      background: var(--card); padding: 18px; border-radius: 12px;
-      border: 1px solid var(--border); cursor: pointer;
-      transition: transform .16s ease, box-shadow .16s ease;
-    }
-    .menu-card:hover { transform: translateY(-6px); box-shadow: 0 12px 28px rgba(0,0,0,0.08); }
-    .menu-card h3 { margin: 0 0 6px 0; color: #0b1b33; }
-    .menu-card p { margin: 0; color: var(--muted); font-size: 13px; }
-
-    .layout {
-      display: grid; grid-template-columns: 1fr 420px; gap: 18px;
-    }
-    .card {
-      background: var(--card); padding: 18px; border-radius: 12px;
-      border: 1px solid var(--border);
+    :root{
+      --navy:#0b2447;
+      --navy-2:#123b70;
+      --blue:#1769e0;
+      --blue-2:#2f80ed;
+      --cyan:#0ea5e9;
+      --green:#10b981;
+      --amber:#f59e0b;
+      --red:#ef4444;
+      --purple:#8b5cf6;
+      --pink:#ec4899;
+      --teal:#14b8a6;
+      --bg:#f4f7fb;
+      --surface:#ffffff;
+      --surface-2:#f8fafc;
+      --text:#132238;
+      --muted:#64748b;
+      --border:#e2e8f0;
+      --shadow:0 10px 30px rgba(15,23,42,.07);
+      --shadow-lg:0 24px 60px rgba(15,23,42,.15);
+      --radius:18px;
+      --radius-sm:12px;
+      --sidebar:244px;
+      --topbar:70px;
     }
 
-    label {
-      display: block; margin-top: 10px; color: var(--muted); font-size: 13px;
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      -webkit-font-smoothing:antialiased;
     }
-    select, input[type="date"], input[type="number"], input[type="text"] {
-      width: 100%; padding: 10px; border-radius: 8px;
-      border: 1px solid var(--border); background: #fff; color: #212529; margin-top: 6px;
-    }
-    .hidden { display: none; }
-    .qty-row {
-      display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;
-    }
-    .qty-row > div { flex: 1; min-width: 100px; }
-
-    .actions {
-      display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap;
-    }
-    .btn {
-      padding: 10px 14px; border-radius: 10px; border: none; cursor: pointer;
-      font-weight: 700; font-size: 14px;
-    }
-    .btn.primary {
-      background: linear-gradient(90deg, var(--accent), #3b82f6);
-      color: #fff;
-    }
-    .btn.ghost {
-      background: transparent; border: 1px solid var(--border); color: #212529;
-    }
-    .btn.ghost:hover {
-      background: #e9ecef;
+    button,input,select{font:inherit}
+    button{border:0}
+    a{color:inherit}
+    .hidden{display:none!important}
+    .muted{color:var(--muted)}
+    .sr-only{
+      position:absolute!important;width:1px!important;height:1px!important;padding:0!important;
+      margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important;
     }
 
-    /* ========================================================== */
-    /* RECIBOS COMPACTOS - OCUPAN POCO ESPACIO                      */
-    /* ========================================================== */
-    .two-copies {
-      display: flex;
-      gap: 10px;
-      margin-top: 12px;
-      flex-wrap: wrap;
+    /* ---------- APP SHELL ---------- */
+    .app-shell{min-height:100vh}
+    .sidebar{
+      position:fixed;inset:0 auto 0 0;width:var(--sidebar);
+      background:linear-gradient(180deg,#081a34 0%,#0b2447 55%,#0e315d 100%);
+      color:#fff;z-index:1000;padding:20px 14px;display:flex;flex-direction:column;
     }
-    .copy {
-      flex: 1 1 45%;
-      min-width: 280px;
-      background: #fff;
-      padding: 6px 8px;
-      border-radius: 6px;
-      border: 1px solid var(--border);
-      overflow-x: auto;
+    .brand{
+      display:flex;align-items:center;gap:12px;padding:5px 10px 22px;
+      border-bottom:1px solid rgba(255,255,255,.12);
     }
-    .copy .receipt {
-      border: 1px solid #ccc;
-      padding: 6px 8px;
-      margin: 0;
-      background: #fff;
-      font-size: 9px;
+    .brand-mark{
+      width:42px;height:42px;border-radius:13px;display:grid;place-items:center;
+      background:linear-gradient(135deg,#2f80ed,#0ea5e9);font-weight:800;letter-spacing:-1px;
+      box-shadow:0 8px 20px rgba(47,128,237,.28);
     }
-    .copy .receipt-header {
-      display: flex;
-      align-items: center;
-      margin-bottom: 2px;
+    .brand-name{font-size:15px;font-weight:800;line-height:1.15}
+    .brand-sub{font-size:11px;color:rgba(255,255,255,.62);margin-top:3px}
+    .nav{display:grid;gap:6px;margin-top:18px}
+    .nav button{
+      color:rgba(255,255,255,.76);background:transparent;text-align:left;padding:12px 12px;
+      border-radius:12px;cursor:pointer;display:flex;align-items:center;gap:11px;transition:.18s ease;
     }
-    .copy .receipt-logo img {
-      max-height: 30px;
-      width: auto;
+    .nav button:hover,.nav button.active{color:#fff;background:rgba(255,255,255,.10)}
+    .nav button.active{box-shadow:inset 3px 0 0 #38bdf8}
+    .nav-icon{
+      width:20px;height:20px;display:grid;place-items:center;flex:0 0 20px;opacity:.9
     }
-    .copy .receipt-title {
-      font-size: 11px;
-      font-weight: bold;
-    }
-    .copy .receipt-info {
-      font-size: 7px;
-      text-align: right;
-      line-height: 1.2;
-    }
-    .copy .receipt-object {
-      font-size: 7px;
-      margin-bottom: 2px;
-    }
-    .copy .receipt-contract {
-      font-size: 8px;
-      margin-bottom: 2px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 2px 8px;
-    }
-    .copy .receipt-table {
-      font-size: 7px;
-      border-collapse: collapse;
-      width: 100%;
-      margin-bottom: 2px;
-    }
-    .copy .receipt-table th,
-    .copy .receipt-table td {
-      border: 1px solid #000;
-      padding: 1px 3px;
-      text-align: left;
-    }
-    .copy .receipt-table th {
-      background-color: #f0f0f0;
-    }
-    .copy .receipt-total {
-      font-size: 8px;
-      font-weight: bold;
-      text-align: right;
-      margin-bottom: 2px;
-    }
-    .copy .receipt-signature {
-      font-size: 8px;
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 2px;
-    }
-    .copy .receipt-footer {
-      font-size: 6px;
-      text-align: center;
-      line-height: 1.2;
-    }
-    /* ========================================================== */
-
-    .summary-table {
-      width: 100%; border-collapse: collapse; margin-top: 10px;
-      font-size: 13px;
-    }
-    .summary-table th, .summary-table td {
-      padding: 6px 8px; border-bottom: 1px solid var(--border); text-align: left;
-    }
-    .summary-table th {
-      background: #f1f3f5;
+    .side-footer{margin-top:auto;padding:14px 10px 2px;color:rgba(255,255,255,.55);font-size:11px;line-height:1.5}
+    .status-dot{
+      display:inline-block;width:8px;height:8px;border-radius:50%;background:#34d399;margin-right:6px;
+      box-shadow:0 0 0 4px rgba(52,211,153,.12)
     }
 
-    .excel-modal {
-      position: fixed; left: 50%; top: 50%; transform: translate(-50%,-50%);
-      width: 90%; max-width: 1200px; max-height: 80vh; overflow: auto;
-      z-index: 9999; background: #fff; border-radius: 12px;
-      padding: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    .main{
+      margin-left:var(--sidebar);min-height:100vh;
     }
-    .backdrop {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999;
+    .topbar{
+      position:sticky;top:0;z-index:900;height:var(--topbar);display:flex;align-items:center;justify-content:space-between;
+      padding:0 28px;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);
+    }
+    .topbar-title{font-weight:800;font-size:16px}
+    .topbar-sub{font-size:12px;color:var(--muted);margin-top:2px}
+    .topbar-actions{display:flex;align-items:center;gap:8px}
+    .container{max-width:1500px;margin:0 auto;padding:24px 28px 40px}
+
+    /* ---------- COMMON UI ---------- */
+    .btn{
+      min-height:40px;padding:0 14px;border-radius:11px;display:inline-flex;align-items:center;justify-content:center;
+      gap:8px;cursor:pointer;font-weight:700;font-size:13px;transition:transform .15s ease,box-shadow .15s ease,background .15s ease;
+      white-space:nowrap
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+    .btn-primary{color:#fff;background:linear-gradient(135deg,var(--blue),var(--blue-2));box-shadow:0 8px 18px rgba(23,105,224,.22)}
+    .btn-primary:hover{box-shadow:0 10px 24px rgba(23,105,224,.28)}
+    .btn-soft{color:#244365;background:#eef4fb;border:1px solid #dbe8f7}
+    .btn-soft:hover{background:#e7f0fb}
+    .btn-danger{color:#b42318;background:#fff1f0;border:1px solid #ffd2ce}
+    .btn-icon{width:40px;padding:0}
+    .icon{width:17px;height:17px;display:inline-block}
+
+    .page-section{scroll-margin-top:88px;margin-bottom:28px}
+    .section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:14px}
+    .section-kicker{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--blue);font-weight:800}
+    .section-title{margin:3px 0 0;font-size:22px;letter-spacing:-.02em}
+    .section-desc{margin:4px 0 0;color:var(--muted);font-size:13px}
+
+    .card{
+      background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);
     }
 
-    .top-actions {
-      display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap;
+    /* ---------- HERO ---------- */
+    .hero{
+      border-radius:22px;padding:24px 26px;color:#fff;overflow:hidden;position:relative;
+      background:
+        radial-gradient(circle at 90% 10%,rgba(56,189,248,.25),transparent 28%),
+        radial-gradient(circle at 55% 0%,rgba(139,92,246,.18),transparent 26%),
+        linear-gradient(135deg,#0a2142,#123e73 64%,#1769e0);
+      box-shadow:0 22px 50px rgba(11,36,71,.18);
     }
-    .center { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .hero::after{
+      content:"";position:absolute;right:-80px;bottom:-110px;width:330px;height:330px;border:1px solid rgba(255,255,255,.08);
+      border-radius:50%;box-shadow:0 0 0 30px rgba(255,255,255,.025),0 0 0 60px rgba(255,255,255,.018)
+    }
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:1.4fr .9fr;gap:20px;align-items:center}
+    .hero h2{margin:0;font-size:30px;letter-spacing:-.035em;max-width:720px}
+    .hero p{margin:10px 0 0;color:rgba(255,255,255,.75);font-size:13px;line-height:1.55;max-width:700px}
+    .hero-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}
+    .hero .btn-soft{background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.17);color:#fff}
+    .hero-panel{
+      background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.12);padding:16px;border-radius:16px;
+      backdrop-filter:blur(8px)
+    }
+    .hero-panel-title{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.62);font-weight:800}
+    .hero-panel-value{font-size:26px;font-weight:800;margin-top:5px}
+    .hero-panel-sub{font-size:11px;color:rgba(255,255,255,.62);margin-top:5px}
 
-    .chart-controls {
-      display: flex; gap: 8px; align-items: center; margin-top: 10px; flex-wrap: wrap;
+    /* ---------- KPI ---------- */
+    .kpi-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-top:14px}
+    .kpi{
+      padding:16px 16px 15px;background:#fff;border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);
+      position:relative;overflow:hidden
     }
-    .filter-row {
-      display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
-      margin-top: 10px;
-    }
-    .filter-row label { margin: 0; }
-    .filter-row input { width: auto; flex: 1; min-width: 120px; }
+    .kpi::before{content:"";position:absolute;left:0;top:0;right:0;height:3px;background:var(--kpi-color,var(--blue))}
+    .kpi-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+    .kpi-label{font-size:11px;color:var(--muted);font-weight:700}
+    .kpi-icon{width:31px;height:31px;border-radius:10px;display:grid;place-items:center;background:var(--kpi-bg,#eef4fb);color:var(--kpi-color,var(--blue))}
+    .kpi-value{font-size:21px;font-weight:800;letter-spacing:-.02em;margin-top:10px}
+    .kpi-note{font-size:11px;color:var(--muted);margin-top:4px}
 
-    .print-modal {
-      position: fixed; left: 50%; top: 50%; transform: translate(-50%,-50%);
-      width: 90%; max-width: 900px; height: 80vh; overflow: auto;
-      background: #fff; color: #000; border-radius: 10px;
-      z-index: 2000; padding: 18px;
-    }
-    .print-preview {
-      background: #fff; padding: 12px; border-radius: 6px;
-    }
-    .print-preview .copy {
-      background: transparent; border: 1px solid #e6e6e6; color: #000;
-    }
-
-    .total-section {
-      margin-top: 20px; padding: 15px;
-      background: #fff; border-radius: 10px; border: 1px solid var(--border);
-    }
-    .total-row {
-      display: flex; justify-content: space-between; margin-bottom: 8px;
-    }
-    .total-row.total-final {
-      border-top: 1px solid var(--border); padding-top: 10px; margin-top: 10px;
-      font-weight: bold;
-    }
-
-    /* Estilos para la vista previa de impresión (se mantienen) */
-    .print-preview .receipt {
-      border: 1px solid #000;
-      padding: 12px;
-      margin-bottom: 10px;
-      font-size: 10px;
-    }
-    .print-preview .receipt-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 6px;
-    }
-    .print-preview .receipt-logo img {
-      max-height: 45px;
-    }
-    .print-preview .receipt-table {
-      font-size: 9px;
-    }
-    .print-preview .receipt-table th,
-    .print-preview .receipt-table td {
-      padding: 3px 5px;
+    /* ---------- CAPTURE ---------- */
+    .capture-grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(330px,.85fr);gap:16px}
+    .form-card{padding:20px}
+    .side-summary{padding:18px;display:flex;flex-direction:column}
+    .card-title-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+    .card-title{margin:0;font-size:17px;letter-spacing:-.015em}
+    .card-sub{margin:4px 0 0;font-size:12px;color:var(--muted)}
+    .badge{
+      display:inline-flex;align-items:center;gap:5px;padding:6px 9px;border-radius:999px;font-size:10px;font-weight:800;
+      background:#eef6ff;color:#1769e0;border:1px solid #d6e8ff
     }
 
-    @media print {
-      @page { size: A4; margin: 15mm; }
-      body * { visibility: hidden; }
-      .print-window, .print-window * { visibility: visible; }
-      .print-window { position: absolute; left: 0; top: 0; width: 100%; }
-      .page-break { page-break-before: always; }
-      .receipt { border: 1px solid #000; margin-bottom: 15px; }
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .field label{display:block;font-size:11px;font-weight:800;color:#475569;margin-bottom:6px}
+    .control{
+      width:100%;height:43px;border-radius:11px;border:1px solid var(--border);background:#fff;color:var(--text);padding:0 12px;
+      outline:0;transition:border-color .15s ease,box-shadow .15s ease
+    }
+    .control:focus{border-color:#7bb4f7;box-shadow:0 0 0 4px rgba(47,128,237,.10)}
+    .field-full{grid-column:1/-1}
+
+    .materials-toolbar{
+      margin-top:18px;padding:12px 13px;border-radius:14px;background:var(--surface-2);border:1px solid var(--border);
+      display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap
+    }
+    .materials-title{font-size:12px;font-weight:800}
+    .materials-hint{font-size:11px;color:var(--muted)}
+    .materials-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
+    .material{
+      border:1px solid var(--border);border-radius:14px;padding:11px;background:#fff;transition:.15s ease;
+    }
+    .material:hover{border-color:#bfd4ef;box-shadow:0 5px 14px rgba(15,23,42,.05)}
+    .material-head{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+    .material-name{font-size:11px;font-weight:800;line-height:1.3}
+    .unit-chip{font-size:9px;color:#64748b;background:#f1f5f9;padding:4px 6px;border-radius:7px;white-space:nowrap}
+    .qty{
+      height:38px;margin-top:9px;width:100%;border-radius:10px;border:1px solid #dbe2ea;background:#fbfdff;
+      padding:0 10px;font-weight:700;color:var(--text);outline:0
+    }
+    .qty:focus{border-color:#7bb4f7;box-shadow:0 0 0 3px rgba(47,128,237,.08)}
+    .common-values{display:flex;gap:5px;margin-top:7px}
+    .common-values button{
+      border:1px solid #e2e8f0;background:#f8fafc;border-radius:8px;padding:3px 7px;font-size:9px;color:#64748b;cursor:pointer
+    }
+    .common-values button:hover{background:#edf4fb;color:#1769e0}
+    .quick-total{
+      margin-top:14px;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 14px;border-radius:14px;
+      background:linear-gradient(135deg,#f4f8ff,#fbfdff);border:1px solid #dce9fa
+    }
+    .quick-total-label{font-size:11px;color:var(--muted);font-weight:700}
+    .quick-total-value{font-size:22px;font-weight:800;color:#0d3f7a}
+    .form-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+
+    /* ---------- SUMMARY SIDE ---------- */
+    .summary-list{display:grid;gap:8px;margin-top:8px}
+    .summary-item{
+      display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid #eef2f7
+    }
+    .summary-item:last-child{border-bottom:0}
+    .summary-item span:first-child{font-size:11px;color:var(--muted)}
+    .summary-item strong{font-size:12px}
+    .progress-wrap{margin-top:15px;padding-top:14px;border-top:1px solid #eef2f7}
+    .progress-label{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-weight:700}
+    .progress{height:10px;background:#e9eef5;border-radius:999px;overflow:hidden;margin-top:8px}
+    .progress > div{height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,#1769e0,#0ea5e9);transition:width .35s ease}
+    .last-receipt{
+      margin-top:auto;padding:13px;border-radius:14px;background:#f8fafc;border:1px dashed #cbd5e1
+    }
+    .last-receipt-title{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#64748b;font-weight:800}
+    .last-receipt-main{display:flex;justify-content:space-between;gap:10px;margin-top:7px}
+    .last-receipt-main strong{font-size:13px}
+    .last-receipt-meta{font-size:10px;color:#64748b;margin-top:3px}
+
+    /* ---------- ANALYTICS ---------- */
+    .filter-bar{
+      display:flex;gap:9px;align-items:center;flex-wrap:wrap;padding:13px;border:1px solid var(--border);
+      background:#fff;border-radius:15px;box-shadow:var(--shadow)
+    }
+    .filter-bar .control{height:39px;width:auto;min-width:150px}
+    .filter-search{flex:1;min-width:180px}
+    .analytics-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:14px}
+    .chart-card{padding:16px;min-height:340px}
+    .chart-card.full{grid-column:1/-1}
+    .chart-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px}
+    .chart-title{font-weight:800;font-size:13px}
+    .chart-sub{font-size:10px;color:var(--muted);margin-top:3px}
+    .chart-wrap{position:relative;height:265px}
+    .chart-wrap.tall{height:315px}
+    .chart-empty{height:265px;display:grid;place-items:center;color:var(--muted);font-size:12px;border:1px dashed #d7dee8;border-radius:12px;background:#fafcff}
+
+    /* ---------- RECORDS ---------- */
+    .records-card{padding:0;overflow:hidden}
+    .records-head{padding:17px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+    .records-table-wrap{overflow:auto;max-height:540px}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:11px 12px;text-align:left;border-bottom:1px solid #eef2f7;white-space:nowrap;font-size:11px}
+    th{position:sticky;top:0;background:#f8fafc;color:#64748b;font-size:10px;text-transform:uppercase;letter-spacing:.05em;z-index:2}
+    tbody tr:hover{background:#fbfdff}
+    .machine-badge{display:inline-flex;align-items:center;padding:5px 8px;border-radius:8px;background:#eef5ff;color:#24548b;font-weight:800;font-size:10px}
+    .money{font-weight:800;color:#0d3f7a}
+    .table-actions{display:flex;gap:5px}
+    .table-actions .btn{min-height:30px;height:30px;padding:0 9px;font-size:10px}
+
+    /* ---------- ADMIN / MODALS ---------- */
+    .backdrop{position:fixed;inset:0;background:rgba(4,15,31,.56);backdrop-filter:blur(3px);z-index:1990}
+    .modal-shell{
+      position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2000;width:min(1120px,94vw);
+      max-height:90vh;overflow:auto;background:#fff;border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow-lg)
+    }
+    .modal-head{
+      position:sticky;top:0;z-index:2;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);
+      padding:16px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;gap:12px;align-items:center
+    }
+    .modal-body{padding:18px}
+    .settings-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+    .settings-group{padding:14px;border:1px solid var(--border);border-radius:14px;background:#fbfdff}
+    .settings-group h4{margin:0 0 12px;font-size:12px}
+    .setting-row{display:grid;grid-template-columns:1fr 130px;gap:10px;align-items:center;margin-bottom:9px}
+    .setting-row:last-child{margin-bottom:0}
+    .setting-row label{font-size:10px;color:#475569;font-weight:700}
+    .setting-row input{height:38px;border:1px solid var(--border);border-radius:9px;padding:0 9px}
+    .warning-box{margin-top:12px;padding:11px 12px;border-radius:11px;background:#fff8e7;border:1px solid #f6dea0;color:#7a5b00;font-size:11px;line-height:1.45}
+
+    /* ---------- PRINT PREVIEW ---------- */
+    .print-modal{width:min(1000px,94vw)}
+    .print-preview{padding:18px;background:#f4f6f8}
+    .print-toolbar{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+    .print-pages{display:grid;gap:16px}
+    .print-page{background:#fff;border:1px solid #cfd6df;box-shadow:0 6px 20px rgba(15,23,42,.06);padding:18px}
+    .receipt{
+      border:1px solid #111;padding:13px;background:#fff;color:#000;font-family:Arial,sans-serif;
+    }
+    .receipt + .receipt{margin-top:0}
+    .receipt-header{display:grid;grid-template-columns:65px 1fr 170px;gap:10px;align-items:center;margin-bottom:7px}
+    .receipt-logo img{max-height:45px;max-width:65px}
+    .receipt-title{text-align:center;font-weight:800;font-size:14px}
+    .receipt-info{text-align:right;font-size:9px;line-height:1.35}
+    .receipt-object{font-size:8px;line-height:1.3;margin-bottom:6px;text-align:justify}
+    .receipt-contract{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:9px;margin-bottom:6px}
+    .receipt-table{width:100%;border-collapse:collapse;font-size:8px}
+    .receipt-table th,.receipt-table td{border:1px solid #111;padding:3px 4px;text-align:left}
+    .receipt-table th{background:#f0f0f0}
+    .receipt-total{text-align:right;font-weight:800;font-size:10px;margin-top:6px}
+    .receipt-signature{display:flex;justify-content:space-between;gap:12px;font-size:8px;margin-top:7px}
+    .receipt-footer{text-align:center;font-size:7px;line-height:1.25;margin-top:7px}
+    .page-break{page-break-before:always}
+
+    /* ---------- TOAST / SAVING ---------- */
+    .toast-stack{
+      position:fixed;right:18px;bottom:18px;z-index:5000;display:grid;gap:8px;max-width:min(380px,calc(100vw - 36px))
+    }
+    .toast{
+      display:flex;gap:10px;align-items:flex-start;padding:12px 13px;border-radius:13px;border:1px solid var(--border);
+      background:#fff;box-shadow:var(--shadow-lg);animation:toast-in .18s ease
+    }
+    .toast-dot{width:9px;height:9px;border-radius:50%;background:var(--green);margin-top:4px;flex:0 0 auto}
+    .toast.error .toast-dot{background:var(--red)}
+    .toast.warn .toast-dot{background:var(--amber)}
+    .toast-title{font-weight:800;font-size:11px}
+    .toast-text{font-size:10px;color:var(--muted);line-height:1.35;margin-top:3px}
+    @keyframes toast-in{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
+    .saving-overlay{
+      position:fixed;inset:0;background:rgba(6,18,35,.55);backdrop-filter:blur(4px);z-index:6000;display:grid;place-items:center
+    }
+    .saving-box{width:min(92vw,420px);padding:24px;border-radius:18px;background:#fff;text-align:center;box-shadow:var(--shadow-lg)}
+    .spinner{width:34px;height:34px;border:3px solid #dbe6f2;border-top-color:var(--blue);border-radius:50%;animation:spin .65s linear infinite;margin:0 auto 13px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .saving-title{font-weight:800;font-size:15px}
+    .saving-text{font-size:11px;color:var(--muted);line-height:1.45;margin-top:5px}
+
+    /* ---------- RESPONSIVE ---------- */
+    @media(max-width:1240px){
+      .kpi-grid{grid-template-columns:repeat(3,1fr)}
+      .capture-grid{grid-template-columns:1fr}
+      .side-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+      .last-receipt{margin-top:0;grid-column:1/-1}
+    }
+    @media(max-width:980px){
+      :root{--sidebar:0px}
+      .sidebar{display:none}
+      .main{margin-left:0}
+      .topbar{padding:0 16px}
+      .container{padding:18px 16px 30px}
+      .hero-grid{grid-template-columns:1fr}
+      .analytics-grid{grid-template-columns:1fr}
+      .chart-card.full{grid-column:auto}
+      .materials-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .settings-grid{grid-template-columns:1fr}
+    }
+    @media(max-width:680px){
+      .topbar-sub{display:none}
+      .hero h2{font-size:24px}
+      .kpi-grid{grid-template-columns:repeat(2,1fr)}
+      .form-grid{grid-template-columns:1fr}
+      .field-full{grid-column:auto}
+      .materials-grid{grid-template-columns:1fr}
+      .side-summary{display:flex}
+      .section-head{align-items:flex-start;flex-direction:column}
+      .filter-bar .control{width:100%;min-width:0}
+      .filter-search{min-width:0}
+      .setting-row{grid-template-columns:1fr}
+      .setting-row input{width:100%}
+    }
+    @media(max-width:420px){
+      .kpi-grid{grid-template-columns:1fr}
+      .hero-actions .btn{flex:1}
     }
 
-    @media (max-width:980px) {
-      .layout { grid-template-columns: 1fr; }
-      .menu-grid { grid-template-columns: repeat(2,1fr); }
-      .two-copies { flex-direction: column; }
-      .copy { flex: 1 1 100%; }
-    }
-
-    .loader {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid #ccc;
-      border-radius: 50%;
-      border-top-color: #0d6efd;
-      animation: spin 0.6s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .sync-status {
-      font-size: 13px;
-      color: var(--muted);
-      margin-left: 8px;
-    }
-    /* Estado de guardado: evita dobles clics y deja claro que el registro se está procesando */
-    .saving-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 10000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0,0,0,0.45);
-    }
-    .saving-overlay.hidden { display: none; }
-    .saving-box {
-      width: min(92%, 420px);
-      background: #fff;
-      border-radius: 12px;
-      padding: 24px;
-      text-align: center;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
-    }
-    .saving-box .loader {
-      width: 32px;
-      height: 32px;
-      border-width: 3px;
-      margin-bottom: 12px;
-    }
-    .saving-title {
-      font-weight: 800;
-      color: #0b1b33;
-      font-size: 17px;
-    }
-    .saving-text {
-      margin-top: 6px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.4;
-    }
-    .btn:disabled,
-    select:disabled,
-    input:disabled {
-      cursor: not-allowed;
+    @media print{
+      @page{size:A4;margin:12mm}
+      body{background:#fff}
+      body *{visibility:hidden!important}
+      .print-window,.print-window *{visibility:visible!important}
+      .print-window{position:absolute!important;left:0!important;top:0!important;width:100%!important}
+      .print-window .print-page{box-shadow:none;border:0;padding:0}
+      .print-window .receipt{border:1px solid #000}
+      .page-break{page-break-before:always}
     }
   </style>
-
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 </head>
 <body>
-  <div id="saving-overlay" class="saving-overlay hidden" aria-live="polite" aria-busy="true">
-    <div class="saving-box">
-      <span class="loader"></span>
-      <div class="saving-title">Guardando registro…</div>
-      <div class="saving-text">Por favor espera. No vuelvas a presionar “Generar recibo” hasta que termine el proceso.</div>
-    </div>
-  </div>
-
-<header>
-  <div class="brand">
-    <div class="logo">CA</div>
-    <div>
-      <h1>Alcaldía Municipal de Jericó - Antioquia</h1>
-      <div class="small">Todos los derechos reservados © Cristian Ardila</div>
-    </div>
-  </div>
-  <div class="center">
-    <button class="btn ghost" id="btn-refresh"><span style="font-size:18px;">⟳</span> Refrescar</button>
-    <button class="btn ghost" id="btn-ir-excel">Ir a Excel (AC)</button>
-    <button class="btn ghost" id="btn-resetar">Resetar</button>
-  </div>
-</header>
-
-<div class="container">
-  <div class="menu-grid">
-    <div class="menu-card" data-page="combustible">
-      <h3>COMBUSTIBLE</h3>
-      <p>Registro de consumos por máquina. Genera recibos e informes.</p>
-    </div>
-    <div class="menu-card" data-page="mantenimiento">
-      <h3>MANTENIMIENTO</h3>
-      <p>Órdenes de trabajo, repuestos y control de costos.</p>
-    </div>
-    <div class="menu-card" id="menu-ajustes">
-      <h3>AJUSTES</h3>
-      <p>Cambia precios y opciones de exportación.</p>
-    </div>
-  </div>
-
-  <div class="layout">
-    <div class="card" id="card-main">
-      <h2>Registro - COMBUSTIBLE</h2>
-      <label>Máquina</label>
-      <select id="maquina">
-        <option>RETRO</option><option>NIVELADORA</option><option>VIBRO</option>
-        <option>VOLQUETA</option><option>XFK75C</option><option>DQU91D</option>
-        <option>QIE55H</option><option>VCW59C</option><option>FPZ593</option>
-        <option>EKV832</option><option>BUS</option><option>UMATA GUADAÑA</option>
-        <option>DEPORTE GUADAÑA</option><option>COMPRESOR</option>
-      </select>
-
-      <label>Fecha</label>
-      <input type="date" id="fecha" />
-
-      <p class="small" style="margin-top:12px">Materiales (ingrese solo la cantidad; los precios no se muestran)</p>
-
-      <div class="qty-row">
-        <div><label>ACPM (GL)</label><input type="number" id="acpm" min="0" step="0.1" placeholder="0" /></div>
-        <div><label>CORRIENTE (GL)</label><input type="number" id="corriente" min="0" step="0.1" placeholder="0" /></div>
-        <div><label>GRASA (LB)</label><input type="number" id="grasa" min="0" step="0.1" placeholder="0" /></div>
-      </div>
-      <div class="qty-row">
-        <div><label>ACEITE 2T (1/4)</label><input type="number" id="aceite2t" min="0" step="0.1" placeholder="0" /></div>
-        <div><label>ACEITE 4T (1/4)</label><input type="number" id="aceite4t" min="0" step="0.1" placeholder="0" /></div>
-        <div><label>ACEITE MOTOR PESADO (1/4)</label><input type="number" id="aceite-pesado" min="0" step="0.1" placeholder="0" /></div>
-      </div>
-      <div class="qty-row">
-        <div><label>ACEITE MOTOR LIVIANO (1/4)</label><input type="number" id="aceite-liviano" min="0" step="0.1" placeholder="0" /></div>
-        <div><label>ACEITE HIDRAULICO (GL)</label><input type="number" id="aceite-hidraulico-gl" min="0" step="0.1" placeholder="0" /></div>
-        <div><label>ACEITE HIDRAULICO (1/4)</label><input type="number" id="aceite-hidraulico-cuarto" min="0" step="0.1" placeholder="0" /></div>
-      </div>
-      <div class="qty-row">
-        <div><label>REFRIGERANTE ROJO (1/4)</label><input type="number" id="refrigerante-rojo" min="0" step="0.1" placeholder="0" /></div>
-        <div><label>UREA (GL)</label><input type="number" id="urea" min="0" step="0.1" placeholder="0" /></div>
-        <div style="visibility:hidden;"><label>&nbsp;</label><input type="number" disabled style="visibility:hidden;" /></div>
-      </div>
-
-      <div class="actions">
-        <button class="btn primary" id="btn-generar">Generar recibo</button>
-        <button class="btn ghost" id="btn-preview-print">Imprimir (ambas copias)</button>
-        <button class="btn ghost" id="btn-clear">Limpiar formulario</button>
-      </div>
-
-      <div id="mensaje" style="margin-top:12px"></div>
-
-      <!-- RECIBOS COMPACTOS -->
-      <div class="two-copies" id="recibos"></div>
-
-      <div style="margin-top:10px">
-        <label>Opciones de impresión</label>
-        <div class="actions">
-          <button class="btn ghost" id="btn-print-copia1">Imprimir COPIA 1</button>
-          <button class="btn ghost" id="btn-print-copia2">Imprimir COPIA 2</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="top-actions">
-        <h3>Resumen & Gráficas</h3>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Navegación principal">
+      <div class="brand">
+        <div class="brand-mark">CA</div>
         <div>
-          <button class="btn primary" id="btn-generate-pdf">PDF</button>
-          <button class="btn ghost" id="btn-download-chart">Descargar gráfica (PNG)</button>
+          <div class="brand-name">© CRISTIAN ARDILA</div>
+          <div class="brand-sub">Jericó · Parque automotor</div>
         </div>
       </div>
-
-      <div class="filter-row">
-        <label>Desde:</label>
-        <input type="date" id="fecha-inicio" />
-        <label>Hasta:</label>
-        <input type="date" id="fecha-fin" />
-        <button class="btn ghost" id="btn-aplicar-filtro">Aplicar filtro</button>
-        <button class="btn ghost" id="btn-limpiar-filtro">Limpiar</button>
+      <nav class="nav">
+        <button class="active" data-target="dashboard">
+          <span class="nav-icon">⌂</span><span>Panel principal</span>
+        </button>
+        <button data-target="consumo">
+          <span class="nav-icon">▣</span><span>Registrar consumo</span>
+        </button>
+        <button data-target="analitica">
+          <span class="nav-icon">◒</span><span>Analítica</span>
+        </button>
+        <button data-target="registros">
+          <span class="nav-icon">☷</span><span>Registros</span>
+        </button>
+      </nav>
+      <div class="side-footer">
+        <div><span class="status-dot"></span><span id="sidebar-status">Conectando…</span></div>
+        <div style="margin-top:8px">Alcaldía Municipal de Jericó - Antioquia</div>
+        <div>Herramienta de control de combustible</div>
       </div>
+    </aside>
 
-      <div class="chart-controls">
-        <select id="chart-type">
-          <option value="bar">Barra</option><option value="line">Línea</option>
-          <option value="pie">Pastel</option><option value="doughnut">Dona</option>
-          <option value="radar">Radar</option>
-        </select>
-        <button class="btn ghost" id="btn-toggle-recent">Ver totales globales</button>
-        <label style="margin-left:auto" class="small">Paleta: Profesional</label>
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="topbar-title">Control de combustible y lubricantes</div>
+          <div class="topbar-sub">Captura rápida · recibos · presupuesto · analítica</div>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-soft" id="btn-refresh" title="Actualizar datos">
+            <span class="icon">↻</span><span class="desktop-label">Actualizar</span>
+          </button>
+          <button class="btn btn-soft" id="btn-excel" title="Abrir registros y exportar Excel">
+            <span class="icon">▤</span><span class="desktop-label">Excel</span>
+          </button>
+          <button class="btn btn-soft" id="btn-settings" title="Ajustes administrativos">
+            <span class="icon">⚙</span><span class="desktop-label">Ajustes</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="container">
+        <!-- DASHBOARD -->
+        <section id="dashboard" class="page-section">
+          <div class="hero">
+            <div class="hero-grid">
+              <div>
+                <div class="section-kicker" style="color:#7dd3fc">Centro de control</div>
+                <h2>ALCALDÍA DE JERICÓ</h2>
+                <div class="hero-actions">
+                  <button class="btn btn-primary" data-target="consumo" id="hero-go-consumo">＋ Nuevo consumo</button>
+                  <button class="btn btn-soft" data-target="analitica">Ver analítica</button>
+                  <button class="btn btn-soft" id="hero-pdf">Generar informe PDF</button>
+                </div>
+              </div>
+              <div class="hero-panel">
+                <div class="hero-panel-title">Saldo estimado del contrato </div>
+                <div class="hero-panel-value" id="hero-restante">$0</div>
+                <div class="hero-panel-sub"><span id="hero-progress-text">0%</span> utilizado · actualización local en tiempo real</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi-grid">
+            <article class="kpi" style="--kpi-color:#1769e0;--kpi-bg:#edf5ff">
+              <div class="kpi-top"><span class="kpi-label">Consumo acumulado</span><span class="kpi-icon">$</span></div>
+              <div class="kpi-value" id="kpi-total">$0</div>
+              <div class="kpi-note">Todos los registros cargados</div>
+            </article>
+            <article class="kpi" style="--kpi-color:#10b981;--kpi-bg:#ecfdf5">
+              <div class="kpi-top"><span class="kpi-label">Saldo contrato</span><span class="kpi-icon">✓</span></div>
+              <div class="kpi-value" id="kpi-restante">$0</div>
+              <div class="kpi-note">Según el valor contractual configurado</div>
+            </article>
+            <article class="kpi" style="--kpi-color:#8b5cf6;--kpi-bg:#f5f3ff">
+              <div class="kpi-top"><span class="kpi-label">Registros</span><span class="kpi-icon">#</span></div>
+              <div class="kpi-value" id="kpi-registros">0</div>
+              <div class="kpi-note">Órdenes cargadas en el panel</div>
+            </article>
+            <article class="kpi" style="--kpi-color:#f59e0b;--kpi-bg:#fffbeb">
+              <div class="kpi-top"><span class="kpi-label">Promedio por orden</span><span class="kpi-icon">↗</span></div>
+              <div class="kpi-value" id="kpi-promedio">$0</div>
+              <div class="kpi-note">Valor promedio del registro</div>
+            </article>
+            <article class="kpi" style="--kpi-color:#ec4899;--kpi-bg:#fdf2f8">
+              <div class="kpi-top"><span class="kpi-label">Máquina líder</span><span class="kpi-icon">★</span></div>
+              <div class="kpi-value" id="kpi-maquina">—</div>
+              <div class="kpi-note" id="kpi-maquina-note">Sin datos todavía</div>
+            </article>
+          </div>
+        </section>
+
+        <!-- CAPTURE -->
+        <section id="consumo" class="page-section">
+          <div class="section-head">
+            <div>
+              <div class="section-kicker">Operación</div>
+              <h2 class="section-title">Registrar consumo</h2>
+              <p class="section-desc">Selecciona máquina, fecha y solo las cantidades utilizadas. </p>
+            </div>
+            <span class="badge">⚡ Flujo rápido · Ctrl + Enter para generar</span>
+          </div>
+
+          <div class="capture-grid">
+            <article class="card form-card">
+              <div class="card-title-row">
+                <div>
+                  <h3 class="card-title">Nuevo recibo</h3>
+                </div>
+                <span class="badge" id="form-mode-badge">NUEVO</span>
+              </div>
+
+              <form id="consumo-form" autocomplete="off">
+                <div class="form-grid">
+                  <div class="field">
+                    <label for="maquina">Máquina / equipo</label>
+                    <select class="control" id="maquina"></select>
+                  </div>
+                  <div class="field">
+                    <label for="fecha">Fecha de suministro</label>
+                    <input class="control" type="date" id="fecha">
+                  </div>
+                </div>
+
+                <div class="materials-toolbar">
+                  <div>
+                    <div class="materials-title">Materiales y lubricantes</div>
+                    <div class="materials-hint">Ingrese cantidades. Use 0 o déjelo vacío cuando no aplique.</div>
+                  </div>
+                  <button type="button" class="btn btn-soft" id="btn-clear">Limpiar cantidades</button>
+                </div>
+
+                <div class="materials-grid" id="materials-grid"></div>
+
+                <div class="quick-total">
+                  <div>
+                    <div class="quick-total-label">Total estimado del recibo</div>
+                    <div class="muted" style="font-size:10px;margin-top:3px">Calculado con los precios de configuración actuales.</div>
+                  </div>
+                  <div class="quick-total-value" id="form-total">$0</div>
+                </div>
+
+                <div class="form-actions">
+                  <button class="btn btn-primary" type="submit" id="btn-generar">
+                    <span>✓</span> Generar recibo
+                  </button>
+                  <button class="btn btn-soft" type="button" id="btn-preview-print">
+                    <span>▣</span> Abrir impresión
+                  </button>
+                  <button class="btn btn-soft" type="button" id="btn-print-c1">Imprimir copia 1</button>
+                  <button class="btn btn-soft" type="button" id="btn-print-c2">Imprimir copia 2</button>
+                </div>
+                <div id="mensaje" style="margin-top:10px"></div>
+              </form>
+
+              <div id="recibos" class="hidden"></div>
+            </article>
+
+            <aside class="card side-summary">
+              <div>
+                <div class="card-title-row" style="margin-bottom:8px">
+                  <div>
+                    <h3 class="card-title">Resumen del contrato</h3>
+                    <p class="card-sub">Seguimiento financiero del MC-058-2026.</p>
+                  </div>
+                </div>
+                <div class="summary-list">
+                  <div class="summary-item"><span>Valor del contrato</span><strong id="side-contrato">$0</strong></div>
+                  <div class="summary-item"><span>Consumido</span><strong id="side-consumido">$0</strong></div>
+                  <div class="summary-item"><span>Disponible</span><strong id="side-disponible">$0</strong></div>
+                  <div class="summary-item"><span>% ejecutado</span><strong id="side-ejecutado">0%</strong></div>
+                </div>
+                <div class="progress-wrap">
+                  <div class="progress-label"><span>Uso del contrato</span><span id="progress-value">0%</span></div>
+                  <div class="progress"><div id="contract-progress"></div></div>
+                </div>
+              </div>
+
+              <div class="last-receipt">
+                <div class="last-receipt-title">Último recibo</div>
+                <div class="last-receipt-main">
+                  <strong id="last-machine">—</strong>
+                  <strong id="last-total">$0</strong>
+                </div>
+                <div class="last-receipt-meta" id="last-meta">Aún no se ha generado un recibo.</div>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <!-- ANALYTICS -->
+        <section id="analitica" class="page-section">
+          <div class="section-head">
+            <div>
+              <div class="section-kicker">Inteligencia operativa</div>
+              <h2 class="section-title">Analítica de consumo</h2>
+              <p class="section-desc">Filtra por fecha y máquina; las gráficas se actualizan con el mismo conjunto de datos.</p>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn btn-soft" id="btn-download-chart">Descargar gráfica</button>
+              <button class="btn btn-primary" id="btn-generate-pdf">Informe PDF</button>
+            </div>
+          </div>
+
+          <div class="filter-bar">
+            <div>
+              <label class="sr-only" for="fecha-inicio">Desde</label>
+              <input class="control" type="date" id="fecha-inicio" aria-label="Fecha inicial">
+            </div>
+            <div>
+              <label class="sr-only" for="fecha-fin">Hasta</label>
+              <input class="control" type="date" id="fecha-fin" aria-label="Fecha final">
+            </div>
+            <select class="control" id="filtro-maquina" aria-label="Filtrar por máquina"></select>
+            <input class="control filter-search" id="buscar-registros" type="search" placeholder="Buscar máquina o fecha…">
+            <button class="btn btn-soft" id="btn-aplicar-filtro">Aplicar</button>
+            <button class="btn btn-soft" id="btn-limpiar-filtro">Limpiar</button>
+            <span class="badge" id="analytics-status">0 registros</span>
+          </div>
+
+          <div class="analytics-grid">
+            <article class="card chart-card">
+              <div class="chart-head">
+                <div><div class="chart-title">Valor por máquina</div><div class="chart-sub">Distribución monetaria del periodo filtrado</div></div>
+                <span class="badge">COP</span>
+              </div>
+              <div class="chart-wrap"><canvas id="chartMachine"></canvas></div>
+            </article>
+
+            <article class="card chart-card">
+              <div class="chart-head">
+                <div><div class="chart-title">Costo por material</div><div class="chart-sub">Qué productos explican el gasto</div></div>
+                <span class="badge">Top costos</span>
+              </div>
+              <div class="chart-wrap"><canvas id="chartMaterialCost"></canvas></div>
+            </article>
+
+            <article class="card chart-card full">
+              <div class="chart-head">
+                <div><div class="chart-title">Evolución diaria del consumo</div><div class="chart-sub">Seguimiento temporal del valor registrado</div></div>
+                <span class="badge">Tendencia</span>
+              </div>
+              <div class="chart-wrap tall"><canvas id="chartDaily"></canvas></div>
+            </article>
+
+            <article class="card chart-card">
+              <div class="chart-head">
+                <div><div class="chart-title">Uso del contrato</div><div class="chart-sub">Consumido vs. disponible</div></div>
+                <span class="badge">Presupuesto</span>
+              </div>
+              <div class="chart-wrap"><canvas id="chartContract"></canvas></div>
+            </article>
+
+            <article class="card chart-card">
+              <div class="chart-head">
+                <div><div class="chart-title">Volumen por material</div><div class="chart-sub">Cantidad acumulada en las unidades de cada producto</div></div>
+                <span class="badge">Cantidades</span>
+              </div>
+              <div class="chart-wrap"><canvas id="chartMaterialQty"></canvas></div>
+            </article>
+          </div>
+        </section>
+
+        <!-- RECORDS -->
+        <section id="registros" class="page-section">
+          <div class="section-head">
+            <div>
+              <div class="section-kicker">Trazabilidad</div>
+              <h2 class="section-title">Registros recientes</h2>
+              <p class="section-desc">Consulta, busca y vuelve a imprimir cualquier recibo disponible en memoria.</p>
+            </div>
+            <button class="btn btn-soft" id="btn-toggle-summary">Ver resumen de cantidades</button>
+          </div>
+
+          <article class="card records-card">
+            <div class="records-head">
+              <div>
+                <div class="card-title">Movimientos</div>
+                <div class="card-sub"><span id="records-count">0</span> registros visibles · <span id="sync-status">Sin sincronizar</span></div>
+              </div>
+              <div class="badge" id="records-badge">Datos locales</div>
+            </div>
+            <div class="records-table-wrap">
+              <table id="records-table">
+                <thead>
+                  <tr>
+                    <th>Fecha</th><th>Máquina</th><th>Orden</th><th>ACPM</th><th>Corriente</th><th>Grasa</th>
+                    <th>Aceites</th><th>Urea</th><th>Total</th><th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+              <div id="records-empty" class="hidden" style="padding:26px;text-align:center;color:var(--muted);font-size:12px">No hay registros para el filtro actual.</div>
+            </div>
+          </article>
+        </section>
       </div>
-
-      <canvas id="chartTotales" style="margin-top:12px;max-height:260px;background:transparent"></canvas>
-
-      <div id="resumen" style="margin-top:12px"></div>
-
-      <div class="total-section">
-        <h4 style="margin-top:0">Resumen Financiero</h4>
-        <div class="total-row"><span>Valor total consumido (global):</span><span id="valor-total-consumido">$0</span></div>
-        <div class="total-row"><span>Valor total consumido (filtrado):</span><span id="valor-total-filtrado">$0</span></div>
-        <div class="total-row total-final"><span>Valor restante del contrato MC:</span><span id="valor-restante-contrato">$0</span></div>
-        <div class="total-row" style="font-size:12px;color:var(--muted)"><span>Valor del contrato:</span><span id="valor-contrato-mostrado">$0</span></div>
-      </div>
-
-      <h4 style="margin-top:12px">Registros / Totales <span class="sync-status" id="sync-status"></span></h4>
-      <div id="lista-registros" style="max-height:320px;overflow:auto;margin-top:8px"></div>
-    </div>
+    </main>
   </div>
 
-  <!-- Print Preview Modal -->
+  <!-- PRINT MODAL -->
   <div id="print-modal" class="hidden">
     <div class="backdrop"></div>
-    <div class="print-modal" role="dialog" aria-modal="true">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <h3>Vista previa de impresión — Ambas copias</h3>
+    <div class="modal-shell print-modal" role="dialog" aria-modal="true" aria-labelledby="print-title">
+      <div class="modal-head">
         <div>
-          <button class="btn ghost" id="btn-close-print">Cerrar</button>
-          <button class="btn primary" id="btn-print-now">Imprimir</button>
+          <div class="section-kicker">Salida</div>
+          <h3 id="print-title" class="card-title">Vista previa · ambas copias</h3>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-soft" id="btn-close-print">Cerrar</button>
+          <button class="btn btn-primary" id="btn-print-now">Imprimir las 2 copias</button>
         </div>
       </div>
-      <div class="print-preview" id="print-preview-content" style="min-height:60vh"></div>
+      <div class="print-preview" id="print-preview-content"></div>
     </div>
   </div>
 
-  <!-- Settings modal -->
-  <div id="settings-modal" class="hidden">
-    <div class="backdrop"></div>
-    <div class="excel-modal card">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <h3>Ajustes</h3>
-        <div>
-          <button class="btn ghost" id="btn-close-settings">Cerrar</button>
-          <button class="btn primary" id="btn-save-settings">Guardar ajustes</button>
-        </div>
-      </div>
-      <div style="margin-top:12px">
-        <label>Precio ACPM</label><input type="number" id="price-acpm" step="0.1" />
-        <label>Precio CORRIENTE</label><input type="number" id="price-corriente" step="0.1" />
-        <label>Precio GRASA</label><input type="number" id="price-grasa" step="0.1" />
-        <label>Precio ACEITE 2T</label><input type="number" id="price-aceite2t" step="0.1" />
-        <label>Precio ACEITE 4T</label><input type="number" id="price-aceite4t" step="0.1" />
-        <label>Precio ACEITE MOTOR PESADO</label><input type="number" id="price-aceite-pesado" step="0.1" />
-        <label>Precio ACEITE MOTOR LIVIANO</label><input type="number" id="price-aceite-liviano" step="0.1" />
-        <label>Precio ACEITE HIDRAULICO (GL)</label><input type="number" id="price-aceite-hidraulico-gl" step="0.1" />
-        <label>Precio ACEITE HIDRAULICO (1/4)</label><input type="number" id="price-aceite-hidraulico-cuarto" step="0.1" />
-        <label>Precio REFRIGERANTE ROJO</label><input type="number" id="price-refrigerante-rojo" step="0.1" />
-        <label>Precio UREA</label><input type="number" id="price-urea" step="0.1" />
-        <label style="margin-top:12px">Valor del contrato MC (pesos)</label>
-        <input type="number" id="valor-contrato-mc" step="0.01" />
-        <label style="margin-top:12px">Opciones de exportación / IA</label>
-        <div style="display:flex;gap:8px;align-items:center;margin-top:6px">
-          <input type="checkbox" id="allow-ai" /> <label class="small">Permitir generación automática de informe con IA</label>
-        </div>
-        <label style="margin-top:8px">Clave API OpenAI (opcional)</label>
-        <input type="text" id="openai-key" placeholder="sk-... (opcional)" />
-        <div class="small" style="margin-top:8px;color:#dc3545">Advertencia: guardar la clave en el navegador es inseguro.</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Excel modal -->
+  <!-- EXCEL MODAL -->
   <div id="excel-modal" class="hidden">
     <div class="backdrop"></div>
-    <div class="excel-modal card">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <h3>Excel virtual - Registros</h3>
+    <div class="modal-shell" role="dialog" aria-modal="true" aria-labelledby="excel-title">
+      <div class="modal-head">
         <div>
-          <button class="btn ghost" id="btn-close-excel">Cerrar</button>
-          <button class="btn primary" id="btn-export-excel">Exportar .xlsx</button>
+          <div class="section-kicker">Datos</div>
+          <h3 id="excel-title" class="card-title">Excel virtual · registros completos</h3>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-soft" id="btn-close-excel">Cerrar</button>
+          <button class="btn btn-primary" id="btn-export-excel">Exportar .xlsx</button>
         </div>
       </div>
-      <div style="margin-top:12px;overflow:auto">
-        <table class="summary-table" id="table-excel">
-          <thead><tr><th>Timestamp</th><th>Máquina</th><th>Fecha</th><th>ACPM</th><th>CORRIENTE</th><th>GRASA</th><th>2T</th><th>4T</th><th>PESADO</th><th>LIVIANO</th><th>HID GL</th><th>HID 1/4</th><th>REF ROJO</th><th>UREA</th><th>Total</th></tr></thead>
-          <tbody></tbody>
-        </table>
+      <div class="modal-body">
+        <div style="overflow:auto">
+          <table id="table-excel">
+            <thead></thead><tbody></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<script>
-  // ============================================================
-  // CONFIGURACIÓN
-  // ============================================================
-  const DEFAULT_PRICES = {
-    ACPM: 14239, 
-    CORRIENTE: 21237, 
-    GRASA: 17426, 
-    ACEITE_2T: 32612, 
-    ACEITE_4T: 31479, 
-    ACEITE_MOTOR_PESADO: 35073, 
-    ACEITE_MOTOR_LIVIANO: 37040, 
-    ACEITE_HIDRAULICO_GL: 96948, 
-    ACEITE_HIDRAULICO_CUARTO: 25086, 
-    REFRIGERANTE_ROJO: 14578, 
-    UREA: 24234    
-  };
-  const ADMIN_PASSWORD = 'AC.ardila2006';
-  const SETTINGS_KEY = 'combustible_settings_v2';
-  // ==== REEMPLAZA ESTA URL CON LA DE TU SCRIPT PUBLICADO ====
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz-_lv4_Gfq6exv2pMR1UpfmYimhoU7pvG-lpv2_sMK6xsgE6E1adHVyKjq-3YfSHpU/exec';
+  <!-- SETTINGS MODAL -->
+  <div id="settings-modal" class="hidden">
+    <div class="backdrop"></div>
+    <div class="modal-shell" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <div class="modal-head">
+        <div>
+          <div class="section-kicker">Administración</div>
+          <h3 id="settings-title" class="card-title">Configuración</h3>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-soft" id="btn-close-settings">Cerrar</button>
+          <button class="btn btn-primary" id="btn-save-settings">Guardar cambios</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="settings-grid">
+          <div class="settings-group">
+            <h4>Precios de referencia</h4>
+            <div id="settings-prices"></div>
+          </div>
+          <div class="settings-group">
+            <h4>Control contractual</h4>
+            <div class="setting-row"><label for="valor-contrato-mc">Valor del contrato MC</label><input type="number" step="0.01" id="valor-contrato-mc"></div>
+            <div class="setting-row"><label for="auto-print">Abrir vista de impresión al guardar</label><input type="checkbox" id="auto-print" checked></div>
+            <div class="setting-row"><label for="cache-enabled">Usar caché local para carga rápida</label><input type="checkbox" id="cache-enabled" checked></div>
+          </div>
+        </div>
+        <div class="warning-box">
+          La contraseña administrativa y cualquier clave secreta no deben considerarse protegidas cuando se guardan dentro de JavaScript del navegador. Para control real de permisos, la validación debe moverse al Apps Script/backend.
+        </div>
+      </div>
+    </div>
+  </div>
 
-  let SETTINGS = loadSettings();
-  let registros = [];
-  let registrosFiltrados = [];
-  let valorContrato = 0;
-  let lastRecord = null;
-  let chartInst = null;
-  let showTotals = false;
-  let isSaving = false;
+  <!-- SAVING -->
+  <div id="saving-overlay" class="saving-overlay hidden" aria-live="polite" aria-busy="true">
+    <div class="saving-box">
+      <div class="spinner"></div>
+      <div class="saving-title">Guardando registro…</div>
+      <div class="saving-text">Se está enviando el registro a Google Sheets. Al confirmar, se abrirá automáticamente la vista de las dos copias.</div>
+    </div>
+  </div>
 
-  const $ = id => document.getElementById(id);
-  const maquinaEl = $('maquina');
-  const fechaEl = $('fecha');
-  const acpmEl = $('acpm');
-  const corrienteEl = $('corriente');
-  const grasaEl = $('grasa');
-  const aceite2tEl = $('aceite2t');
-  const aceite4tEl = $('aceite4t');
-  const aceitePesadoEl = $('aceite-pesado');
-  const aceiteLivianoEl = $('aceite-liviano');
-  const aceiteHidGlEl = $('aceite-hidraulico-gl');
-  const aceiteHidCuartoEl = $('aceite-hidraulico-cuarto');
-  const refRojoEl = $('refrigerante-rojo');
-  const ureaEl = $('urea');
-  const mensajeEl = $('mensaje');
-  const recibosEl = $('recibos');
-  const listaRegistros = $('lista-registros');
-  const resumenEl = $('resumen');
-  const chartCanvas = $('chartTotales');
-  const chartTypeSel = $('chart-type');
-  const btnToggleRecent = $('btn-toggle-recent');
-  const btnDownloadChart = $('btn-download-chart');
-  const valorTotalConsumidoEl = $('valor-total-consumido');
-  const valorTotalFiltradoEl = $('valor-total-filtrado');
-  const valorRestanteContratoEl = $('valor-restante-contrato');
-  const valorContratoMostradoEl = $('valor-contrato-mostrado');
-  const syncStatus = $('sync-status');
-  const fechaInicio = $('fecha-inicio');
-  const fechaFin = $('fecha-fin');
-  const btnGenerar = $('btn-generar');
-  const savingOverlay = $('saving-overlay');
+  <div id="toast-stack" class="toast-stack" aria-live="polite" aria-atomic="true"></div>
 
-  const formControls = [
-    maquinaEl, fechaEl,
-    acpmEl, corrienteEl, grasaEl, aceite2tEl, aceite4tEl,
-    aceitePesadoEl, aceiteLivianoEl, aceiteHidGlEl, aceiteHidCuartoEl,
-    refRojoEl, ureaEl
-  ];
+  <script>
+    "use strict";
 
-  function loadSettings() {
-    const raw = localStorage.getItem(SETTINGS_KEY);
-    if (!raw) return { prices: { ...DEFAULT_PRICES }, allowAI: false, openaiKey: '', valorContratoMC: 49025340 };
-    try {
-      const s = JSON.parse(raw);
-      if (s.valorContratoMC === undefined) s.valorContratoMC = 0;
-      return s;
-    } catch { return { prices: { ...DEFAULT_PRICES }, allowAI: false, openaiKey: '', valorContratoMC: 0 }; }
-  }
-  function saveSettings(s) { localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); }
+    /* ==========================================================
+       CONFIGURACIÓN
+       ========================================================== */
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz-_lv4_Gfq6exv2pMR1UpfmYimhoU7pvG-lpv2_sMK6xsgE6E1adHVyKjq-3YfSHpU/exec';
+    const ADMIN_PASSWORD = 'AC.ardila2006'; // Compatibilidad con tu versión actual. Mover al backend en producción.
+    const SETTINGS_KEY = 'combustible_settings_v3';
+    const CACHE_KEY = 'combustible_records_cache_v3';
+    const AUTO_REFRESH_MS = 90000;
 
-  // ============================================================
-  // Google Sheets
-  // ============================================================
-  async function cargarRegistros(showLoader = true) {
-    if (showLoader) syncStatus.innerHTML = '<span class="loader"></span> Cargando...';
-    try {
-      const res = await fetch(SCRIPT_URL);
-      const json = await res.json();
-      console.log('Respuesta:', json);
-      if (json.status === 'success' && Array.isArray(json.data)) {
-        registros = json.data.map(r => ({
-          ...r,
-          acpm_qty: parseFloat(r.acpm_qty) || 0,
-          corriente_qty: parseFloat(r.corriente_qty) || 0,
-          grasa_qty: parseFloat(r.grasa_qty) || 0,
-          aceite2t_qty: parseFloat(r.aceite2t_qty) || 0,
-          aceite4t_qty: parseFloat(r.aceite4t_qty) || 0,
-          aceite_pesado_qty: parseFloat(r.aceite_pesado_qty) || 0,
-          aceite_liviano_qty: parseFloat(r.aceite_liviano_qty) || 0,
-          aceite_hidraulico_gl_qty: parseFloat(r.aceite_hidraulico_gl_qty) || 0,
-          aceite_hidraulico_cuarto_qty: parseFloat(r.aceite_hidraulico_cuarto_qty) || 0,
-          refrigerante_rojo_qty: parseFloat(r.refrigerante_rojo_qty) || 0,
-          urea_qty: parseFloat(r.urea_qty) || 0,
-          total_precio: parseFloat(r.total_precio) || 0,
-          orderNumber: parseInt(r.orderNumber) || 1,
-        }));
-        valorContrato = json.valorContrato || 0;
-        if (valorContrato === 0 && SETTINGS.valorContratoMC) valorContrato = SETTINGS.valorContratoMC;
-        syncStatus.innerHTML = `✅ ${registros.length} registros`;
-        aplicarFiltro();
-      } else {
-        if (showLoader) {
-          registros = []; registrosFiltrados = [];
-          syncStatus.innerHTML = '⚠️ Sin datos';
-          actualizarInterfaz();
-          mensajeEl.innerHTML = '<div style="color:#dc3545;">No se pudieron cargar los datos de Google Sheets.</div>';
-        } else {
-          syncStatus.innerHTML = '⚠️ Guardado; sincronización pendiente';
-        }
-      }
-    } catch (error) {
-      console.error(error);
-      if (showLoader) {
-        registros = []; registrosFiltrados = [];
-        syncStatus.innerHTML = '❌ Error de red';
-        actualizarInterfaz();
-        mensajeEl.innerHTML = '<div style="color:#dc3545;">Error de conexión con Google Sheets.</div>';
-      } else {
-        syncStatus.innerHTML = '⚠️ Guardado; sincronización pendiente';
-      }
+    const MATERIALS = [
+      {key:'acpm_qty', price:'ACPM', label:'ACPM', unit:'GL', input:'acpm'},
+      {key:'corriente_qty', price:'CORRIENTE', label:'CORRIENTE', unit:'GL', input:'corriente'},
+      {key:'grasa_qty', price:'GRASA', label:'GRASA', unit:'LB', input:'grasa'},
+      {key:'aceite2t_qty', price:'ACEITE_2T', label:'ACEITE 2T', unit:'1/4', input:'aceite2t'},
+      {key:'aceite4t_qty', price:'ACEITE_4T', label:'ACEITE 4T', unit:'1/4', input:'aceite4t'},
+      {key:'aceite_pesado_qty', price:'ACEITE_MOTOR_PESADO', label:'ACEITE MOTOR PESADO', unit:'1/4', input:'aceite-pesado'},
+      {key:'aceite_liviano_qty', price:'ACEITE_MOTOR_LIVIANO', label:'ACEITE MOTOR LIVIANO', unit:'1/4', input:'aceite-liviano'},
+      {key:'aceite_hidraulico_gl_qty', price:'ACEITE_HIDRAULICO_GL', label:'ACEITE HIDRÁULICO', unit:'GL', input:'aceite-hidraulico-gl'},
+      {key:'aceite_hidraulico_cuarto_qty', price:'ACEITE_HIDRAULICO_CUARTO', label:'ACEITE HIDRÁULICO', unit:'1/4', input:'aceite-hidraulico-cuarto'},
+      {key:'refrigerante_rojo_qty', price:'REFRIGERANTE_ROJO', label:'REFRIGERANTE ROJO', unit:'1/4', input:'refrigerante-rojo'},
+      {key:'urea_qty', price:'UREA', label:'UREA', unit:'GL', input:'urea'}
+    ];
+
+    const MACHINES = [
+      'RETRO','NIVELADORA','VIBRO','VOLQUETA','XFK75C','DQU91D','QIE55H',
+      'VCW59C','FPZ593','EKV832','BUS','UMATA GUADAÑA','DEPORTE GUADAÑA','COMPRESOR'
+    ];
+
+    const DEFAULT_PRICES = {
+      ACPM:14239, CORRIENTE:21237, GRASA:17426, ACEITE_2T:32612, ACEITE_4T:31479,
+      ACEITE_MOTOR_PESADO:35073, ACEITE_MOTOR_LIVIANO:37040, ACEITE_HIDRAULICO_GL:96948,
+      ACEITE_HIDRAULICO_CUARTO:25086, REFRIGERANTE_ROJO:14578, UREA:24234
+    };
+
+    // 12 tonos diferentes para evitar la repetición de colores de la versión anterior.
+    const PALETTE = [
+      '#1769E0','#8B5CF6','#10B981','#F59E0B','#EF4444','#EC4899',
+      '#0EA5E9','#14B8A6','#F97316','#6366F1','#84CC16','#64748B'
+    ];
+
+    const state = {
+      settings: loadSettings(),
+      records: [],
+      filtered: [],
+      lastRecord: null,
+      charts: {},
+      filters: {start:'',end:'',machine:'',search:''},
+      summaryMode:false,
+      saving:false,
+      cacheEnabled:true
+    };
+
+    const $ = id => document.getElementById(id);
+
+    /* ==========================================================
+       UTILIDADES
+       ========================================================== */
+    function money(v){
+      return new Intl.NumberFormat('es-CO',{
+        style:'currency',currency:'COP',maximumFractionDigits:0
+      }).format(Number(v)||0);
     }
-  }
-
-  function setSavingState(saving) {
-    isSaving = saving;
-    savingOverlay.classList.toggle('hidden', !saving);
-    btnGenerar.disabled = saving;
-    formControls.forEach(el => { el.disabled = saving; });
-  }
-
-  function limpiarCamposCantidad() {
-    acpmEl.value = '';
-    corrienteEl.value = '';
-    grasaEl.value = '';
-    aceite2tEl.value = '';
-    aceite4tEl.value = '';
-    aceitePesadoEl.value = '';
-    aceiteLivianoEl.value = '';
-    aceiteHidGlEl.value = '';
-    aceiteHidCuartoEl.value = '';
-    refRojoEl.value = '';
-    ureaEl.value = '';
-  }
-
-  async function enviarAGoogleSheets(record) {
-    try {
-      mensajeEl.innerHTML = '<span style="color:#0d6efd;">(Guardando...)</span>';
-
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000);
-
-      let res;
-      try {
-        res = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          mode: 'cors',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(record),
-          signal: controller.signal
-        });
-      } finally {
-        clearTimeout(timeoutId);
-      }
-
-      const json = await res.json();
-
-      if (json.status !== 'success') {
-        throw new Error('Google Sheets no confirmó el guardado.');
-      }
-
-      // Actualización inmediata: el usuario no tiene que esperar una nueva descarga completa.
-      registros = [record, ...registros];
-      aplicarFiltro();
-
-      mensajeEl.innerHTML = '<div style="color:#198754;font-weight:700">✔ Registro guardado</div>';
-
-      // Sincronización posterior en segundo plano.
-      cargarRegistros(false).catch(error => {
-        console.warn('La sincronización posterior quedó pendiente:', error);
-        syncStatus.innerHTML = '⚠️ Guardado; sincronización pendiente';
+    function number(v, decimals=2){
+      return (Number(v)||0).toLocaleString('es-CO',{
+        minimumFractionDigits:decimals,maximumFractionDigits:decimals
       });
-
-      return true;
-    } catch (error) {
-      console.error(error);
-      if (error && error.name === 'AbortError') {
-        mensajeEl.innerHTML = '<div style="color:#dc3545;">La conexión está tardando demasiado. El guardado no pudo confirmarse.</div>';
-      } else {
-        mensajeEl.innerHTML = '<div style="color:#dc3545;">Error de red al guardar. Verifica la conexión antes de intentar nuevamente.</div>';
-      }
-      return false;
     }
-  }
+    function safeDateInput(){
+      const d = new Date();
+      const p = n => String(n).padStart(2,'0');
+      return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
+    }
+    // Evita el desfase de un día provocado por new Date("YYYY-MM-DD") en zonas UTC-5.
+    function formatDateCO(s){
+      if(!s)return '—';
+      const m = String(s).match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if(m)return `${m[3]}/${m[2]}/${m[1]}`;
+      const d = new Date(s);
+      return Number.isNaN(d.getTime()) ? String(s) : d.toLocaleDateString('es-CO');
+    }
+    function formatDateTime(s){
+      const d = new Date(s);
+      return Number.isNaN(d.getTime()) ? '—' : d.toLocaleString('es-CO',{
+        dateStyle:'short',timeStyle:'short'
+      });
+    }
+    function escapeHtml(value){
+      return String(value ?? '').replace(/[&<>"']/g,m=>({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
+      }[m]));
+    }
+    function clamp(n,min,max){return Math.min(max,Math.max(min,n))}
+    function getPrices(){return state.settings.prices || DEFAULT_PRICES}
 
-  // ============================================================
-  // Utilidades
-  // ============================================================
-  function formatoMoneda(v) {
-    return '$' + Number(v).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-  }
-  function formatDateForReceipt(dateString) {
-    const d = new Date(dateString);
-    return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
-  }
-  function getNextOrderNumber(maquina) {
-    const filtrados = registros.filter(r => r.maquina === maquina);
-    if (filtrados.length === 0) return 1;
-    const maxOrder = Math.max(...filtrados.map(r => parseInt(r.orderNumber) || 0));
-    return maxOrder + 1;
-  }
+    function loadSettings(){
+      const fallback = {
+        prices:{...DEFAULT_PRICES},
+        valorContratoMC:49025340,
+        autoPrint:true,
+        cacheEnabled:true
+      };
+      try{
+        const raw = localStorage.getItem(SETTINGS_KEY);
+        if(!raw)return fallback;
+        const s = {...fallback,...JSON.parse(raw)};
+        s.prices = {...DEFAULT_PRICES,...(s.prices||{})};
+        return s;
+      }catch{
+        return fallback;
+      }
+    }
+    function saveSettings(){localStorage.setItem(SETTINGS_KEY,JSON.stringify(state.settings))}
 
-  // ============================================================
-  // Filtro
-  // ============================================================
-  function aplicarFiltro() {
-    const inicio = fechaInicio.value;
-    const fin = fechaFin.value;
-    if (!inicio && !fin) {
-      registrosFiltrados = [...registros];
-    } else {
-      registrosFiltrados = registros.filter(r => {
-        if (!r.fecha) return true;
-        if (inicio && r.fecha < inicio) return false;
-        if (fin && r.fecha > fin) return false;
+    function setSaving(flag){
+      state.saving=flag;
+      $('saving-overlay').classList.toggle('hidden',!flag);
+      $('btn-generar').disabled=flag;
+      document.querySelectorAll('#consumo-form input,#consumo-form select,#consumo-form button').forEach(el=>{
+        if(el.id!=='btn-generar') el.disabled=flag;
+      });
+    }
+
+    function toast(title,text,type='ok'){
+      const box=document.createElement('div');
+      box.className=`toast ${type==='error'?'error':type==='warn'?'warn':''}`;
+      box.innerHTML=`<span class="toast-dot"></span><div><div class="toast-title">${escapeHtml(title)}</div><div class="toast-text">${escapeHtml(text)}</div></div>`;
+      $('toast-stack').appendChild(box);
+      setTimeout(()=>box.remove(),4200);
+    }
+
+    function getNextOrderNumber(machine){
+      const nums=state.records.filter(r=>r.maquina===machine).map(r=>Number(r.orderNumber)||0);
+      return nums.length ? Math.max(...nums)+1 : 1;
+    }
+
+    function calculateRecordTotal(record){
+      const p=getPrices();
+      return MATERIALS.reduce((sum,m)=>sum+(Number(record[m.key])||0)*(Number(p[m.price])||0),0);
+    }
+
+    function getFormRecord(){
+      const maquina=$('maquina').value;
+      const fecha=$('fecha').value || safeDateInput();
+      const record={
+        timestamp:new Date().toISOString(),
+        clientId:(crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`),
+        maquina,fecha,
+        orderNumber:getNextOrderNumber(maquina)
+      };
+      MATERIALS.forEach(m=>{
+        record[m.key]=Math.max(0,Number(parseFloat($(m.input).value)||0));
+      });
+      record.total_precio=calculateRecordTotal(record);
+      return record;
+    }
+
+    function setMachineOptions(){
+      $('maquina').innerHTML=MACHINES.map(m=>`<option value="${escapeHtml(m)}">${escapeHtml(m)}</option>`).join('');
+      $('filtro-maquina').innerHTML=`<option value="">Todas las máquinas</option>`+
+        MACHINES.map(m=>`<option value="${escapeHtml(m)}">${escapeHtml(m)}</option>`).join('');
+    }
+
+    function renderMaterials(){
+      $('materials-grid').innerHTML=MATERIALS.map((m,i)=>`
+        <div class="material">
+          <div class="material-head">
+            <div class="material-name">${escapeHtml(m.label)}</div>
+            <span class="unit-chip">${escapeHtml(m.unit)}</span>
+          </div>
+          <input class="qty" type="number" min="0" step="0.1" id="${escapeHtml(m.input)}" placeholder="0" inputmode="decimal">
+          <div class="common-values">
+
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function updateFormTotal(){
+      const fake={};
+      MATERIALS.forEach(m=>fake[m.key]=Number(parseFloat($(m.input).value)||0));
+      $('form-total').textContent=money(calculateRecordTotal(fake));
+    }
+
+    function clearQuantities(){
+      MATERIALS.forEach(m=>$(m.input).value='');
+      updateFormTotal();
+      toast('Formulario limpio','Las cantidades fueron restablecidas.');
+    }
+
+    /* ==========================================================
+       CACHE + GOOGLE SHEETS
+       ========================================================== */
+    function normalizeRecord(r){
+      const out={...r};
+      MATERIALS.forEach(m=>out[m.key]=Number.parseFloat(r?.[m.key])||0);
+      out.total_precio=Number.parseFloat(r?.total_precio)||calculateRecordTotal(out);
+      out.orderNumber=Number.parseInt(r?.orderNumber)||1;
+      return out;
+    }
+
+    function saveCache(){
+      if(!state.cacheEnabled)return;
+      try{
+        localStorage.setItem(CACHE_KEY,JSON.stringify({
+          records:state.records,
+          savedAt:new Date().toISOString(),
+          valorContrato:state.contract
+        }));
+      }catch(err){
+        console.warn('No se pudo guardar caché local',err);
+      }
+    }
+
+    function loadCache(){
+      if(!state.settings.cacheEnabled)return false;
+      try{
+        const raw=localStorage.getItem(CACHE_KEY);
+        if(!raw)return false;
+        const cache=JSON.parse(raw);
+        if(!Array.isArray(cache.records))return false;
+        state.records=cache.records.map(normalizeRecord);
+        state.contract=Number(cache.valorContrato)||Number(state.settings.valorContratoMC)||0;
+        applyFilters(false);
+        const age=cache.savedAt ? Math.round((Date.now()-new Date(cache.savedAt).getTime())/60000) : null;
+        $('sync-status').textContent=age===null?'Caché local':`Caché ${age} min`;
+        $('records-badge').textContent='Caché local';
+        $('sidebar-status').textContent='Caché · sincronizando';
+        return true;
+      }catch{return false}
+    }
+
+    async function fetchJson(url,options={}){
+      const controller=new AbortController();
+      const timeout=setTimeout(()=>controller.abort(),25000);
+      try{
+        const res=await fetch(url,{...options,signal:controller.signal,cache:'no-store'});
+        if(!res.ok)throw new Error(`HTTP ${res.status}`);
+        return await res.json();
+      }finally{
+        clearTimeout(timeout);
+      }
+    }
+
+    async function cargarRegistros(showToast=false){
+      $('sync-status').textContent='Actualizando…';
+      try{
+        const json=await fetchJson(SCRIPT_URL);
+        if(json?.status!=='success' || !Array.isArray(json.data))throw new Error('Respuesta no válida del servicio');
+        state.records=json.data.map(normalizeRecord);
+        state.contract=Number(json.valorContrato)||Number(state.settings.valorContratoMC)||0;
+        saveCache();
+        applyFilters(false);
+        $('sync-status').textContent=`Sincronizado ${formatDateTime(new Date().toISOString())}`;
+        $('records-badge').textContent=`${state.records.length} datos`;
+        $('sidebar-status').textContent='Sincronizado';
+        if(showToast)toast('Datos actualizados',`${state.records.length} registros cargados desde Google Sheets.`);
+      }catch(err){
+        console.error(err);
+        $('sync-status').textContent='Sin conexión · usando datos locales';
+        $('records-badge').textContent='Modo local';
+        $('sidebar-status').textContent='Modo local';
+        if(showToast)toast('Sincronización pendiente','No fue posible consultar Google Sheets. Se conservan los datos locales visibles.','warn');
+      }
+    }
+
+    async function enviarAGoogleSheets(record){
+      const json=await fetchJson(SCRIPT_URL,{
+        method:'POST',
+        mode:'cors',
+        headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body:JSON.stringify(record)
+      });
+      if(json?.status!=='success')throw new Error(json?.message || 'El backend no confirmó el guardado.');
+      return json;
+    }
+
+    /* ==========================================================
+       FILTROS / KPIs
+       ========================================================== */
+    function getFilteredRecords(){
+      const f=state.filters;
+      return state.records.filter(r=>{
+        if(f.start && r.fecha<f.start)return false;
+        if(f.end && r.fecha>f.end)return false;
+        if(f.machine && r.maquina!==f.machine)return false;
+        if(f.search){
+          const q=f.search.toLowerCase();
+          const hay=`${r.maquina} ${r.fecha} ${r.orderNumber}`.toLowerCase();
+          if(!hay.includes(q))return false;
+        }
         return true;
       });
     }
-    actualizarInterfaz();
-  }
-  function limpiarFiltro() {
-    fechaInicio.value = '';
-    fechaFin.value = '';
-    registrosFiltrados = [...registros];
-    actualizarInterfaz();
-  }
 
-  // ============================================================
-  // Recibo HTML (con logo desde la misma carpeta)
-  // ============================================================
-  function generateReceiptHTML(record, titulo) {
-    const orderNumber = record.orderNumber || 1;
-    const formattedDate = formatDateForReceipt(record.fecha);
-    const prices = SETTINGS.prices || DEFAULT_PRICES;
-
-    const acpm_total = (record.acpm_qty || 0) * prices.ACPM;
-    const corriente_total = (record.corriente_qty || 0) * prices.CORRIENTE;
-    const grasa_total = (record.grasa_qty || 0) * prices.GRASA;
-    const aceite2t_total = (record.aceite2t_qty || 0) * prices.ACEITE_2T;
-    const aceite4t_total = (record.aceite4t_qty || 0) * prices.ACEITE_4T;
-    const aceite_pesado_total = (record.aceite_pesado_qty || 0) * prices.ACEITE_MOTOR_PESADO;
-    const aceite_liviano_total = (record.aceite_liviano_qty || 0) * prices.ACEITE_MOTOR_LIVIANO;
-    const aceite_hid_gl_total = (record.aceite_hidraulico_gl_qty || 0) * prices.ACEITE_HIDRAULICO_GL;
-    const aceite_hid_cuarto_total = (record.aceite_hidraulico_cuarto_qty || 0) * prices.ACEITE_HIDRAULICO_CUARTO;
-    const ref_rojo_total = (record.refrigerante_rojo_qty || 0) * prices.REFRIGERANTE_ROJO;
-    const urea_total = (record.urea_qty || 0) * prices.UREA;
-    const total_precio = acpm_total + corriente_total + grasa_total + aceite2t_total +
-                         aceite4t_total + aceite_pesado_total + aceite_liviano_total +
-                         aceite_hid_gl_total + aceite_hid_cuarto_total + ref_rojo_total + urea_total;
-
-    const logoHtml = `<img src="images.png" alt="Logo" />`;
-
-    return `
-      <div class="receipt">
-        <div class="receipt-header">
-          <div class="receipt-logo">${logoHtml}</div>
-          <div style="flex:1; text-align:center;">
-            <div class="receipt-title">${titulo}</div>
-          </div>
-          <div class="receipt-info">
-            <div>Código: ${record.timestamp}</div>
-            <div>Código TRD:</div>
-            <div>Vigencia:</div>
-            <div>Versión:</div>
-          </div>
-        </div>
-        <div class="receipt-object">
-          OBJETO: CONTRATAR EL SUMINISTRO PERIÓDICO Y CONTINUO DE COMBUSTIBLE, LUBRICANTES, ACEITES, REFRIGERANTES, UREA Y GRASAS, DESTINADOS AL FUNCIONAMIENTO, OPERACIÓN Y MANTENIMIENTO DEL PARQUE AUTOMOTOR, MAQUINARIA Y EQUIPOS MENORES (GUADAÑAS) ADSCRITOS AL MUNICIPIO DE JERICO – ANTIOQUIA.
-        </div>
-        <div class="receipt-contract">
-          <div>CONTRATO N°: MC-058-2026 </div>
-          <div>ORDEN DE PEDIDO N°: ${orderNumber}</div>
-          <div>FECHA: ${formattedDate}</div>
-        </div>
-        <table class="receipt-table">
-          <thead><tr><th>VEHÍCULO</th><th>DESCRIPCIÓN</th><th>UNIDAD</th><th>CANTIDAD</th><th>Vr. UNITARIO</th><th>Vr. TOTAL</th></tr></thead>
-          <tbody>
-            <tr><td>${record.maquina}</td><td>ACPM</td><td>GL</td><td>${record.acpm_qty || 0}</td><td>${formatoMoneda(prices.ACPM)}</td><td>${formatoMoneda(acpm_total)}</td></tr>
-            <tr><td></td><td>CORRIENTE</td><td>GL</td><td>${record.corriente_qty || 0}</td><td>${formatoMoneda(prices.CORRIENTE)}</td><td>${formatoMoneda(corriente_total)}</td></tr>
-            <tr><td></td><td>GRASA</td><td>LB</td><td>${record.grasa_qty || 0}</td><td>${formatoMoneda(prices.GRASA)}</td><td>${formatoMoneda(grasa_total)}</td></tr>
-            <tr><td></td><td>ACEITE 2T</td><td>0.25</td><td>${record.aceite2t_qty || 0}</td><td>${formatoMoneda(prices.ACEITE_2T)}</td><td>${formatoMoneda(aceite2t_total)}</td></tr>
-            <tr><td></td><td>ACEITE 4T</td><td>0.25</td><td>${record.aceite4t_qty || 0}</td><td>${formatoMoneda(prices.ACEITE_4T)}</td><td>${formatoMoneda(aceite4t_total)}</td></tr>
-            <tr><td></td><td>ACEITE MOTOR PESADO</td><td>0.25</td><td>${record.aceite_pesado_qty || 0}</td><td>${formatoMoneda(prices.ACEITE_MOTOR_PESADO)}</td><td>${formatoMoneda(aceite_pesado_total)}</td></tr>
-            <tr><td></td><td>ACEITE MOTOR LIVIANO</td><td>0.25</td><td>${record.aceite_liviano_qty || 0}</td><td>${formatoMoneda(prices.ACEITE_MOTOR_LIVIANO)}</td><td>${formatoMoneda(aceite_liviano_total)}</td></tr>
-            <tr><td></td><td>ACEITE HIDRAULICO</td><td>GL</td><td>${record.aceite_hidraulico_gl_qty || 0}</td><td>${formatoMoneda(prices.ACEITE_HIDRAULICO_GL)}</td><td>${formatoMoneda(aceite_hid_gl_total)}</td></tr>
-            <tr><td></td><td>ACEITE HIDRAULICO</td><td>0.25</td><td>${record.aceite_hidraulico_cuarto_qty || 0}</td><td>${formatoMoneda(prices.ACEITE_HIDRAULICO_CUARTO)}</td><td>${formatoMoneda(aceite_hid_cuarto_total)}</td></tr>
-            <tr><td></td><td>REFRIGERANTE ROJO</td><td>0.25</td><td>${record.refrigerante_rojo_qty || 0}</td><td>${formatoMoneda(prices.REFRIGERANTE_ROJO)}</td><td>${formatoMoneda(ref_rojo_total)}</td></tr>
-            <tr><td></td><td>UREA</td><td>GL</td><td>${record.urea_qty || 0}</td><td>${formatoMoneda(prices.UREA)}</td><td>${formatoMoneda(urea_total)}</td></tr>
-          </tbody>
-        </table>
-        <div class="receipt-total">VALOR TOTAL ${formatoMoneda(total_precio)}</div>
-        <div class="receipt-signature">
-          <div>NOMBRE Y APELLIDOS: DAVID GRISALES VALENCIA</div>
-          <div>FIRMA: ______________________________</div>
-        </div>
-        <div class="receipt-footer">
-          Palacio Municipal, Santiago Santamaría<br>
-          NIT: 890.981.069 - Teléfono: (604) 830523101- Código postal 056010 <br>
-          www.jerico-antioquia.gov.co
-        </div>
-      </div>
-    `;
-  }
-
-  function renderRecibos(record) {
-    recibosEl.innerHTML = '';
-    ['COPIA 1', 'COPIA 2'].forEach(titulo => {
-      const div = document.createElement('div');
-      div.className = 'copy';
-      div.innerHTML = generateReceiptHTML(record, titulo);
-      recibosEl.appendChild(div);
-    });
-  }
-
-  // ============================================================
-  // Renderizado
-  // ============================================================
-  function renderLista() {
-    if (showTotals) {
-      renderTotalesGlobal();
-      return;
-    }
-    const datos = registrosFiltrados;
-    if (!datos.length) {
-      listaRegistros.innerHTML = '<div class="small">No hay registros en este rango.</div>';
-      return;
-    }
-    const sorted = [...datos].sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
-    listaRegistros.innerHTML = '';
-    sorted.slice(0, 200).forEach(r => {
-      const d = document.createElement('div');
-      d.className = 'card';
-      d.style.marginBottom = '8px';
-      let materiales = '';
-      if (r.acpm_qty) materiales += `ACPM: ${Number(r.acpm_qty).toFixed(2)} GL<br>`;
-      if (r.corriente_qty) materiales += `CORR: ${Number(r.corriente_qty).toFixed(2)} GL<br>`;
-      if (r.grasa_qty) materiales += `GRASA: ${Number(r.grasa_qty).toFixed(2)} LB<br>`;
-      if (r.aceite2t_qty) materiales += `2T: ${Number(r.aceite2t_qty).toFixed(2)} 1/4<br>`;
-      if (r.aceite4t_qty) materiales += `4T: ${Number(r.aceite4t_qty).toFixed(2)} 1/4<br>`;
-      if (r.aceite_pesado_qty) materiales += `PESADO: ${Number(r.aceite_pesado_qty).toFixed(2)} 1/4<br>`;
-      if (r.aceite_liviano_qty) materiales += `LIVIANO: ${Number(r.aceite_liviano_qty).toFixed(2)} 1/4<br>`;
-      if (r.aceite_hidraulico_gl_qty) materiales += `HID GL: ${Number(r.aceite_hidraulico_gl_qty).toFixed(2)} GL<br>`;
-      if (r.aceite_hidraulico_cuarto_qty) materiales += `HID 1/4: ${Number(r.aceite_hidraulico_cuarto_qty).toFixed(2)} 1/4<br>`;
-      if (r.refrigerante_rojo_qty) materiales += `REF ROJO: ${Number(r.refrigerante_rojo_qty).toFixed(2)} 1/4<br>`;
-      if (r.urea_qty) materiales += `UREA: ${Number(r.urea_qty).toFixed(2)} GL<br>`;
-      d.innerHTML = `
-        <div style="display:flex;justify-content:space-between">
-          <div>
-            <strong>${r.maquina}</strong>
-            <div class="small">${r.fecha} · ${new Date(r.timestamp).toLocaleString()}</div>
-            <div class="small">Orden: ${r.orderNumber || 1}</div>
-          </div>
-          <div class="small">${materiales}</div>
-        </div>
-      `;
-      listaRegistros.appendChild(d);
-    });
-  }
-
-  function renderTotalesGlobal() {
-    const datos = registrosFiltrados;
-    if (!datos.length) {
-      listaRegistros.innerHTML = '<div class="small">No hay registros en este rango.</div>';
-      return;
-    }
-    const totals = { acpm:0, corriente:0, grasa:0, aceite2t:0, aceite4t:0,
-      aceite_pesado:0, aceite_liviano:0, aceite_hidraulico_gl:0,
-      aceite_hidraulico_cuarto:0, refrigerante_rojo:0, urea:0, money:0 };
-    datos.forEach(r => {
-      totals.acpm += Number(r.acpm_qty)||0;
-      totals.corriente += Number(r.corriente_qty)||0;
-      totals.grasa += Number(r.grasa_qty)||0;
-      totals.aceite2t += Number(r.aceite2t_qty)||0;
-      totals.aceite4t += Number(r.aceite4t_qty)||0;
-      totals.aceite_pesado += Number(r.aceite_pesado_qty)||0;
-      totals.aceite_liviano += Number(r.aceite_liviano_qty)||0;
-      totals.aceite_hidraulico_gl += Number(r.aceite_hidraulico_gl_qty)||0;
-      totals.aceite_hidraulico_cuarto += Number(r.aceite_hidraulico_cuarto_qty)||0;
-      totals.refrigerante_rojo += Number(r.refrigerante_rojo_qty)||0;
-      totals.urea += Number(r.urea_qty)||0;
-      totals.money += Number(r.total_precio)||0;
-    });
-    listaRegistros.innerHTML = `
-      <div style="padding:12px">
-        <div><strong>Totales globales (filtrados)</strong></div>
-        <div class="small" style="margin-top:8px">
-          ${totals.acpm ? `ACPM: ${totals.acpm.toFixed(2)} GL<br>` : ''}
-          ${totals.corriente ? `CORRIENTE: ${totals.corriente.toFixed(2)} GL<br>` : ''}
-          ${totals.grasa ? `GRASA: ${totals.grasa.toFixed(2)} LB<br>` : ''}
-          ${totals.aceite2t ? `ACEITE 2T: ${totals.aceite2t.toFixed(2)} 1/4<br>` : ''}
-          ${totals.aceite4t ? `ACEITE 4T: ${totals.aceite4t.toFixed(2)} 1/4<br>` : ''}
-          ${totals.aceite_pesado ? `PESADO: ${totals.aceite_pesado.toFixed(2)} 1/4<br>` : ''}
-          ${totals.aceite_liviano ? `LIVIANO: ${totals.aceite_liviano.toFixed(2)} 1/4<br>` : ''}
-          ${totals.aceite_hidraulico_gl ? `HID GL: ${totals.aceite_hidraulico_gl.toFixed(2)} GL<br>` : ''}
-          ${totals.aceite_hidraulico_cuarto ? `HID 1/4: ${totals.aceite_hidraulico_cuarto.toFixed(2)} 1/4<br>` : ''}
-          ${totals.refrigerante_rojo ? `REF ROJO: ${totals.refrigerante_rojo.toFixed(2)} 1/4<br>` : ''}
-          ${totals.urea ? `UREA: ${totals.urea.toFixed(2)} GL<br>` : ''}
-        </div>
-        <div style="margin-top:8px;font-weight:800">Valor total (pesos): ${formatoMoneda(totals.money)}</div>
-      </div>
-    `;
-  }
-
-  function renderResumen() {
-    const datos = registrosFiltrados;
-    if (!datos.length) {
-      resumenEl.innerHTML = '<div class="small">No hay registros en este rango.</div>';
-      if (chartInst) { chartInst.destroy(); chartInst = null; }
-      const totalGlobal = registros.reduce((sum, r) => sum + (r.total_precio || 0), 0);
-      valorTotalConsumidoEl.textContent = formatoMoneda(totalGlobal);
-      valorTotalFiltradoEl.textContent = '$0';
-      valorRestanteContratoEl.textContent = formatoMoneda(valorContrato - totalGlobal);
-      valorContratoMostradoEl.textContent = formatoMoneda(valorContrato);
-      return;
-    }
-
-    const resumen = {};
-    let totalFiltrado = 0;
-    datos.forEach(r => {
-      const m = r.maquina;
-      if (!resumen[m]) {
-        resumen[m] = { acpm:0, corriente:0, grasa:0, aceite2t:0, aceite4t:0,
-          aceite_pesado:0, aceite_liviano:0, aceite_hidraulico_gl:0,
-          aceite_hidraulico_cuarto:0, refrigerante_rojo:0, urea:0, total:0 };
+    function applyFilters(render=true){
+      state.filtered=getFilteredRecords();
+      if(render)renderAll();
+      else{
+        renderKPIs();
+        renderAnalytics();
+        renderRecords();
+        renderContract();
       }
-      resumen[m].acpm += Number(r.acpm_qty)||0;
-      resumen[m].corriente += Number(r.corriente_qty)||0;
-      resumen[m].grasa += Number(r.grasa_qty)||0;
-      resumen[m].aceite2t += Number(r.aceite2t_qty)||0;
-      resumen[m].aceite4t += Number(r.aceite4t_qty)||0;
-      resumen[m].aceite_pesado += Number(r.aceite_pesado_qty)||0;
-      resumen[m].aceite_liviano += Number(r.aceite_liviano_qty)||0;
-      resumen[m].aceite_hidraulico_gl += Number(r.aceite_hidraulico_gl_qty)||0;
-      resumen[m].aceite_hidraulico_cuarto += Number(r.aceite_hidraulico_cuarto_qty)||0;
-      resumen[m].refrigerante_rojo += Number(r.refrigerante_rojo_qty)||0;
-      resumen[m].urea += Number(r.urea_qty)||0;
-      resumen[m].total += Number(r.total_precio)||0;
-      totalFiltrado += Number(r.total_precio)||0;
-    });
-
-    const totalGlobal = registros.reduce((sum, r) => sum + (r.total_precio || 0), 0);
-    valorTotalConsumidoEl.textContent = formatoMoneda(totalGlobal);
-    valorTotalFiltradoEl.textContent = formatoMoneda(totalFiltrado);
-    valorRestanteContratoEl.textContent = formatoMoneda(valorContrato - totalGlobal);
-    valorContratoMostradoEl.textContent = formatoMoneda(valorContrato);
-
-    let html = `<table class="summary-table"><thead><tr>
-      <th>Máquina</th><th>ACPM</th><th>CORR</th><th>GRASA</th><th>2T</th><th>4T</th>
-      <th>PESADO</th><th>LIVIANO</th><th>HID GL</th><th>HID 1/4</th><th>REF ROJO</th><th>UREA</th><th>Valor</th>
-    </tr></thead><tbody>`;
-    const labels = [], data = [];
-    const palette = ['#0d6efd','#6610f2','#198754','#dc3545','#ffc107','#fd7e14'];
-    for (const m in resumen) {
-      const r = resumen[m];
-      html += `<tr>
-        <td>${m}</td><td>${r.acpm.toFixed(2)}</td><td>${r.corriente.toFixed(2)}</td>
-        <td>${r.grasa.toFixed(2)}</td><td>${r.aceite2t.toFixed(2)}</td><td>${r.aceite4t.toFixed(2)}</td>
-        <td>${r.aceite_pesado.toFixed(2)}</td><td>${r.aceite_liviano.toFixed(2)}</td>
-        <td>${r.aceite_hidraulico_gl.toFixed(2)}</td><td>${r.aceite_hidraulico_cuarto.toFixed(2)}</td>
-        <td>${r.refrigerante_rojo.toFixed(2)}</td><td>${r.urea.toFixed(2)}</td>
-        <td>${formatoMoneda(r.total)}</td>
-      </tr>`;
-      labels.push(m);
-      data.push(r.total);
     }
-    html += '</tbody></table>';
-    resumenEl.innerHTML = html;
 
-    const type = chartTypeSel.value || 'bar';
-    const ctx = chartCanvas.getContext('2d');
-    if (chartInst) chartInst.destroy();
-    chartInst = new Chart(ctx, {
-      type,
-      data: {
-        labels,
-        datasets: [{
-          label: 'Valor total (pesos) - filtrado',
-          data,
-          backgroundColor: palette.slice(0, labels.length),
-          borderColor: palette.slice(0, labels.length).map(c => c),
-          borderWidth: 1
+    function readFilterUI(){
+      state.filters.start=$('fecha-inicio').value;
+      state.filters.end=$('fecha-fin').value;
+      state.filters.machine=$('filtro-maquina').value;
+      state.filters.search=$('buscar-registros').value.trim();
+    }
+
+    function clearFilters(){
+      $('fecha-inicio').value='';
+      $('fecha-fin').value='';
+      $('filtro-maquina').value='';
+      $('buscar-registros').value='';
+      state.filters={start:'',end:'',machine:'',search:''};
+      applyFilters();
+    }
+
+    function totals(records){
+      return records.reduce((a,r)=>{
+        a.money += Number(r.total_precio)||0;
+        MATERIALS.forEach(m=>a.qty[m.key]+=(Number(r[m.key])||0));
+        return a;
+      },{money:0,qty:Object.fromEntries(MATERIALS.map(m=>[m.key,0]))});
+    }
+
+    function renderContract(){
+      const all=totals(state.records);
+      const contract=Number(state.contract)||Number(state.settings.valorContratoMC)||0;
+      const remaining=contract-all.money;
+      const pct=contract>0 ? clamp((all.money/contract)*100,0,100) : 0;
+
+      ['valor-total-consumido','valor-total-filtrado','valor-restante-contrato','valor-contrato-mostrado'].forEach(()=>{});
+      $('kpi-total').textContent=money(all.money);
+      $('kpi-restante').textContent=money(remaining);
+      $('kpi-registros').textContent=state.records.length.toLocaleString('es-CO');
+      $('kpi-promedio').textContent=money(state.records.length ? all.money/state.records.length : 0);
+
+      const byMachine={};
+      state.records.forEach(r=>byMachine[r.maquina]=(byMachine[r.maquina]||0)+(Number(r.total_precio)||0));
+      const lead=Object.entries(byMachine).sort((a,b)=>b[1]-a[1])[0];
+      $('kpi-maquina').textContent=lead ? lead[0] : '—';
+      $('kpi-maquina-note').textContent=lead ? `${money(lead[1])} acumulados` : 'Sin datos todavía';
+
+      $('hero-restante').textContent=money(remaining);
+      $('hero-progress-text').textContent=`${pct.toFixed(1)}%`;
+      $('side-contrato').textContent=money(contract);
+      $('side-consumido').textContent=money(all.money);
+      $('side-disponible').textContent=money(remaining);
+      $('side-ejecutado').textContent=`${pct.toFixed(1)}%`;
+      $('progress-value').textContent=`${pct.toFixed(1)}%`;
+      $('contract-progress').style.width=`${pct}%`;
+    }
+
+    function renderKPIs(){
+      renderContract();
+      if(state.lastRecord){
+        const r=state.lastRecord;
+        $('last-machine').textContent=r.maquina;
+        $('last-total').textContent=money(r.total_precio);
+        $('last-meta').textContent=`Orden ${r.orderNumber} · ${formatDateCO(r.fecha)} · ${formatDateTime(r.timestamp)}`;
+      }
+    }
+
+    /* ==========================================================
+       CHARTS
+       ========================================================== */
+    const baseFont={family:'Inter',size:10};
+    function destroyChart(name){
+      if(state.charts[name]){state.charts[name].destroy();state.charts[name]=null}
+    }
+    function chartOptions(yMoney=false){
+      return {
+        responsive:true,maintainAspectRatio:false,
+        animation:{duration:350},
+        plugins:{
+          legend:{labels:{usePointStyle:true,pointStyle:'circle',font:{...baseFont}}},
+          tooltip:{
+            titleFont:baseFont,bodyFont:baseFont,
+            callbacks:yMoney ? {label:ctx=>`${ctx.dataset.label||''}: ${money(ctx.parsed.y ?? ctx.raw)}`} : {}
+          }
+        },
+        scales:{
+          x:{grid:{display:false},ticks:{font:baseFont,color:'#64748b'}},
+          y:{beginAtZero:true,grid:{color:'#edf2f7'},ticks:{
+            font:baseFont,color:'#64748b',
+            callback:value=>yMoney?money(value):value
+          }}
+        }
+      };
+    }
+
+    function emptyChart(container,canvas){
+      canvas.style.display='none';
+      let el=container.querySelector('.chart-empty');
+      if(!el){el=document.createElement('div');el.className='chart-empty';container.appendChild(el)}
+      el.textContent='No hay datos suficientes para este periodo.';
+      el.style.display='grid';
+    }
+    function showChart(canvas){
+      canvas.style.display='block';
+      const empty=canvas.parentElement.querySelector('.chart-empty');
+      if(empty)empty.style.display='none';
+    }
+
+    function renderAnalytics(){
+      const data=state.filtered;
+      $('analytics-status').textContent=`${data.length.toLocaleString('es-CO')} registros`;
+
+      const machine={};
+      const materialCost={};
+      const materialQty={};
+      const daily={};
+      data.forEach(r=>{
+        machine[r.maquina]=(machine[r.maquina]||0)+(Number(r.total_precio)||0);
+        daily[r.fecha]=(daily[r.fecha]||0)+(Number(r.total_precio)||0);
+        MATERIALS.forEach(m=>{
+          const q=Number(r[m.key])||0;
+          materialQty[m.key]=(materialQty[m.key]||0)+q;
+          materialCost[m.key]=(materialCost[m.key]||0)+(q*(Number(getPrices()[m.price])||0));
+        });
+      });
+
+      // 1. Máquina
+      destroyChart('machine');
+      const c1=$('chartMachine');
+      if(!data.length){emptyChart(c1.parentElement,c1)}
+      else{
+        showChart(c1);
+        const entries=Object.entries(machine).sort((a,b)=>b[1]-a[1]);
+        state.charts.machine=new Chart(c1,{
+          type:'bar',
+          data:{
+            labels:entries.map(x=>x[0]),
+            datasets:[{
+              label:'Valor consumido',
+              data:entries.map(x=>x[1]),
+              backgroundColor:entries.map((_,i)=>PALETTE[i%PALETTE.length]),
+              borderRadius:8,borderSkipped:false
+            }]
+          },
+          options:{
+            ...chartOptions(true),
+            indexAxis:'y',
+            scales:{
+              x:{beginAtZero:true,grid:{color:'#edf2f7'},ticks:{font:baseFont,color:'#64748b',callback:v=>money(v)}},
+              y:{grid:{display:false},ticks:{font:baseFont,color:'#475569'}}
+            },
+            plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>money(ctx.raw)}}}
+          }
+        });
+      }
+
+      // 2. Costos por material
+      destroyChart('materialCost');
+      const c2=$('chartMaterialCost');
+      const mc=Object.entries(materialCost).sort((a,b)=>b[1]-a[1]).filter(([,v])=>v>0);
+      if(!mc.length){emptyChart(c2.parentElement,c2)}
+      else{
+        showChart(c2);
+        state.charts.materialCost=new Chart(c2,{
+          type:'doughnut',
+          data:{
+            labels:mc.map(([k])=>MATERIALS.find(m=>m.key===k)?.label||k),
+            datasets:[{
+              data:mc.map(([,v])=>v),
+              backgroundColor:mc.map((_,i)=>PALETTE[i%PALETTE.length]),
+              borderColor:'#fff',borderWidth:3,hoverOffset:7
+            }]
+          },
+          options:{
+            responsive:true,maintainAspectRatio:false,cutout:'63%',
+            plugins:{
+              legend:{position:'bottom',labels:{usePointStyle:true,padding:10,font:baseFont}},
+              tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${money(ctx.raw)}`}}
+            }
+          }
+        });
+      }
+
+      // 3. Diario
+      destroyChart('daily');
+      const c3=$('chartDaily');
+      const de=Object.entries(daily).sort((a,b)=>a[0].localeCompare(b[0]));
+      if(!de.length){emptyChart(c3.parentElement,c3)}
+      else{
+        showChart(c3);
+        state.charts.daily=new Chart(c3,{
+          type:'line',
+          data:{
+            labels:de.map(([d])=>formatDateCO(d)),
+            datasets:[{
+              label:'Consumo diario',
+              data:de.map(([,v])=>v),
+              borderColor:'#1769E0',backgroundColor:'rgba(23,105,224,.10)',
+              fill:true,tension:.32,pointRadius:3,pointHoverRadius:5
+            }]
+          },
+          options:chartOptions(true)
+        });
+      }
+
+      // 4. Contrato
+      destroyChart('contract');
+      const c4=$('chartContract');
+      showChart(c4);
+      const allMoney=totals(state.records).money;
+      const contract=Number(state.contract)||0;
+      const remaining=Math.max(contract-allMoney,0);
+      state.charts.contract=new Chart(c4,{
+        type:'doughnut',
+        data:{
+          labels:['Consumido','Disponible'],
+          datasets:[{data:contract>0?[Math.min(allMoney,contract),remaining]:[allMoney,0],
+            backgroundColor:['#1769E0','#e5eaf1'],borderWidth:0,hoverOffset:6}]
+        },
+        options:{
+          responsive:true,maintainAspectRatio:false,cutout:'70%',
+          plugins:{
+            legend:{position:'bottom',labels:{usePointStyle:true,font:baseFont}},
+            tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${money(ctx.raw)}`}}
+          }
+        },
+        plugins:[{
+          id:'centerText',
+          afterDraw(chart){
+            const {ctx}=chart, area=chart.chartArea;
+            const x=(area.left+area.right)/2,y=(area.top+area.bottom)/2;
+            ctx.save();ctx.textAlign='center';ctx.fillStyle='#132238';
+            ctx.font='800 19px Inter';ctx.fillText(contract?`${((allMoney/contract)*100).toFixed(1)}%`:'—',x,y);
+            ctx.font='500 9px Inter';ctx.fillStyle='#64748b';ctx.fillText('ejecutado',x,y+16);ctx.restore();
+          }
         }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: true, position: 'bottom' } },
-        scales: { y: { beginAtZero: true } }
+      });
+
+      // 5. Cantidades
+      destroyChart('materialQty');
+      const c5=$('chartMaterialQty');
+      const mq=Object.entries(materialQty).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+      if(!mq.length){emptyChart(c5.parentElement,c5)}
+      else{
+        showChart(c5);
+        state.charts.materialQty=new Chart(c5,{
+          type:'bar',
+          data:{
+            labels:mq.map(([k])=>MATERIALS.find(m=>m.key===k)?.label||k),
+            datasets:[{
+              label:'Cantidad',
+              data:mq.map(([,v])=>v),
+              backgroundColor:mq.map((_,i)=>PALETTE[i%PALETTE.length]),
+              borderRadius:7,borderSkipped:false
+            }]
+          },
+          options:{
+            ...chartOptions(false),
+            indexAxis:'y',
+            plugins:{legend:{display:false}},
+            scales:{
+              x:{beginAtZero:true,grid:{color:'#edf2f7'},ticks:{font:baseFont,color:'#64748b'}},
+              y:{grid:{display:false},ticks:{font:baseFont,color:'#475569'}}
+            }
+          }
+        });
       }
-    });
-  }
-
-  function actualizarInterfaz() {
-    renderLista();
-    renderResumen();
-  }
-
-  // ============================================================
-  // Funciones de impresión
-  // ============================================================
-  function buildPrintableHtml(record) {
-    const style = `
-      <style>
-        body{font-family:Arial,sans-serif;color:#000;margin:20px}
-        .receipt {border:1px solid #000; padding:12px; margin-bottom:15px; position:relative;}
-        .receipt-header {display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;}
-        .receipt-logo {flex-shrink:0;}
-        .receipt-logo img {max-height:45px; width:auto;}
-        .receipt-title {font-weight:bold; font-size:14px;}
-        .receipt-info {font-size:10px; text-align:right;}
-        .receipt-object {font-size:9px; margin-bottom:4px;}
-        .receipt-contract {display:flex; justify-content:space-between; margin-bottom:4px; font-size:10px; flex-wrap:wrap;}
-        .receipt-table {width:100%; border-collapse:collapse; font-size:9px; margin-bottom:4px;}
-        .receipt-table th, .receipt-table td {border:1px solid #000; padding:3px 5px; text-align:left;}
-        .receipt-table th {background-color:#f0f0f0;}
-        .receipt-total {font-weight:bold; text-align:right; margin-bottom:4px;}
-        .receipt-signature {display:flex; justify-content:space-between; margin-bottom:4px;}
-        .receipt-footer {font-size:8px; text-align:center;}
-        .page-break {page-break-before:always;}
-      </style>
-    `;
-    return `<!doctype html><html><head><meta charset="utf-8">${style}</head><body>
-      ${generateReceiptHTML(record, 'COPIA 1')}
-      <div class="page-break"></div>
-      ${generateReceiptHTML(record, 'COPIA 2')}
-    </body></html>`;
-  }
-
-  function buildSingleCopyHtml(record, titulo) {
-    const style = `
-      <style>
-        body{font-family:Arial,sans-serif;color:#000;margin:20px}
-        .receipt {border:1px solid #000; padding:12px; position:relative;}
-        .receipt-header {display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;}
-        .receipt-logo {flex-shrink:0;}
-        .receipt-logo img {max-height:45px; width:auto;}
-        .receipt-title {font-weight:bold; font-size:14px;}
-        .receipt-info {font-size:10px; text-align:right;}
-        .receipt-object {font-size:9px; margin-bottom:4px;}
-        .receipt-contract {display:flex; justify-content:space-between; margin-bottom:4px; font-size:10px; flex-wrap:wrap;}
-        .receipt-table {width:100%; border-collapse:collapse; font-size:9px; margin-bottom:4px;}
-        .receipt-table th, .receipt-table td {border:1px solid #000; padding:3px 5px; text-align:left;}
-        .receipt-table th {background-color:#f0f0f0;}
-        .receipt-total {font-weight:bold; text-align:right; margin-bottom:4px;}
-        .receipt-signature {display:flex; justify-content:space-between; margin-bottom:4px;}
-        .receipt-footer {font-size:8px; text-align:center;}
-      </style>
-    `;
-    return `<!doctype html><html><head><meta charset="utf-8">${style}</head><body>
-      ${generateReceiptHTML(record, titulo)}
-    </body></html>`;
-  }
-
-  // ============================================================
-  // Eventos
-  // ============================================================
-
-  // Refrescar
-  $('btn-refresh').addEventListener('click', () => cargarRegistros(true));
-
-  // Filtros
-  $('btn-aplicar-filtro').addEventListener('click', aplicarFiltro);
-  $('btn-limpiar-filtro').addEventListener('click', limpiarFiltro);
-  fechaInicio.addEventListener('change', aplicarFiltro);
-  fechaFin.addEventListener('change', aplicarFiltro);
-
-  // Generar recibo
-  $('btn-generar').addEventListener('click', async () => {
-    // Protección contra doble/triple clic mientras Google Sheets responde.
-    if (isSaving) return;
-
-    const maquina = maquinaEl.value;
-    const fecha = fechaEl.value || new Date().toISOString().slice(0,10);
-    const acpm_qty = parseFloat(acpmEl.value) || 0;
-    const corriente_qty = parseFloat(corrienteEl.value) || 0;
-    const grasa_qty = parseFloat(grasaEl.value) || 0;
-    const aceite2t_qty = parseFloat(aceite2tEl.value) || 0;
-    const aceite4t_qty = parseFloat(aceite4tEl.value) || 0;
-    const aceite_pesado_qty = parseFloat(aceitePesadoEl.value) || 0;
-    const aceite_liviano_qty = parseFloat(aceiteLivianoEl.value) || 0;
-    const aceite_hidraulico_gl_qty = parseFloat(aceiteHidGlEl.value) || 0;
-    const aceite_hidraulico_cuarto_qty = parseFloat(aceiteHidCuartoEl.value) || 0;
-    const refrigerante_rojo_qty = parseFloat(refRojoEl.value) || 0;
-    const urea_qty = parseFloat(ureaEl.value) || 0;
-
-    const orderNumber = getNextOrderNumber(maquina);
-    const prices = SETTINGS.prices || DEFAULT_PRICES;
-    const total_precio = (acpm_qty * prices.ACPM) +
-                        (corriente_qty * prices.CORRIENTE) +
-                        (grasa_qty * prices.GRASA) +
-                        (aceite2t_qty * prices.ACEITE_2T) +
-                        (aceite4t_qty * prices.ACEITE_4T) +
-                        (aceite_pesado_qty * prices.ACEITE_MOTOR_PESADO) +
-                        (aceite_liviano_qty * prices.ACEITE_MOTOR_LIVIANO) +
-                        (aceite_hidraulico_gl_qty * prices.ACEITE_HIDRAULICO_GL) +
-                        (aceite_hidraulico_cuarto_qty * prices.ACEITE_HIDRAULICO_CUARTO) +
-                        (refrigerante_rojo_qty * prices.REFRIGERANTE_ROJO) +
-                        (urea_qty * prices.UREA);
-
-    const record = {
-      timestamp: new Date().toISOString(),
-      maquina, fecha,
-      acpm_qty, corriente_qty, grasa_qty,
-      aceite2t_qty, aceite4t_qty, aceite_pesado_qty, aceite_liviano_qty,
-      aceite_hidraulico_gl_qty, aceite_hidraulico_cuarto_qty,
-      refrigerante_rojo_qty, urea_qty,
-      orderNumber, total_precio
-    };
-
-    // Se genera una sola vez y el recibo queda disponible para imprimir.
-    renderRecibos(record);
-    lastRecord = record;
-
-    setSavingState(true);
-
-    const guardado = await enviarAGoogleSheets(record);
-
-    if (guardado) {
-      // Evita que el siguiente registro herede cantidades del anterior.
-      limpiarCamposCantidad();
     }
 
-    setSavingState(false);
-  });
+    /* ==========================================================
+       RECORDS + SUMMARY
+       ========================================================== */
+    function renderRecords(){
+      const tbody=document.querySelector('#records-table tbody');
+      tbody.innerHTML='';
+      if(state.summaryMode){
+        renderSummaryTable(tbody);
+        $('records-count').textContent=state.filtered.length;
+        $('records-empty').classList.add('hidden');
+        return;
+      }
 
-  // Limpiar
-  $('btn-clear').addEventListener('click', () => {
-    if (isSaving) return;
-    limpiarCamposCantidad();
-    mensajeEl.innerHTML = '';
-  });
+      const sorted=[...state.filtered].sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp)).slice(0,300);
+      $('records-count').textContent=state.filtered.length.toLocaleString('es-CO');
+      if(!sorted.length){$('records-empty').classList.remove('hidden');return}
+      $('records-empty').classList.add('hidden');
 
-  // Vista previa de impresión
-  $('btn-preview-print').addEventListener('click', () => {
-    if (!lastRecord) { alert('Genera un recibo primero.'); return; }
-    const modal = $('print-modal');
-    const content = $('print-preview-content');
-    content.innerHTML = '';
-    const c1 = document.createElement('div');
-    c1.innerHTML = generateReceiptHTML(lastRecord, 'COPIA 1');
-    const c2 = document.createElement('div');
-    c2.innerHTML = generateReceiptHTML(lastRecord, 'COPIA 2');
-    content.appendChild(c1);
-    const br = document.createElement('div');
-    br.className = 'page-break';
-    br.style.height = '12px';
-    content.appendChild(br);
-    content.appendChild(c2);
-    modal.classList.remove('hidden');
-  });
-
-  $('btn-close-print').addEventListener('click', () => {
-    $('print-modal').classList.add('hidden');
-  });
-
-  $('btn-print-now').addEventListener('click', () => {
-    if (!lastRecord) return;
-    const html = buildPrintableHtml(lastRecord);
-    const w = window.open('', '_blank');
-    if (!w) { alert('Permite ventanas emergentes para imprimir.'); return; }
-    w.document.open(); w.document.write(html); w.document.close();
-    w.onload = () => setTimeout(() => { w.focus(); w.print(); }, 500);
-  });
-
-  // Imprimir copias individuales
-  $('btn-print-copia1').addEventListener('click', () => {
-    if (!lastRecord) { alert('Genera un recibo primero.'); return; }
-    const html = buildSingleCopyHtml(lastRecord, 'COPIA 1');
-    const w = window.open('', '_blank');
-    if (!w) { alert('Permite ventanas emergentes para imprimir.'); return; }
-    w.document.open(); w.document.write(html); w.document.close();
-    w.onload = () => setTimeout(() => { w.focus(); w.print(); }, 500);
-  });
-
-  $('btn-print-copia2').addEventListener('click', () => {
-    if (!lastRecord) { alert('Genera un recibo primero.'); return; }
-    const html = buildSingleCopyHtml(lastRecord, 'COPIA 2');
-    const w = window.open('', '_blank');
-    if (!w) { alert('Permite ventanas emergentes para imprimir.'); return; }
-    w.document.open(); w.document.write(html); w.document.close();
-    w.onload = () => setTimeout(() => { w.focus(); w.print(); }, 500);
-  });
-
-  // Alternar totales globales
-  btnToggleRecent.addEventListener('click', () => {
-    showTotals = !showTotals;
-    btnToggleRecent.textContent = showTotals ? 'Ver registros individuales' : 'Ver totales globales';
-    renderLista();
-  });
-
-  // Cambiar tipo de gráfica
-  chartTypeSel.addEventListener('change', renderResumen);
-
-  // Descargar gráfica PNG
-  btnDownloadChart.addEventListener('click', () => {
-    if (!chartInst) { alert('Primero genera datos.'); return; }
-    const link = document.createElement('a');
-    link.download = 'grafica.png';
-    link.href = chartCanvas.toDataURL('image/png');
-    document.body.appendChild(link); link.click(); link.remove();
-  });
-
-  // PDF
-  $('btn-generate-pdf').addEventListener('click', async () => {
-    const datos = registrosFiltrados;
-    if (!datos.length) { alert('No hay datos en el rango seleccionado.'); return; }
-    const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = 1000; tempCanvas.height = 450;
-    const ctx = tempCanvas.getContext('2d');
-    const resumen = {};
-    datos.forEach(r => {
-      const m = r.maquina;
-      if (!resumen[m]) resumen[m] = 0;
-      resumen[m] += Number(r.total_precio) || 0;
-    });
-    const labels = Object.keys(resumen);
-    const data = labels.map(m => resumen[m]);
-    new Chart(ctx, {
-      type: 'bar',
-      data: { labels, datasets: [{ label: 'Valor total (pesos) - filtrado', data, backgroundColor: ['#0d6efd','#6610f2','#198754','#dc3545','#ffc107'] }] },
-      options: { responsive: false, plugins: { legend: { display: false } } }
-    });
-    await new Promise(r => setTimeout(r, 500));
-    const chartDataUrl = tempCanvas.toDataURL('image/png');
-
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({ unit: 'pt', format: 'a4' });
-    pdf.setFontSize(18);
-    pdf.text('Informe Profesional - Combustible (Filtrado)', 40, 50);
-    pdf.setFontSize(10);
-    pdf.text(`Generado por: Cristian · Fecha: ${new Date().toLocaleString()}`, 40, 70);
-    pdf.text(`Rango: ${fechaInicio.value || 'inicio'} - ${fechaFin.value || 'fin'}`, 40, 85);
-    pdf.addImage(chartDataUrl, 'PNG', 40, 100, 520, 250);
-    pdf.addPage();
-    pdf.text('Detalles por máquina (filtrado)', 40, 40);
-    let y = 60;
-    pdf.setFontSize(10);
-    for (const m in resumen) {
-      pdf.text(`${m}: ${formatoMoneda(resumen[m])}`, 40, y);
-      y += 16;
+      sorted.forEach(r=>{
+        const oil=MATERIALS.filter(m=>m.label.includes('ACEITE') && (Number(r[m.key])||0)>0)
+          .reduce((s,m)=>s+(Number(r[m.key])||0),0);
+        const tr=document.createElement('tr');
+        tr.innerHTML=`
+          <td>${escapeHtml(formatDateCO(r.fecha))}</td>
+          <td><span class="machine-badge">${escapeHtml(r.maquina)}</span></td>
+          <td>#${escapeHtml(r.orderNumber)}</td>
+          <td>${number(r.acpm_qty)}</td>
+          <td>${number(r.corriente_qty)}</td>
+          <td>${number(r.grasa_qty)}</td>
+          <td>${number(oil)}</td>
+          <td>${number(r.urea_qty)}</td>
+          <td class="money">${money(r.total_precio)}</td>
+          <td>
+            <div class="table-actions">
+              <button class="btn btn-soft" data-receipt-record="${escapeHtml(r.clientId||r.timestamp)}">Recibo</button>
+              <button class="btn btn-soft" data-copy-record="${escapeHtml(r.clientId||r.timestamp)}">2 copias</button>
+            </div>
+          </td>`;
+        tbody.appendChild(tr);
+      });
     }
-    pdf.save('resumen_combustible_filtrado.pdf');
-  });
 
-  // Excel modal
-  $('btn-ir-excel').addEventListener('click', () => {
-    const pw = prompt('Ingrese la contraseña para ver el Excel:');
-    if (pw === ADMIN_PASSWORD) {
-      $('excel-modal').classList.remove('hidden');
-      renderExcelTable();
-    } else {
-      alert('Contraseña incorrecta');
+    function renderSummaryTable(tbody){
+      const t=totals(state.filtered);
+      MATERIALS.forEach((m,i)=>{
+        const val=t.qty[m.key];
+        if(!val)return;
+        const tr=document.createElement('tr');
+        tr.innerHTML=`
+          <td colspan="3"><strong>${escapeHtml(m.label)}</strong></td>
+          <td>${number(val)}</td><td colspan="5">${escapeHtml(m.unit)}</td>
+          <td class="money">${money(val*(Number(getPrices()[m.price])||0))}</td>`;
+        tbody.appendChild(tr);
+      });
     }
-  });
-  $('btn-close-excel').addEventListener('click', () => {
-    $('excel-modal').classList.add('hidden');
-  });
-  $('btn-export-excel').addEventListener('click', () => {
-    if (!registros.length) { alert('No hay registros.'); return; }
-    const ws = XLSX.utils.json_to_sheet(registros);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'registros');
-    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-    const blob = new Blob([wbout], { type: 'application/octet-stream' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = 'registros_combustible.xlsx';
-    document.body.appendChild(a); a.click(); a.remove();
-    URL.revokeObjectURL(url);
-  });
 
-  function renderExcelTable() {
-    const tbody = document.querySelector('#table-excel tbody');
-    tbody.innerHTML = '';
-    const sorted = [...registros].sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
-    sorted.forEach(r => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${r.timestamp}</td><td>${r.maquina}</td><td>${r.fecha}</td>
-        <td>${Number(r.acpm_qty).toFixed(2)}</td><td>${Number(r.corriente_qty).toFixed(2)}</td>
-        <td>${Number(r.grasa_qty).toFixed(2)}</td><td>${Number(r.aceite2t_qty).toFixed(2)}</td>
-        <td>${Number(r.aceite4t_qty).toFixed(2)}</td><td>${Number(r.aceite_pesado_qty).toFixed(2)}</td>
-        <td>${Number(r.aceite_liviano_qty).toFixed(2)}</td>
-        <td>${Number(r.aceite_hidraulico_gl_qty).toFixed(2)}</td>
-        <td>${Number(r.aceite_hidraulico_cuarto_qty).toFixed(2)}</td>
-        <td>${Number(r.refrigerante_rojo_qty).toFixed(2)}</td>
-        <td>${Number(r.urea_qty).toFixed(2)}</td>
-        <td>${formatoMoneda(r.total_precio)}</td>
+    function renderAll(){
+      renderKPIs();
+      renderAnalytics();
+      renderRecords();
+      renderContract();
+    }
+
+    /* ==========================================================
+       RECEIPT
+       ========================================================== */
+    function generateReceiptHTML(record,titulo){
+      const p=getPrices();
+      const rows=MATERIALS.map((m,i)=>{
+        const q=Number(record[m.key])||0;
+        return `<tr>
+          <td>${i===0?escapeHtml(record.maquina):''}</td>
+          <td>${escapeHtml(m.label)}</td>
+          <td>${escapeHtml(m.unit)}</td>
+          <td>${number(q)}</td>
+          <td>${money(p[m.price])}</td>
+          <td>${money(q*(Number(p[m.price])||0))}</td>
+        </tr>`;
+      }).join('');
+
+      return `
+        <div class="receipt">
+          <div class="receipt-header">
+            <div class="receipt-logo"><img src="images.png" alt="Logo"></div>
+            <div class="receipt-title">${escapeHtml(titulo)}</div>
+            <div class="receipt-info">
+              <div>Código: ${escapeHtml(record.timestamp||'')}</div>
+              <div>Código TRD:</div>
+              <div>Vigencia:</div>
+              <div>Versión:</div>
+            </div>
+          </div>
+          <div class="receipt-object">
+            OBJETO: CONTRATAR EL SUMINISTRO PERIÓDICO Y CONTINUO DE COMBUSTIBLE, LUBRICANTES, ACEITES, REFRIGERANTES, UREA Y GRASAS, DESTINADOS AL FUNCIONAMIENTO, OPERACIÓN Y MANTENIMIENTO DEL PARQUE AUTOMOTOR, MAQUINARIA Y EQUIPOS MENORES (GUADAÑAS) ADSCRITOS AL MUNICIPIO DE JERICO – ANTIOQUIA.
+          </div>
+          <div class="receipt-contract">
+            <div><strong>CONTRATO N°:</strong> MC-058-2026</div>
+            <div><strong>ORDEN DE PEDIDO N°:</strong> ${escapeHtml(record.orderNumber||1)}</div>
+            <div><strong>FECHA:</strong> ${escapeHtml(formatDateCO(record.fecha))}</div>
+          </div>
+          <table class="receipt-table">
+            <thead><tr><th>VEHÍCULO</th><th>DESCRIPCIÓN</th><th>UNIDAD</th><th>CANTIDAD</th><th>Vr. UNITARIO</th><th>Vr. TOTAL</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+          <div class="receipt-total">VALOR TOTAL ${money(record.total_precio)}</div>
+          <div class="receipt-signature">
+            <div>NOMBRE Y APELLIDOS: DAVID GRISALES VALENCIA</div>
+            <div>FIRMA: ______________________________</div>
+          </div>
+          <div class="receipt-footer">
+            Palacio Municipal, Santiago Santamaría<br>
+            NIT: 890.981.069 - Teléfono: (604) 830523101- Código postal 056010<br>
+            www.jerico-antioquia.gov.co
+          </div>
+        </div>`;
+    }
+
+    function renderReceiptModal(record){
+      if(!record)return;
+      $('print-preview-content').innerHTML=`
+        <div class="print-toolbar" style="margin-bottom:12px">
+          <span class="badge">Orden #${escapeHtml(record.orderNumber)} · ${escapeHtml(record.maquina)} · ${escapeHtml(formatDateCO(record.fecha))}</span>
+          <span class="muted" style="font-size:11px">${money(record.total_precio)}</span>
+        </div>
+        <div class="print-pages">
+          <div class="print-page">${generateReceiptHTML(record,'COPIA 1')}</div>
+          <div class="page-break"></div>
+          <div class="print-page">${generateReceiptHTML(record,'COPIA 2')}</div>
+        </div>`;
+      $('print-modal').classList.remove('hidden');
+    }
+
+    function openPrintWindow(record,titulo='AMBAS COPIAS'){
+      // Se conserva el formato de impresión original: cada copia ocupa una hoja independiente
+      // y la tabla mantiene el diseño clásico del recibo.
+      const w=window.open('','_blank','popup,width=980,height=760');
+      if(!w){toast('Ventana bloqueada','Permite ventanas emergentes en este sitio para imprimir.','warn');return}
+
+      const style = `
+        <style>
+          @page { size: A4; margin: 15mm; }
+          html,body{margin:0;padding:0;background:#fff;color:#000;font-family:Arial,sans-serif;}
+          body{font-size:10px;}
+          .print-page{width:100%;box-sizing:border-box;}
+          .receipt{border:1px solid #000;padding:12px;margin:0 0 15px 0;position:relative;background:#fff;color:#000;}
+          .receipt-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+          .receipt-logo{flex-shrink:0;}
+          .receipt-logo img{max-height:45px;width:auto;}
+          .receipt-title{font-weight:bold;font-size:14px;text-align:center;}
+          .receipt-info{font-size:10px;text-align:right;line-height:1.2;}
+          .receipt-object{font-size:9px;margin-bottom:4px;line-height:1.3;}
+          .receipt-contract{display:flex;justify-content:space-between;margin-bottom:4px;font-size:10px;flex-wrap:wrap;gap:4px 10px;}
+          .receipt-table{width:100%;border-collapse:collapse;font-size:9px;margin-bottom:4px;}
+          .receipt-table th,.receipt-table td{border:1px solid #000;padding:3px 5px;text-align:left;}
+          .receipt-table th{background-color:#f0f0f0;}
+          .receipt-total{font-weight:bold;text-align:right;margin-bottom:4px;}
+          .receipt-signature{display:flex;justify-content:space-between;margin-bottom:4px;gap:12px;}
+          .receipt-footer{font-size:8px;text-align:center;line-height:1.25;}
+          .page-break{page-break-before:always;break-before:page;height:0;}
+          @media print{
+            body{margin:0;}
+            .print-page{break-after:page;page-break-after:always;}
+            .print-page:last-child{break-after:auto;page-break-after:auto;}
+            .receipt{margin-bottom:0;}
+          }
+        </style>
       `;
-      tbody.appendChild(tr);
-    });
-  }
 
-  // Menú
-  document.querySelectorAll('.menu-card').forEach(c => {
-    c.addEventListener('click', () => {
-      if (c.id === 'menu-ajustes') {
-        const pw = prompt('Ingrese la contraseña para abrir Ajustes:');
-        if (pw === ADMIN_PASSWORD) abrirSettings();
-        else alert('Contraseña incorrecta');
-      } else if (c.dataset.page === 'mantenimiento') {
-        alert('Sección Mantenimiento: puedes agregar los campos que necesites.');
-      } else {
-        window.scrollTo({ top: document.getElementById('card-main').offsetTop - 20, behavior: 'smooth' });
-      }
-    });
-  });
+      const script = `<script>window.addEventListener('load',()=>setTimeout(()=>{window.focus();window.print()},300))<\/script>`;
+      const body = titulo==='AMBAS COPIAS'
+        ? `<div class="print-window">
+             <div class="print-page">${generateReceiptHTML(record,'COPIA 1')}</div>
+             <div class="page-break"></div>
+             <div class="print-page">${generateReceiptHTML(record,'COPIA 2')}</div>
+           </div>`
+        : `<div class="print-window"><div class="print-page">${generateReceiptHTML(record,titulo)}</div></div>`;
 
-  // Settings
-  function abrirSettings() {
-    $('settings-modal').classList.remove('hidden');
-    const s = SETTINGS;
-    $('price-acpm').value = s.prices?.ACPM || DEFAULT_PRICES.ACPM;
-    $('price-corriente').value = s.prices?.CORRIENTE || DEFAULT_PRICES.CORRIENTE;
-    $('price-grasa').value = s.prices?.GRASA || DEFAULT_PRICES.GRASA;
-    $('price-aceite2t').value = s.prices?.ACEITE_2T || DEFAULT_PRICES.ACEITE_2T;
-    $('price-aceite4t').value = s.prices?.ACEITE_4T || DEFAULT_PRICES.ACEITE_4T;
-    $('price-aceite-pesado').value = s.prices?.ACEITE_MOTOR_PESADO || DEFAULT_PRICES.ACEITE_MOTOR_PESADO;
-    $('price-aceite-liviano').value = s.prices?.ACEITE_MOTOR_LIVIANO || DEFAULT_PRICES.ACEITE_MOTOR_LIVIANO;
-    $('price-aceite-hidraulico-gl').value = s.prices?.ACEITE_HIDRAULICO_GL || DEFAULT_PRICES.ACEITE_HIDRAULICO_GL;
-    $('price-aceite-hidraulico-cuarto').value = s.prices?.ACEITE_HIDRAULICO_CUARTO || DEFAULT_PRICES.ACEITE_HIDRAULICO_CUARTO;
-    $('price-refrigerante-rojo').value = s.prices?.REFRIGERANTE_ROJO || DEFAULT_PRICES.REFRIGERANTE_ROJO;
-    $('price-urea').value = s.prices?.UREA || DEFAULT_PRICES.UREA;
-    $('valor-contrato-mc').value = s.valorContratoMC || 0;
-    $('allow-ai').checked = s.allowAI || false;
-    $('openai-key').value = s.openaiKey || '';
-  }
-
-  $('btn-close-settings').addEventListener('click', () => {
-    $('settings-modal').classList.add('hidden');
-  });
-
-  $('btn-save-settings').addEventListener('click', () => {
-    SETTINGS.prices = {
-      ACPM: parseFloat($('price-acpm').value) || DEFAULT_PRICES.ACPM,
-      CORRIENTE: parseFloat($('price-corriente').value) || DEFAULT_PRICES.CORRIENTE,
-      GRASA: parseFloat($('price-grasa').value) || DEFAULT_PRICES.GRASA,
-      ACEITE_2T: parseFloat($('price-aceite2t').value) || DEFAULT_PRICES.ACEITE_2T,
-      ACEITE_4T: parseFloat($('price-aceite4t').value) || DEFAULT_PRICES.ACEITE_4T,
-      ACEITE_MOTOR_PESADO: parseFloat($('price-aceite-pesado').value) || DEFAULT_PRICES.ACEITE_MOTOR_PESADO,
-      ACEITE_MOTOR_LIVIANO: parseFloat($('price-aceite-liviano').value) || DEFAULT_PRICES.ACEITE_MOTOR_LIVIANO,
-      ACEITE_HIDRAULICO_GL: parseFloat($('price-aceite-hidraulico-gl').value) || DEFAULT_PRICES.ACEITE_HIDRAULICO_GL,
-      ACEITE_HIDRAULICO_CUARTO: parseFloat($('price-aceite-hidraulico-cuarto').value) || DEFAULT_PRICES.ACEITE_HIDRAULICO_CUARTO,
-      REFRIGERANTE_ROJO: parseFloat($('price-refrigerante-rojo').value) || DEFAULT_PRICES.REFRIGERANTE_ROJO,
-      UREA: parseFloat($('price-urea').value) || DEFAULT_PRICES.UREA
-    };
-    SETTINGS.valorContratoMC = parseFloat($('valor-contrato-mc').value) || 0;
-    SETTINGS.allowAI = $('allow-ai').checked;
-    SETTINGS.openaiKey = $('openai-key').value.trim();
-    saveSettings(SETTINGS);
-    if (!valorContrato) valorContrato = SETTINGS.valorContratoMC;
-    alert('Ajustes guardados.');
-    $('settings-modal').classList.add('hidden');
-    renderResumen();
-  });
-
-  // Resetar
-  $('btn-resetar').addEventListener('click', () => {
-    const pw = prompt('Ingrese la contraseña para resetear:');
-    if (pw === ADMIN_PASSWORD) {
-      if (confirm('¿Está seguro? Esto borrará todos los registros en la hoja de cálculo.')) {
-        alert('Función no implementada: debes borrar los datos manualmente desde Google Sheets.');
-      }
-    } else {
-      alert('Contraseña incorrecta');
+      const html=`<!doctype html><html><head><meta charset="utf-8"><title>Recibo ${escapeHtml(record.orderNumber||'')}</title>${style}</head><body>${body}${script}</body></html>`;
+      w.document.open();w.document.write(html);w.document.close();
     }
-  });
 
-  // Inicializar
-  fechaEl.valueAsDate = new Date();
-  (async function init() {
-    await cargarRegistros(true);
-  })();
-  setInterval(() => cargarRegistros(false), 60000);
-</script>
+    /* ==========================================================
+       PDF / EXCEL
+       ========================================================== */
+    function downloadCurrentChart(){
+      const first=Object.values(state.charts).find(Boolean);
+      if(!first){toast('Sin gráfica','Primero carga o filtra datos para crear una gráfica.','warn');return}
+      const a=document.createElement('a');
+      a.download=`analitica_combustible_${safeDateInput()}.png`;
+      a.href=first.toBase64Image('image/png',1);
+      a.click();
+    }
 
+    async function generatePDF(){
+      const data=state.filtered;
+      if(!data.length){toast('Sin datos','No hay registros para el rango seleccionado.','warn');return}
+      const btn=$('btn-generate-pdf');btn.disabled=true;
+      try{
+        const {jsPDF}=window.jspdf;
+        const pdf=new jsPDF({unit:'pt',format:'a4'});
+        const pageW=pdf.internal.pageSize.getWidth();
+        const margin=42;
+        const t=totals(data);
+        const contract=Number(state.contract)||0;
+        const pct=contract?((t.money/contract)*100):0;
+
+        pdf.setFillColor(11,36,71);pdf.rect(0,0,pageW,88,'F');
+        pdf.setTextColor(255,255,255);pdf.setFont('helvetica','bold');pdf.setFontSize(18);
+        pdf.text('Informe de combustible y lubricantes',margin,38);
+        pdf.setFont('helvetica','normal');pdf.setFontSize(9);
+        pdf.text('Alcaldía Municipal de Jericó · Antioquia',margin,55);
+        pdf.text(`Generado: ${new Date().toLocaleString('es-CO')}`,margin,70);
+
+        pdf.setTextColor(19,34,56);pdf.setFont('helvetica','bold');pdf.setFontSize(11);
+        pdf.text('Resumen ejecutivo',margin,118);
+        pdf.setFont('helvetica','normal');pdf.setFontSize(10);
+        const summaryLines=[
+          `Registros analizados: ${data.length}`,
+          `Valor filtrado: ${money(t.money)}`,
+          `Valor acumulado global: ${money(totals(state.records).money)}`,
+          `Contrato: ${money(contract)}`,
+          `Ejecución aproximada del contrato en el rango: ${pct.toFixed(1)}%`
+        ];
+        summaryLines.forEach((line,i)=>pdf.text(line,margin,138+i*15));
+
+        const chart=state.charts.machine;
+        if(chart){
+          const img=chart.toBase64Image('image/png',1);
+          pdf.addImage(img,'PNG',margin,220,pageW-margin*2,260);
+        }
+
+        pdf.addPage();
+        pdf.setFont('helvetica','bold');pdf.setFontSize(14);
+        pdf.text('Detalle por máquina',margin,48);
+        let y=70;
+        pdf.setFontSize(9);
+        const byMachine={};
+        data.forEach(r=>byMachine[r.maquina]=(byMachine[r.maquina]||0)+(Number(r.total_precio)||0));
+        Object.entries(byMachine).sort((a,b)=>b[1]-a[1]).forEach(([m,v])=>{
+          if(y>760){pdf.addPage();y=48}
+          pdf.setFont('helvetica','bold');pdf.text(m,margin,y);
+          pdf.setFont('helvetica','normal');pdf.text(money(v),pageW-margin-110,y);
+          y+=16;
+        });
+
+        pdf.save(`informe_combustible_${safeDateInput()}.pdf`);
+        toast('PDF generado','El informe filtrado fue preparado correctamente.');
+      }catch(err){
+        console.error(err);toast('Error al generar PDF',err.message||'No fue posible crear el informe.','error');
+      }finally{btn.disabled=false}
+    }
+
+    function renderExcelTable(){
+      const headers=['Timestamp','Máquina','Fecha','Orden','ACPM','CORRIENTE','GRASA','ACEITE 2T','ACEITE 4T','ACEITE MOTOR PESADO','ACEITE MOTOR LIVIANO','ACEITE HIDRÁULICO GL','ACEITE HIDRÁULICO 1/4','REFRIGERANTE ROJO','UREA','Total'];
+      $('table-excel').querySelector('thead').innerHTML=`<tr>${headers.map(h=>`<th>${escapeHtml(h)}</th>`).join('')}</tr>`;
+      const rows=[...state.records].sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
+      $('table-excel').querySelector('tbody').innerHTML=rows.map(r=>`
+        <tr>
+          <td>${escapeHtml(r.timestamp)}</td><td>${escapeHtml(r.maquina)}</td><td>${escapeHtml(r.fecha)}</td><td>${escapeHtml(r.orderNumber)}</td>
+          ${MATERIALS.map(m=>`<td>${number(r[m.key])}</td>`).join('')}
+          <td class="money">${money(r.total_precio)}</td>
+        </tr>`).join('');
+    }
+
+    function exportExcel(){
+      if(!window.XLSX || !state.records.length){toast('Sin datos','No hay registros disponibles para exportar.','warn');return}
+      const rows=state.records.map(r=>{
+        const obj={
+          Timestamp:r.timestamp,Máquina:r.maquina,Fecha:r.fecha,Orden:r.orderNumber
+        };
+        MATERIALS.forEach(m=>obj[m.label]=Number(r[m.key])||0);
+        obj.Total=Number(r.total_precio)||0;
+        return obj;
+      });
+      const ws=XLSX.utils.json_to_sheet(rows);
+      ws['!cols']=Object.keys(rows[0]||{}).map((_,i)=>({wch:i<4?20:14}));
+      const wb=XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb,ws,'Registros');
+      XLSX.writeFile(wb,`registros_combustible_${safeDateInput()}.xlsx`);
+      toast('Excel exportado','El archivo .xlsx fue generado.');
+    }
+
+    /* ==========================================================
+       SETTINGS
+       ========================================================== */
+    function renderSettings(){
+      $('valor-contrato-mc').value=state.settings.valorContratoMC||0;
+      $('auto-print').checked=state.settings.autoPrint!==false;
+      $('cache-enabled').checked=state.settings.cacheEnabled!==false;
+      $('settings-prices').innerHTML=MATERIALS.map(m=>`
+        <div class="setting-row">
+          <label>${escapeHtml(m.label)} · ${escapeHtml(m.unit)}</label>
+          <input type="number" step="0.01" data-setting-price="${escapeHtml(m.price)}" value="${Number(getPrices()[m.price])||0}">
+        </div>
+      `).join('');
+    }
+
+    function saveSettingsFromUI(){
+      MATERIALS.forEach(m=>{
+        const el=document.querySelector(`[data-setting-price="${CSS.escape(m.price)}"]`);
+        if(el)state.settings.prices[m.price]=Math.max(0,Number(parseFloat(el.value)||0));
+      });
+      state.settings.valorContratoMC=Math.max(0,Number(parseFloat($('valor-contrato-mc').value)||0));
+      state.settings.autoPrint=$('auto-print').checked;
+      state.settings.cacheEnabled=$('cache-enabled').checked;
+      state.cacheEnabled=state.settings.cacheEnabled;
+      saveSettings();
+      $('settings-modal').classList.add('hidden');
+      updateFormTotal();
+      renderAll();
+      toast('Configuración guardada','Los precios y preferencias quedaron actualizados.');
+    }
+
+    /* ==========================================================
+       EVENTOS
+       ========================================================== */
+    function closeModal(id){$(id).classList.add('hidden')}
+
+    // Navegación
+    document.querySelectorAll('[data-target]').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const id=btn.dataset.target;
+        const section=$(id);
+        if(section)section.scrollIntoView({behavior:'smooth',block:'start'});
+        document.querySelectorAll('.nav button').forEach(n=>n.classList.toggle('active',n.dataset.target===id));
+      });
+    });
+
+    document.querySelectorAll('.nav button').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        document.querySelectorAll('.nav button').forEach(n=>n.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+
+    // Cantidades / total
+    $('materials-grid').addEventListener('input',updateFormTotal);
+    $('materials-grid').addEventListener('click',e=>{
+      const b=e.target.closest('[data-qty-target]');
+      if(!b)return;
+      $(b.dataset.qtyTarget).value=b.dataset.qtyValue;
+      updateFormTotal();
+      $(b.dataset.qtyTarget).focus();
+    });
+
+    $('btn-clear').addEventListener('click',clearQuantities);
+
+    // Generación
+    $('consumo-form').addEventListener('submit',async e=>{
+      e.preventDefault();
+      if(state.saving)return;
+
+      const record=getFormRecord();
+      if(!record.maquina){toast('Falta máquina','Selecciona un equipo antes de generar.','warn');return}
+      if(record.total_precio<=0){toast('Recibo vacío','Ingresa al menos una cantidad de material.','warn');return}
+
+      state.lastRecord=record;
+      $('form-mode-badge').textContent=`ORDEN #${record.orderNumber}`;
+      setSaving(true);
+
+      try{
+        await enviarAGoogleSheets(record);
+
+        // Actualización local inmediata: no hacemos GET completo después del POST.
+        state.records=[record,...state.records.filter(r=>r.clientId!==record.clientId)];
+        saveCache();
+        applyFilters(false);
+
+        clearQuantities();
+        setSaving(false);
+        toast('Registro guardado',`Orden #${record.orderNumber} · ${record.maquina} · ${money(record.total_precio)}`);
+        $('mensaje').innerHTML='<span style="font-size:11px;color:#15803d;font-weight:800">✓ Registro guardado y sincronizado</span>';
+
+        if(state.settings.autoPrint)renderReceiptModal(record);
+      }catch(err){
+        console.error(err);
+        setSaving(false);
+        $('mensaje').innerHTML='<span style="font-size:11px;color:#b42318;font-weight:800">✕ No se confirmó el guardado. El formulario se conserva para reintentar.</span>';
+        toast('No se pudo guardar',err.message||'Verifica la conexión y vuelve a intentar.','error');
+      }
+    });
+
+    $('btn-preview-print').addEventListener('click',()=>{
+      if(!state.lastRecord){toast('Sin recibo','Genera un recibo primero.','warn');return}
+      renderReceiptModal(state.lastRecord);
+    });
+
+    $('btn-print-now').addEventListener('click',()=>{
+      if(!state.lastRecord)return;
+      openPrintWindow(state.lastRecord,'AMBAS COPIAS');
+    });
+
+    $('btn-print-c1').addEventListener('click',()=>{
+      if(!state.lastRecord){toast('Sin recibo','Genera un recibo primero.','warn');return}
+      openPrintWindow(state.lastRecord,'COPIA 1');
+    });
+    $('btn-print-c2').addEventListener('click',()=>{
+      if(!state.lastRecord){toast('Sin recibo','Genera un recibo primero.','warn');return}
+      openPrintWindow(state.lastRecord,'COPIA 2');
+    });
+
+    // Modales
+    $('btn-close-print').addEventListener('click',()=>closeModal('print-modal'));
+    $('btn-excel').addEventListener('click',()=>{
+      const pw=prompt('Ingrese la contraseña para ver los registros:');
+      if(pw!==ADMIN_PASSWORD){toast('Acceso denegado','La contraseña no es correcta.','error');return}
+      renderExcelTable();$('excel-modal').classList.remove('hidden');
+    });
+    $('btn-close-excel').addEventListener('click',()=>closeModal('excel-modal'));
+    $('btn-export-excel').addEventListener('click',exportExcel);
+
+    $('btn-settings').addEventListener('click',()=>{
+      const pw=prompt('Ingrese la contraseña de administración:');
+      if(pw!==ADMIN_PASSWORD){toast('Acceso denegado','La contraseña no es correcta.','error');return}
+      renderSettings();$('settings-modal').classList.remove('hidden');
+    });
+    $('btn-close-settings').addEventListener('click',()=>closeModal('settings-modal'));
+    $('btn-save-settings').addEventListener('click',saveSettingsFromUI);
+
+    // Filtros
+    $('btn-aplicar-filtro').addEventListener('click',()=>{readFilterUI();applyFilters()});
+    $('btn-limpiar-filtro').addEventListener('click',clearFilters);
+    ['fecha-inicio','fecha-fin','filtro-maquina'].forEach(id=>$(id).addEventListener('change',()=>{readFilterUI();applyFilters()}));
+    $('buscar-registros').addEventListener('input',()=>{readFilterUI();applyFilters()});
+
+    // Registros: imprimir / ver recibo
+    document.querySelector('#records-table tbody').addEventListener('click',e=>{
+      const receiptBtn=e.target.closest('[data-receipt-record]');
+      const copyBtn=e.target.closest('[data-copy-record]');
+      if(!receiptBtn && !copyBtn)return;
+      const id=(receiptBtn||copyBtn).dataset.receiptRecord || (receiptBtn||copyBtn).dataset.copyRecord;
+      const r=state.records.find(x=>String(x.clientId||x.timestamp)===String(id));
+      if(!r)return;
+      state.lastRecord=r;
+      $('form-mode-badge').textContent=`ORDEN #${r.orderNumber}`;
+      if(receiptBtn)renderReceiptModal(r);
+      else openPrintWindow(r,'AMBAS COPIAS');
+    });
+
+    $('btn-toggle-summary').addEventListener('click',()=>{
+      state.summaryMode=!state.summaryMode;
+      $('btn-toggle-summary').textContent=state.summaryMode?'Ver registros individuales':'Ver resumen de cantidades';
+      renderRecords();
+    });
+
+    // Acciones
+    $('btn-refresh').addEventListener('click',()=>cargarRegistros(true));
+    $('btn-generate-pdf').addEventListener('click',generatePDF);
+    $('hero-pdf').addEventListener('click',generatePDF);
+    $('btn-download-chart').addEventListener('click',downloadCurrentChart);
+
+    // Teclado
+    document.addEventListener('keydown',e=>{
+      if(e.key==='Escape'){
+        ['print-modal','excel-modal','settings-modal'].forEach(closeModal);
+      }
+      if((e.ctrlKey||e.metaKey) && e.key==='Enter'){
+        e.preventDefault();
+        $('consumo-form').requestSubmit();
+      }
+    });
+
+    // Resize / visibilidad: una sincronización adicional al volver a la pestaña.
+    document.addEventListener('visibilitychange',()=>{
+      if(document.visibilityState==='visible')cargarRegistros(false);
+    });
+
+    /* ==========================================================
+       INICIALIZACIÓN
+       ========================================================== */
+    function init(){
+      state.cacheEnabled=state.settings.cacheEnabled!==false;
+      setMachineOptions();
+      renderMaterials();
+      $('fecha').value=safeDateInput();
+      $('maquina').value=MACHINES[0];
+      renderSettings();
+      loadCache();
+      renderAll();
+      updateFormTotal();
+
+      // Carga de servidor después de pintar el caché: mejora la percepción de velocidad.
+      cargarRegistros(false);
+      setInterval(()=>{if(document.visibilityState==='visible')cargarRegistros(false)},AUTO_REFRESH_MS);
+    }
+
+    init();
+  </script>
 </body>
 </html>
