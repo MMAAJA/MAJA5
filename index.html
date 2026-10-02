@@ -209,6 +209,29 @@
       height:38px;margin-top:9px;width:100%;border-radius:10px;border:1px solid #dbe2ea;background:#fbfdff;
       padding:0 10px;font-weight:700;color:var(--text);outline:0
     }
+    /* Los campos de cantidad se controlan por teclado; la rueda del mouse no modifica valores. */
+    .qty::-webkit-outer-spin-button,.qty::-webkit-inner-spin-button{margin:0;-webkit-appearance:none}
+    .qty{appearance:textfield;-moz-appearance:textfield}
+    .edit-mode-note{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;padding:10px 12px;
+      border-radius:12px;background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;font-size:11px;font-weight:700
+    }
+    .edit-mode-note strong{font-size:12px}
+    .period-summary{margin-top:14px;padding:16px}
+    .period-summary-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap}
+    .period-summary-kpis{display:grid;grid-template-columns:repeat(2,minmax(150px,1fr));gap:9px;min-width:min(100%,380px)}
+    .period-kpi{padding:11px 12px;border:1px solid var(--border);border-radius:12px;background:#fbfdff}
+    .period-kpi-label{font-size:10px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+    .period-kpi-value{font-size:18px;font-weight:800;margin-top:4px;color:#0d3f7a}
+    .period-kpi-note{font-size:10px;color:var(--muted);margin-top:2px}
+    .period-table-wrap{overflow:auto;margin-top:13px;border:1px solid var(--border);border-radius:12px}
+    .period-table{width:100%;border-collapse:collapse}
+    .period-table th,.period-table td{padding:9px 10px;font-size:10px;border-bottom:1px solid #eef2f7;white-space:nowrap}
+    .period-table th{background:#f8fafc;color:#64748b;text-transform:uppercase;letter-spacing:.04em}
+    .period-table td:last-child,.period-table th:last-child{text-align:right}
+    .period-table tr:last-child td{border-bottom:0}
+    .period-empty{padding:14px;color:var(--muted);font-size:11px;text-align:center}
+    .edit-input-highlight{border-color:#60a5fa!important;background:#eff6ff!important}
     .qty:focus{border-color:#7bb4f7;box-shadow:0 0 0 3px rgba(47,128,237,.08)}
     .common-values{display:flex;gap:5px;margin-top:7px}
     .common-values button{
@@ -372,6 +395,7 @@
       .filter-search{min-width:0}
       .setting-row{grid-template-columns:1fr}
       .setting-row input{width:100%}
+      .period-summary-kpis{grid-template-columns:1fr}
     }
     @media(max-width:420px){
       .kpi-grid{grid-template-columns:1fr}
@@ -550,7 +574,9 @@
                   </button>
                   <button class="btn btn-soft" type="button" id="btn-print-c1">Imprimir copia 1</button>
                   <button class="btn btn-soft" type="button" id="btn-print-c2">Imprimir copia 2</button>
+                  <button class="btn btn-danger hidden" type="button" id="btn-cancel-edit">Cancelar edición</button>
                 </div>
+                <div id="edit-mode-note" class="edit-mode-note hidden"><span>Modo edición activo · <strong id="edit-mode-label">—</strong></span><span>La clave se valida en el servidor.</span></div>
                 <div id="mensaje" style="margin-top:10px"></div>
               </form>
 
@@ -595,7 +621,7 @@
             <div>
               <div class="section-kicker">Inteligencia operativa</div>
               <h2 class="section-title">Analítica de consumo</h2>
-              <p class="section-desc">Filtra por fecha y máquina; las gráficas se actualizan con el mismo conjunto de datos.</p>
+              <p class="section-desc">Filtra por fecha y máquina; el resumen, las cantidades y las gráficas usan el mismo conjunto de datos.</p>
             </div>
             <div style="display:flex;gap:8px;flex-wrap:wrap">
               <button class="btn btn-soft" id="btn-download-chart">Descargar gráfica</button>
@@ -618,6 +644,35 @@
             <button class="btn btn-soft" id="btn-limpiar-filtro">Limpiar</button>
             <span class="badge" id="analytics-status">0 registros</span>
           </div>
+
+          <article class="card period-summary">
+            <div class="period-summary-top">
+              <div>
+                <div class="section-kicker">Resumen del periodo</div>
+                <h3 class="card-title" style="margin-top:3px">Consumo por ítem</h3>
+                <p class="card-sub" id="period-summary-range">Todo el histórico</p>
+              </div>
+              <div class="period-summary-kpis">
+                <div class="period-kpi">
+                  <div class="period-kpi-label">Valor consumido</div>
+                  <div class="period-kpi-value" id="period-total-value">$0</div>
+                  <div class="period-kpi-note">Dentro de los filtros actuales</div>
+                </div>
+                <div class="period-kpi">
+                  <div class="period-kpi-label">Registros</div>
+                  <div class="period-kpi-value" id="period-record-count">0</div>
+                  <div class="period-kpi-note">Movimientos incluidos</div>
+                </div>
+              </div>
+            </div>
+            <div class="period-table-wrap">
+              <table class="period-table" id="period-summary-table">
+                <thead><tr><th>Ítem</th><th>Unidad</th><th>Cantidad</th><th>Valor consumido</th></tr></thead>
+                <tbody></tbody>
+              </table>
+              <div id="period-summary-empty" class="period-empty hidden">No hay consumo en el rango o filtros seleccionados.</div>
+            </div>
+          </article>
 
           <div class="analytics-grid">
             <article class="card chart-card">
@@ -668,7 +723,7 @@
             <div>
               <div class="section-kicker">Trazabilidad</div>
               <h2 class="section-title">Registros recientes</h2>
-              <p class="section-desc">Consulta, busca y vuelve a imprimir cualquier recibo disponible en memoria.</p>
+              <p class="section-desc">Consulta, busca, corrige y vuelve a imprimir cualquier recibo disponible.</p>
             </div>
             <button class="btn btn-soft" id="btn-toggle-summary">Ver resumen de cantidades</button>
           </div>
@@ -793,7 +848,7 @@
        CONFIGURACIÓN
        ========================================================== */
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz-_lv4_Gfq6exv2pMR1UpfmYimhoU7pvG-lpv2_sMK6xsgE6E1adHVyKjq-3YfSHpU/exec';
-    const ADMIN_PASSWORD = 'AC.ardila2006'; // Compatibilidad con tu versión actual. Mover al backend en producción.
+    const ADMIN_PASSWORD = 'AC.ardila2006'; // Mantiene compatibilidad con los accesos actuales de Excel/Ajustes. La clave de edición se valida solo en backend.
     const SETTINGS_KEY = 'combustible_settings_v3';
     const CACHE_KEY = 'combustible_records_cache_v3';
     const AUTO_REFRESH_MS = 90000;
@@ -838,7 +893,9 @@
       filters: {start:'',end:'',machine:'',search:''},
       summaryMode:false,
       saving:false,
-      cacheEnabled:true
+      cacheEnabled:true,
+      editingRecord:null,
+      editPassword:null
     };
 
     const $ = id => document.getElementById(id);
@@ -958,12 +1015,17 @@
             <div class="material-name">${escapeHtml(m.label)}</div>
             <span class="unit-chip">${escapeHtml(m.unit)}</span>
           </div>
-          <input class="qty" type="number" min="0" step="0.1" id="${escapeHtml(m.input)}" placeholder="0" inputmode="decimal">
+          <input class="qty" type="number" min="0" step="0.1" id="${escapeHtml(m.input)}" placeholder="0" inputmode="decimal" autocomplete="off">
           <div class="common-values">
 
           </div>
         </div>
       `).join('');
+
+      // Al pasar la rueda sobre un campo de cantidad, el valor permanece intacto.
+      document.querySelectorAll('.qty').forEach(input=>{
+        input.addEventListener('wheel',()=>input.blur(),{passive:true});
+      });
     }
 
     function updateFormTotal(){
@@ -972,11 +1034,50 @@
       $('form-total').textContent=money(calculateRecordTotal(fake));
     }
 
-    function clearQuantities(){
+    function clearQuantities(silent=false){
       MATERIALS.forEach(m=>$(m.input).value='');
       updateFormTotal();
-      toast('Formulario limpio','Las cantidades fueron restablecidas.');
+      if(!silent)toast('Formulario limpio','Las cantidades fueron restablecidas.');
     }
+
+    function setEditMode(record,password){
+      state.editingRecord=record;
+      state.editPassword=password;
+      $('maquina').value=record.maquina;
+      $('fecha').value=record.fecha || safeDateInput();
+      MATERIALS.forEach(m=>$(m.input).value=Number(record[m.key])||0);
+      $('form-mode-badge').textContent=`EDITAR ORDEN #${record.orderNumber}`;
+      $('btn-generar').innerHTML='<span>✓</span> Guardar cambios';
+      $('btn-cancel-edit').classList.remove('hidden');
+      $('edit-mode-note').classList.remove('hidden');
+      $('edit-mode-label').textContent=`Orden #${record.orderNumber} · ${record.maquina}`;
+      $('mensaje').innerHTML='';
+      updateFormTotal();
+      $('consumo').scrollIntoView({behavior:'smooth',block:'start'});
+      setTimeout(()=>$('maquina').focus(),450);
+    }
+
+    function cancelEdit(silent=false){
+      state.editingRecord=null;
+      state.editPassword=null;
+      $('form-mode-badge').textContent='NUEVO';
+      $('btn-generar').innerHTML='<span>✓</span> Generar recibo';
+      $('btn-cancel-edit').classList.add('hidden');
+      $('edit-mode-note').classList.add('hidden');
+      $('mensaje').innerHTML='';
+      $('fecha').value=safeDateInput();
+      $('maquina').value=MACHINES[0];
+      clearQuantities(true);
+      if(!silent)toast('Edición cancelada','El formulario volvió al modo de registro nuevo.','warn');
+    }
+
+    function fillRecordIntoForm(record){
+      $('maquina').value=record.maquina;
+      $('fecha').value=record.fecha || safeDateInput();
+      MATERIALS.forEach(m=>$(m.input).value=Number(record[m.key])||0);
+      updateFormTotal();
+    }
+
 
     /* ==========================================================
        CACHE + GOOGLE SHEETS
@@ -986,6 +1087,8 @@
       MATERIALS.forEach(m=>out[m.key]=Number.parseFloat(r?.[m.key])||0);
       out.total_precio=Number.parseFloat(r?.total_precio)||calculateRecordTotal(out);
       out.orderNumber=Number.parseInt(r?.orderNumber)||1;
+      out.sheetRow=Number.parseInt(r?.sheetRow)||0;
+      out.clientId=String(r?.clientId || (out.sheetRow ? `sheet-${out.sheetRow}` : r?.timestamp || ''));
       return out;
     }
 
@@ -1062,6 +1165,40 @@
         body:JSON.stringify(record)
       });
       if(json?.status!=='success')throw new Error(json?.message || 'El backend no confirmó el guardado.');
+      return json;
+    }
+
+    async function autorizarEdicion(password){
+      if(!password)return false;
+      const json=await fetchJson(SCRIPT_URL,{
+        method:'POST',
+        mode:'cors',
+        headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body:JSON.stringify({action:'authorizeEdit',password})
+      });
+      if(json?.status!=='success')throw new Error(json?.message || 'La clave no fue aceptada.');
+      return true;
+    }
+
+    async function editarEnGoogleSheets(record,password){
+      if(!password)throw new Error('La sesión de edición no tiene una clave válida.');
+      const json=await fetchJson(SCRIPT_URL,{
+        method:'POST',
+        mode:'cors',
+        headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body:JSON.stringify({
+          action:'edit',
+          password,
+          sheetRow:record.sheetRow,
+          clientId:record.clientId,
+          maquina:record.maquina,
+          fecha:record.fecha,
+          orderNumber:record.orderNumber,
+          ...Object.fromEntries(MATERIALS.map(m=>[m.key,record[m.key]])),
+          total_precio:record.total_precio
+        })
+      });
+      if(json?.status!=='success')throw new Error(json?.message || 'El backend no confirmó la edición.');
       return json;
     }
 
@@ -1197,8 +1334,44 @@
       if(empty)empty.style.display='none';
     }
 
+    function renderPeriodSummary(records){
+      const t=totals(records);
+      $('period-total-value').textContent=money(t.money);
+      $('period-record-count').textContent=records.length.toLocaleString('es-CO');
+
+      const start=state.filters.start;
+      const end=state.filters.end;
+      const machine=state.filters.machine;
+      const parts=[];
+      if(start && end) parts.push(`${formatDateCO(start)} → ${formatDateCO(end)}`);
+      else if(start) parts.push(`Desde ${formatDateCO(start)}`);
+      else if(end) parts.push(`Hasta ${formatDateCO(end)}`);
+      else parts.push('Todo el histórico');
+      if(machine) parts.push(`Máquina: ${machine}`);
+      if(state.filters.search) parts.push(`Búsqueda: ${state.filters.search}`);
+      $('period-summary-range').textContent=parts.join(' · ');
+
+      const tbody=$('period-summary-table').querySelector('tbody');
+      tbody.innerHTML='';
+      const rows=MATERIALS.filter(m=>(Number(t.qty[m.key])||0)>0);
+      $('period-summary-empty').classList.toggle('hidden',rows.length>0);
+      rows.forEach(m=>{
+        const qty=Number(t.qty[m.key])||0;
+        const value=qty*(Number(getPrices()[m.price])||0);
+        const tr=document.createElement('tr');
+        tr.innerHTML=`<td><strong>${escapeHtml(m.label)}</strong></td><td>${escapeHtml(m.unit)}</td><td>${number(qty)}</td><td class="money">${money(value)}</td>`;
+        tbody.appendChild(tr);
+      });
+      if(rows.length){
+        const tr=document.createElement('tr');
+        tr.innerHTML=`<td colspan="3"><strong>TOTAL DEL PERIODO</strong></td><td class="money"><strong>${money(t.money)}</strong></td>`;
+        tbody.appendChild(tr);
+      }
+    }
+
     function renderAnalytics(){
       const data=state.filtered;
+      renderPeriodSummary(data);
       $('analytics-status').textContent=`${data.length.toLocaleString('es-CO')} registros`;
 
       const machine={};
@@ -1392,7 +1565,7 @@
           <td class="money">${money(r.total_precio)}</td>
           <td>
             <div class="table-actions">
-              <button class="btn btn-soft" data-receipt-record="${escapeHtml(r.clientId||r.timestamp)}">Recibo</button>
+              <button class="btn btn-soft" data-edit-record="${escapeHtml(r.clientId||r.timestamp)}">Editar</button>
               <button class="btn btn-soft" data-copy-record="${escapeHtml(r.clientId||r.timestamp)}">2 copias</button>
             </div>
           </td>`;
@@ -1710,35 +1883,67 @@
       e.preventDefault();
       if(state.saving)return;
 
-      const record=getFormRecord();
-      if(!record.maquina){toast('Falta máquina','Selecciona un equipo antes de generar.','warn');return}
-      if(record.total_precio<=0){toast('Recibo vacío','Ingresa al menos una cantidad de material.','warn');return}
+      const base=getFormRecord();
+      if(!base.maquina){toast('Falta máquina','Selecciona un equipo antes de continuar.','warn');return}
+      if(base.total_precio<=0){toast('Recibo vacío','Ingresa al menos una cantidad de material.','warn');return}
+
+      const isEditing=!!state.editingRecord;
+      const record=isEditing ? {
+        ...state.editingRecord,
+        maquina:base.maquina,
+        fecha:base.fecha,
+        ...Object.fromEntries(MATERIALS.map(m=>[m.key,base[m.key]])),
+        total_precio:base.total_precio,
+        editedAt:new Date().toISOString()
+      } : base;
 
       state.lastRecord=record;
-      $('form-mode-badge').textContent=`ORDEN #${record.orderNumber}`;
       setSaving(true);
 
       try{
-        await enviarAGoogleSheets(record);
+        let result;
+        if(isEditing){
+          result=await editarEnGoogleSheets(record,state.editPassword);
+        }else{
+          result=await enviarAGoogleSheets(record);
+        }
 
-        // Actualización local inmediata: no hacemos GET completo después del POST.
-        state.records=[record,...state.records.filter(r=>r.clientId!==record.clientId)];
+        const saved=normalizeRecord({...record,...(result?.record||{})});
+        state.lastRecord=saved;
+
+        // Actualización local inmediata.
+        state.records=[saved,...state.records.filter(r=>{
+          if(isEditing){
+            return Number(r.sheetRow)!==Number(saved.sheetRow);
+          }
+          return r.clientId!==saved.clientId;
+        })];
         saveCache();
         applyFilters(false);
 
-        clearQuantities();
-        setSaving(false);
-        toast('Registro guardado',`Orden #${record.orderNumber} · ${record.maquina} · ${money(record.total_precio)}`);
-        $('mensaje').innerHTML='<span style="font-size:11px;color:#15803d;font-weight:800">✓ Registro guardado y sincronizado</span>';
-
-        if(state.settings.autoPrint)renderReceiptModal(record);
+        if(isEditing){
+          const label=`Orden #${saved.orderNumber} · ${saved.maquina} · ${money(saved.total_precio)}`;
+          cancelEdit(true);
+          setSaving(false);
+          toast('Recibo actualizado',`${label} · cambios guardados correctamente.`);
+          $('mensaje').innerHTML='<span style="font-size:11px;color:#15803d;font-weight:800">✓ Recibo actualizado y sincronizado</span>';
+          if(state.settings.autoPrint)renderReceiptModal(saved);
+        }else{
+          clearQuantities();
+          setSaving(false);
+          toast('Registro guardado',`Orden #${saved.orderNumber} · ${saved.maquina} · ${money(saved.total_precio)}`);
+          $('mensaje').innerHTML='<span style="font-size:11px;color:#15803d;font-weight:800">✓ Registro guardado y sincronizado</span>';
+          if(state.settings.autoPrint)renderReceiptModal(saved);
+        }
       }catch(err){
         console.error(err);
         setSaving(false);
-        $('mensaje').innerHTML='<span style="font-size:11px;color:#b42318;font-weight:800">✕ No se confirmó el guardado. El formulario se conserva para reintentar.</span>';
-        toast('No se pudo guardar',err.message||'Verifica la conexión y vuelve a intentar.','error');
+        $('mensaje').innerHTML=`<span style="font-size:11px;color:#b42318;font-weight:800">✕ ${escapeHtml(err.message||'No fue posible guardar los cambios.')}</span>`;
+        toast(isEditing?'No se pudo actualizar':'No se pudo guardar',err.message||'Verifica la conexión y vuelve a intentar.','error');
       }
     });
+
+    $('btn-cancel-edit').addEventListener('click',()=>cancelEdit());
 
     $('btn-preview-print').addEventListener('click',()=>{
       if(!state.lastRecord){toast('Sin recibo','Genera un recibo primero.','warn');return}
@@ -1778,23 +1983,58 @@
     $('btn-save-settings').addEventListener('click',saveSettingsFromUI);
 
     // Filtros
-    $('btn-aplicar-filtro').addEventListener('click',()=>{readFilterUI();applyFilters()});
+    $('btn-aplicar-filtro').addEventListener('click',()=>{
+      readFilterUI();
+      if(state.filters.start && state.filters.end && state.filters.start>state.filters.end){
+        toast('Rango inválido','La fecha inicial no puede ser posterior a la fecha final.','warn');
+        return;
+      }
+      applyFilters();
+    });
     $('btn-limpiar-filtro').addEventListener('click',clearFilters);
-    ['fecha-inicio','fecha-fin','filtro-maquina'].forEach(id=>$(id).addEventListener('change',()=>{readFilterUI();applyFilters()}));
+    ['fecha-inicio','fecha-fin','filtro-maquina'].forEach(id=>$(id).addEventListener('change',()=>{
+      readFilterUI();
+      if(state.filters.start && state.filters.end && state.filters.start>state.filters.end){
+        toast('Rango inválido','La fecha inicial no puede ser posterior a la fecha final.','warn');
+        return;
+      }
+      applyFilters();
+    }));
     $('buscar-registros').addEventListener('input',()=>{readFilterUI();applyFilters()});
 
-    // Registros: imprimir / ver recibo
-    document.querySelector('#records-table tbody').addEventListener('click',e=>{
-      const receiptBtn=e.target.closest('[data-receipt-record]');
+    // Registros: editar / imprimir 2 copias
+    document.querySelector('#records-table tbody').addEventListener('click',async e=>{
+      const editBtn=e.target.closest('[data-edit-record]');
       const copyBtn=e.target.closest('[data-copy-record]');
-      if(!receiptBtn && !copyBtn)return;
-      const id=(receiptBtn||copyBtn).dataset.receiptRecord || (receiptBtn||copyBtn).dataset.copyRecord;
+      if(!editBtn && !copyBtn)return;
+
+      const id=(editBtn||copyBtn).dataset.editRecord || (editBtn||copyBtn).dataset.copyRecord;
       const r=state.records.find(x=>String(x.clientId||x.timestamp)===String(id));
       if(!r)return;
-      state.lastRecord=r;
-      $('form-mode-badge').textContent=`ORDEN #${r.orderNumber}`;
-      if(receiptBtn)renderReceiptModal(r);
-      else openPrintWindow(r,'AMBAS COPIAS');
+
+      if(copyBtn){
+        state.lastRecord=r;
+        $('form-mode-badge').textContent=`ORDEN #${r.orderNumber}`;
+        openPrintWindow(r,'AMBAS COPIAS');
+        return;
+      }
+
+      if(!r.sheetRow){
+        toast('Edición no disponible','Este registro no tiene identificador de fila. Actualiza los datos desde Google Sheets y vuelve a intentarlo.','warn');
+        return;
+      }
+
+      const pw=prompt(`Clave de edición para la orden #${r.orderNumber}:`);
+      if(!pw){toast('Edición cancelada','No se ingresó la clave.','warn');return}
+      try{
+        await autorizarEdicion(pw);
+        state.lastRecord=r;
+        setEditMode(r,pw);
+        toast('Modo edición habilitado',`Puedes corregir máquina, fecha y cantidades de la orden #${r.orderNumber}.`);
+      }catch(err){
+        console.error(err);
+        toast('Acceso denegado',err.message||'La clave no es correcta.','error');
+      }
     });
 
     $('btn-toggle-summary').addEventListener('click',()=>{
@@ -1813,6 +2053,7 @@
     document.addEventListener('keydown',e=>{
       if(e.key==='Escape'){
         ['print-modal','excel-modal','settings-modal'].forEach(closeModal);
+        if(state.editingRecord)cancelEdit(true);
       }
       if((e.ctrlKey||e.metaKey) && e.key==='Enter'){
         e.preventDefault();
