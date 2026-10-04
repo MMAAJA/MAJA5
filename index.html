@@ -293,7 +293,7 @@
     tbody tr:hover{background:#fbfdff}
     .machine-badge{display:inline-flex;align-items:center;padding:5px 8px;border-radius:8px;background:#eef5ff;color:#24548b;font-weight:800;font-size:10px}
     .money{font-weight:800;color:#0d3f7a}
-    .table-actions{display:flex;gap:5px}
+    .table-actions{display:flex;gap:5px;flex-wrap:wrap}
     .table-actions .btn{min-height:30px;height:30px;padding:0 9px;font-size:10px}
 
     /* ---------- ADMIN / MODALS ---------- */
@@ -479,9 +479,9 @@
                 </div>
               </div>
               <div class="hero-panel">
-                <div class="hero-panel-title">Saldo estimado del contrato </div>
+                <div class="hero-panel-title">Saldo disponible del contrato </div>
                 <div class="hero-panel-value" id="hero-restante">$0</div>
-                <div class="hero-panel-sub"><span id="hero-progress-text">0%</span> utilizado · actualización local en tiempo real</div>
+                <div class="hero-panel-sub"><span id="hero-progress-text">0%</span> ejecutado · actualización desde Google Sheets</div>
               </div>
             </div>
           </div>
@@ -820,7 +820,7 @@
             <h4>Control contractual</h4>
             <div class="setting-row"><label for="valor-contrato-mc">Valor del contrato MC</label><input type="number" step="0.01" id="valor-contrato-mc"></div>
             <div class="setting-row"><label for="auto-print">Abrir vista de impresión al guardar</label><input type="checkbox" id="auto-print" checked></div>
-            <div class="setting-row"><label for="cache-enabled">Usar caché local para carga rápida</label><input type="checkbox" id="cache-enabled" checked></div>
+            <div class="setting-row"><label>Fuente de datos</label><input type="text" value="Google Sheets · servidor" disabled></div>
           </div>
         </div>
         <div class="warning-box">
@@ -847,11 +847,15 @@
     /* ==========================================================
        CONFIGURACIÓN
        ========================================================== */
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxQL3vSm5Uw77ZtOwt4o4LouyZ_nk_DXEdnw5I3XBGyVJy2_-PUYthOZmxHhLTy2Bu8/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxeezlgWpAge2ZN-WTuEEI2lOFQKWtTfpA1QqKDRiYGYI6wTH_s96q2-8AUfPIlJkjw/exec';
     const ADMIN_PASSWORD = 'AC.ardila2006'; // Mantiene compatibilidad con los accesos actuales de Excel/Ajustes. La clave de edición se valida solo en backend.
     const SETTINGS_KEY = 'combustible_settings_v3';
     const CACHE_KEY = 'combustible_records_cache_v3';
     const AUTO_REFRESH_MS = 90000;
+    const CONTRACT_VALUE_FALLBACK = 783616400;
+    try{
+      localStorage.removeItem(CACHE_KEY);
+    }catch{}
 
     const MATERIALS = [
       {key:'acpm_qty', price:'ACPM', label:'ACPM', unit:'GL', input:'acpm'},
@@ -943,15 +947,16 @@
     function loadSettings(){
       const fallback = {
         prices:{...DEFAULT_PRICES},
-        valorContratoMC:49025340,
+        valorContratoMC:CONTRACT_VALUE_FALLBACK,
         autoPrint:true,
-        cacheEnabled:true
+        cacheEnabled:false
       };
       try{
         const raw = localStorage.getItem(SETTINGS_KEY);
         if(!raw)return fallback;
         const s = {...fallback,...JSON.parse(raw)};
         s.prices = {...DEFAULT_PRICES,...(s.prices||{})};
+        s.cacheEnabled = false;
         return s;
       }catch{
         return fallback;
@@ -1106,6 +1111,9 @@
     }
 
     function loadCache(){
+      // Google Sheets es la única fuente oficial de datos.
+      // No se carga ningún registro desde localStorage.
+      return false;
       if(!state.settings.cacheEnabled)return false;
       try{
         const raw=localStorage.getItem(CACHE_KEY);
@@ -1141,7 +1149,8 @@
         const json=await fetchJson(SCRIPT_URL);
         if(json?.status!=='success' || !Array.isArray(json.data))throw new Error('Respuesta no válida del servicio');
         state.records=json.data.map(normalizeRecord);
-        state.contract=Number(json.valorContrato)||Number(state.settings.valorContratoMC)||0;
+        const serverContract=Number(json.valorContrato);
+        state.contract=Number.isFinite(serverContract) && serverContract>0 ? serverContract : CONTRACT_VALUE_FALLBACK;
         saveCache();
         applyFilters(false);
         $('sync-status').textContent=`Sincronizado ${formatDateTime(new Date().toISOString())}`;
@@ -1202,6 +1211,26 @@
       return json;
     }
 
+    async function eliminarEnGoogleSheets(record,password){
+      if(!password)throw new Error('La sesión de eliminación no tiene una clave válida.');
+      if(!record?.sheetRow)throw new Error('Este registro no tiene una fila válida para eliminar.');
+      const json=await fetchJson(SCRIPT_URL,{
+        method:'POST',
+        mode:'cors',
+        headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body:JSON.stringify({
+          action:'delete',
+          password,
+          sheetRow:record.sheetRow,
+          clientId:record.clientId,
+          orderNumber:record.orderNumber,
+          maquina:record.maquina
+        })
+      });
+      if(json?.status!=='success')throw new Error(json?.message || 'El backend no confirmó la eliminación.');
+      return json;
+    }
+
     /* ==========================================================
        FILTROS / KPIs
        ========================================================== */
@@ -1255,17 +1284,26 @@
       },{money:0,qty:Object.fromEntries(MATERIALS.map(m=>[m.key,0]))});
     }
 
-    function renderContract(){
-      const all=totals(state.records);
-      const contract=Number(state.contract)||Number(state.settings.valorContratoMC)||0;
-      const remaining=contract-all.money;
-      const pct=contract>0 ? clamp((all.money/contract)*100,0,100) : 0;
+    function getContractValue(){
+      const remote=Number(state.contract);
+      return Number.isFinite(remote) && remote>0 ? remote : CONTRACT_VALUE_FALLBACK;
+    }
 
-      ['valor-total-consumido','valor-total-filtrado','valor-restante-contrato','valor-contrato-mostrado'].forEach(()=>{});
-      $('kpi-total').textContent=money(all.money);
+    function getContractSummary(){
+      const contract=getContractValue();
+      const consumed=Number(totals(state.records).money)||0;
+      const remaining=contract-consumed;
+      const pct=contract>0 ? (consumed/contract)*100 : 0;
+      return {contract,consumed,remaining,pct};
+    }
+
+    function renderContract(){
+      // ÚNICA fuente de verdad para el saldo: valor del contrato - consumo acumulado.
+      const {contract,consumed,remaining,pct}=getContractSummary();
+      $('kpi-total').textContent=money(consumed);
       $('kpi-restante').textContent=money(remaining);
       $('kpi-registros').textContent=state.records.length.toLocaleString('es-CO');
-      $('kpi-promedio').textContent=money(state.records.length ? all.money/state.records.length : 0);
+      $('kpi-promedio').textContent=money(state.records.length ? consumed/state.records.length : 0);
 
       const byMachine={};
       state.records.forEach(r=>byMachine[r.maquina]=(byMachine[r.maquina]||0)+(Number(r.total_precio)||0));
@@ -1276,11 +1314,11 @@
       $('hero-restante').textContent=money(remaining);
       $('hero-progress-text').textContent=`${pct.toFixed(1)}%`;
       $('side-contrato').textContent=money(contract);
-      $('side-consumido').textContent=money(all.money);
+      $('side-consumido').textContent=money(consumed);
       $('side-disponible').textContent=money(remaining);
       $('side-ejecutado').textContent=`${pct.toFixed(1)}%`;
       $('progress-value').textContent=`${pct.toFixed(1)}%`;
-      $('contract-progress').style.width=`${pct}%`;
+      $('contract-progress').style.width=`${clamp(pct,0,100)}%`;
     }
 
     function renderKPIs(){
@@ -1471,14 +1509,14 @@
       destroyChart('contract');
       const c4=$('chartContract');
       showChart(c4);
-      const allMoney=totals(state.records).money;
-      const contract=Number(state.contract)||0;
-      const remaining=Math.max(contract-allMoney,0);
+      const {contract,consumed:allMoney,remaining}=getContractSummary();
+      const chartConsumed=Math.max(Math.min(allMoney,contract),0);
+      const chartRemaining=Math.max(remaining,0);
       state.charts.contract=new Chart(c4,{
         type:'doughnut',
         data:{
           labels:['Consumido','Disponible'],
-          datasets:[{data:contract>0?[Math.min(allMoney,contract),remaining]:[allMoney,0],
+          datasets:[{data:contract>0?[chartConsumed,chartRemaining]:[allMoney,0],
             backgroundColor:['#1769E0','#e5eaf1'],borderWidth:0,hoverOffset:6}]
         },
         options:{
@@ -1567,6 +1605,7 @@
             <div class="table-actions">
               <button class="btn btn-soft" data-edit-record="${escapeHtml(r.clientId||r.timestamp)}">Editar</button>
               <button class="btn btn-soft" data-copy-record="${escapeHtml(r.clientId||r.timestamp)}">2 copias</button>
+              <button class="btn btn-danger" data-delete-record="${escapeHtml(r.clientId||r.timestamp)}" title="Eliminar orden">Eliminar</button>
             </div>
           </td>`;
         tbody.appendChild(tr);
@@ -1819,7 +1858,6 @@
     function renderSettings(){
       $('valor-contrato-mc').value=state.settings.valorContratoMC||0;
       $('auto-print').checked=state.settings.autoPrint!==false;
-      $('cache-enabled').checked=state.settings.cacheEnabled!==false;
       $('settings-prices').innerHTML=MATERIALS.map(m=>`
         <div class="setting-row">
           <label>${escapeHtml(m.label)} · ${escapeHtml(m.unit)}</label>
@@ -1835,8 +1873,8 @@
       });
       state.settings.valorContratoMC=Math.max(0,Number(parseFloat($('valor-contrato-mc').value)||0));
       state.settings.autoPrint=$('auto-print').checked;
-      state.settings.cacheEnabled=$('cache-enabled').checked;
-      state.cacheEnabled=state.settings.cacheEnabled;
+      state.settings.cacheEnabled=false;
+      state.cacheEnabled=false;
       saveSettings();
       $('settings-modal').classList.add('hidden');
       updateFormTotal();
@@ -1911,15 +1949,21 @@
         const saved=normalizeRecord({...record,...(result?.record||{})});
         state.lastRecord=saved;
 
-        // Actualización local inmediata.
-        state.records=[saved,...state.records.filter(r=>{
-          if(isEditing){
-            return Number(r.sheetRow)!==Number(saved.sheetRow);
-          }
-          return r.clientId!==saved.clientId;
-        })];
-        saveCache();
-        applyFilters(false);
+        // Google Sheets es la fuente oficial. Volvemos a leer el servidor
+        // después de guardar para que esta computadora también quede alineada
+        // y para que nunca dependamos del cache local.
+        try{
+          await cargarRegistros(false);
+        }catch(syncError){
+          console.warn('Registro guardado en servidor, pero no fue posible refrescar inmediatamente.',syncError);
+          state.records=[saved,...state.records.filter(r=>{
+            if(isEditing){
+              return Number(r.sheetRow)!==Number(saved.sheetRow);
+            }
+            return r.clientId!==saved.clientId;
+          })];
+          applyFilters(false);
+        }
 
         if(isEditing){
           const label=`Orden #${saved.orderNumber} · ${saved.maquina} · ${money(saved.total_precio)}`;
@@ -2006,9 +2050,11 @@
     document.querySelector('#records-table tbody').addEventListener('click',async e=>{
       const editBtn=e.target.closest('[data-edit-record]');
       const copyBtn=e.target.closest('[data-copy-record]');
-      if(!editBtn && !copyBtn)return;
+      const deleteBtn=e.target.closest('[data-delete-record]');
+      if(!editBtn && !copyBtn && !deleteBtn)return;
 
-      const id=(editBtn||copyBtn).dataset.editRecord || (editBtn||copyBtn).dataset.copyRecord;
+      const source=editBtn||copyBtn||deleteBtn;
+      const id=source.dataset.editRecord || source.dataset.copyRecord || source.dataset.deleteRecord;
       const r=state.records.find(x=>String(x.clientId||x.timestamp)===String(id));
       if(!r)return;
 
@@ -2016,6 +2062,34 @@
         state.lastRecord=r;
         $('form-mode-badge').textContent=`ORDEN #${r.orderNumber}`;
         openPrintWindow(r,'AMBAS COPIAS');
+        return;
+      }
+
+      if(deleteBtn){
+        if(!r.sheetRow){
+          toast('Eliminación no disponible','Este registro no tiene identificador de fila. Actualiza los datos y vuelve a intentarlo.','warn');
+          return;
+        }
+        const confirmed=confirm(`¿Está seguro de eliminar la orden #${r.orderNumber} de ${r.maquina}?\n\nEsta acción eliminará el registro de Google Sheets y quedará registrada en Auditoria.`);
+        if(!confirmed)return;
+        const pw=prompt(`Clave de edición para eliminar la orden #${r.orderNumber}:`);
+        if(!pw){toast('Eliminación cancelada','No se ingresó la clave.','warn');return}
+        try{
+          await autorizarEdicion(pw);
+          await eliminarEnGoogleSheets(r,pw);
+          state.records=state.records.filter(x=>Number(x.sheetRow)!==Number(r.sheetRow));
+          if(state.lastRecord && Number(state.lastRecord.sheetRow)===Number(r.sheetRow))state.lastRecord=null;
+          if(state.editingRecord && Number(state.editingRecord.sheetRow)===Number(r.sheetRow))cancelEdit(true);
+          saveCache();
+          applyFilters(false);
+          // Al eliminar una fila, las filas posteriores cambian de número.
+          // Sincronizamos para evitar referencias de fila desactualizadas.
+          await cargarRegistros(false);
+          toast('Orden eliminada',`La orden #${r.orderNumber} fue eliminada correctamente.`);
+        }catch(err){
+          console.error(err);
+          toast('No se pudo eliminar',err.message||'La orden no fue eliminada.','error');
+        }
         return;
       }
 
@@ -2070,7 +2144,7 @@
        INICIALIZACIÓN
        ========================================================== */
     function init(){
-      state.cacheEnabled=state.settings.cacheEnabled!==false;
+      state.cacheEnabled=false;
       setMachineOptions();
       renderMaterials();
       $('fecha').value=safeDateInput();
@@ -2080,7 +2154,7 @@
       renderAll();
       updateFormTotal();
 
-      // Carga de servidor después de pintar el caché: mejora la percepción de velocidad.
+      // Carga inicial directamente desde Google Sheets.
       cargarRegistros(false);
       setInterval(()=>{if(document.visibilityState==='visible')cargarRegistros(false)},AUTO_REFRESH_MS);
     }
