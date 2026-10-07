@@ -835,7 +835,7 @@
     <div class="saving-box">
       <div class="spinner"></div>
       <div class="saving-title">Guardando registro…</div>
-      <div class="saving-text">Se está enviando el registro a Google Sheets. Al confirmar, se abrirá automáticamente la vista de las dos copias.</div>
+      <div class="saving-text">Se está enviando el registro a Google Sheets. La impresión permanece bloqueada hasta recibir la confirmación del servidor.</div>
     </div>
   </div>
 
@@ -852,7 +852,17 @@
     const SETTINGS_KEY = 'combustible_settings_v3';
     const CACHE_KEY = 'combustible_records_cache_v3';
     const AUTO_REFRESH_MS = 90000;
+    const REQUEST_TIMEOUT_MS = 30000;
+    const CREATE_RETRY_DELAY_MS = 650;
     const CONTRACT_VALUE_FALLBACK = 783616400;
+
+    // Control de concurrencia del cliente.
+    // Solo puede existir una sincronización GET en vuelo y las respuestas
+    // antiguas quedan invalidadas cuando comienza una escritura.
+    let syncInFlight = null;
+    let syncRevision = 0;
+    let saveInFlight = false;
+
     try{
       localStorage.removeItem(CACHE_KEY);
     }catch{}
@@ -897,7 +907,7 @@
       filters: {start:'',end:'',machine:'',search:''},
       summaryMode:false,
       saving:false,
-      cacheEnabled:true,
+      cacheEnabled:false,
       editingRecord:null,
       editPassword:null
     };
@@ -968,6 +978,8 @@
       state.saving=flag;
       $('saving-overlay').classList.toggle('hidden',!flag);
       $('btn-generar').disabled=flag;
+      if($('btn-refresh'))$('btn-refresh').disabled=flag;
+
       document.querySelectorAll('#consumo-form input,#consumo-form select,#consumo-form button').forEach(el=>{
         if(el.id!=='btn-generar') el.disabled=flag;
       });
@@ -996,7 +1008,9 @@
       const fecha=$('fecha').value || safeDateInput();
       const record={
         timestamp:new Date().toISOString(),
-        clientId:(crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`),
+        clientId:(window.crypto && typeof window.crypto.randomUUID==='function')
+          ? window.crypto.randomUUID()
+          : `${Date.now()}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`,
         maquina,fecha,
         orderNumber:getNextOrderNumber(maquina)
       };
@@ -1085,8 +1099,9 @@
 
 
     /* ==========================================================
-       CACHE + GOOGLE SHEETS
+       CACHE + GOOGLE SHEETS · CAPA DE DATOS ROBUSTA
        ========================================================== */
+
     function normalizeRecord(r){
       const out={...r};
       MATERIALS.forEach(m=>out[m.key]=Number.parseFloat(r?.[m.key])||0);
@@ -1097,138 +1112,308 @@
       return out;
     }
 
+    // El servidor es la fuente oficial. Se conserva la firma de estas
+    // funciones para no romper otras partes del frontend, pero el caché
+    // local queda desactivado para evitar presentar datos no confirmados.
     function saveCache(){
-      if(!state.cacheEnabled)return;
-      try{
-        localStorage.setItem(CACHE_KEY,JSON.stringify({
-          records:state.records,
-          savedAt:new Date().toISOString(),
-          valorContrato:state.contract
-        }));
-      }catch(err){
-        console.warn('No se pudo guardar caché local',err);
-      }
+      return;
     }
 
     function loadCache(){
-      // Google Sheets es la única fuente oficial de datos.
-      // No se carga ningún registro desde localStorage.
       return false;
-      if(!state.settings.cacheEnabled)return false;
-      try{
-        const raw=localStorage.getItem(CACHE_KEY);
-        if(!raw)return false;
-        const cache=JSON.parse(raw);
-        if(!Array.isArray(cache.records))return false;
-        state.records=cache.records.map(normalizeRecord);
-        state.contract=Number(cache.valorContrato)||Number(state.settings.valorContratoMC)||0;
-        applyFilters(false);
-        const age=cache.savedAt ? Math.round((Date.now()-new Date(cache.savedAt).getTime())/60000) : null;
-        $('sync-status').textContent=age===null?'Caché local':`Caché ${age} min`;
-        $('records-badge').textContent='Caché local';
-        $('sidebar-status').textContent='Caché · sincronizando';
-        return true;
-      }catch{return false}
     }
 
-    async function fetchJson(url,options={}){
+    function sleep(ms){
+      return new Promise(resolve=>setTimeout(resolve,ms));
+    }
+
+    async function fetchJson(url,options={},label='GET'){
       const controller=new AbortController();
-      const timeout=setTimeout(()=>controller.abort(),25000);
+      const timeout=setTimeout(()=>controller.abort('timeout'),REQUEST_TIMEOUT_MS);
+      const started=performance.now();
+
+      const requestOptions={
+        method:'GET',
+        mode:'cors',
+        credentials:'omit',
+        redirect:'follow',
+        cache:'no-store',
+        ...options,
+        headers:{
+          Accept:'application/json',
+          ...(options.headers||{})
+        },
+        signal:controller.signal
+      };
+
       try{
-        const res=await fetch(url,{...options,signal:controller.signal,cache:'no-store'});
-        if(!res.ok)throw new Error(`HTTP ${res.status}`);
-        return await res.json();
+        console.info(`[API] ${label} · iniciando`,{
+          method:requestOptions.method,
+          url
+        });
+
+        const res=await fetch(url,requestOptions);
+        const raw=await res.text();
+        const elapsed=Math.round(performance.now()-started);
+
+        console.info(`[API] ${label} · respuesta`,{
+          httpStatus:res.status,
+          ok:res.ok,
+          redirected:res.redirected,
+          finalUrl:res.url,
+          responseType:res.type,
+          elapsedMs:elapsed
+        });
+
+        if(res.type==='opaque'){
+          const err=new Error('La respuesta es opaca (no-cors). No es posible verificar status ni leer el JSON.');
+          err.isTransport=true;
+          throw err;
+        }
+
+        if(!res.ok){
+          const err=new Error(`HTTP ${res.status}. ${raw.slice(0,240)}`);
+          err.isTransport=res.status>=500;
+          err.httpStatus=res.status;
+          throw err;
+        }
+
+        let json;
+        try{
+          json=JSON.parse(raw);
+        }catch(parseError){
+          const err=new Error(`El servidor respondió algo distinto de JSON. Respuesta: ${raw.slice(0,300)}`);
+          err.isTransport=false;
+          err.cause=parseError;
+          throw err;
+        }
+
+        return json;
+      }catch(err){
+        const isAbort=err?.name==='AbortError' || String(err?.message||'').toLowerCase().includes('aborted');
+        if(isAbort){
+          const timeoutError=new Error(`Tiempo de espera agotado después de ${REQUEST_TIMEOUT_MS/1000}s.`);
+          timeoutError.isTransport=true;
+          timeoutError.cause=err;
+          console.error(`[API] ${label} · timeout`,timeoutError);
+          throw timeoutError;
+        }
+
+        if(err && typeof err.isTransport!=='boolean'){
+          err.isTransport=true;
+        }
+
+        console.error(`[API] ${label} · error`,{
+          message:err?.message || String(err),
+          stack:err?.stack || ''
+        });
+        throw err;
       }finally{
         clearTimeout(timeout);
       }
     }
 
+    async function postJson(action,payload,{retryTransport=false}={}){
+      const attempts=retryTransport?2:1;
+      let lastError=null;
+
+      for(let attempt=1;attempt<=attempts;attempt++){
+        try{
+          const json=await fetchJson(
+            SCRIPT_URL,
+            {
+              method:'POST',
+              mode:'cors',
+              credentials:'omit',
+              redirect:'follow',
+              headers:{
+                'Content-Type':'text/plain;charset=utf-8'
+              },
+              body:JSON.stringify(payload)
+            },
+            `POST ${action} #${attempt}`
+          );
+          return json;
+        }catch(err){
+          lastError=err;
+          if(!retryTransport || !err?.isTransport || attempt>=attempts)break;
+          console.warn(`[API] ${action} · reintentando una vez con el mismo clientId`,payload?.clientId||'sin-clientId');
+          await sleep(CREATE_RETRY_DELAY_MS);
+        }
+      }
+
+      throw lastError || new Error('No fue posible completar la petición.');
+    }
+
+    function requireServerSuccess(json,context='operación'){
+      if(!json || json.status!=='success'){
+        throw new Error(json?.message || `El servidor no confirmó la ${context}.`);
+      }
+      if(!json.record && context!=='autorización' && context!=='eliminación'){
+        throw new Error(`El servidor confirmó ${context}, pero no devolvió el registro persistido.`);
+      }
+      return json;
+    }
+
+    function buildConfirmedRecord(original,result){
+      requireServerSuccess(result,'guardado');
+      const serverRecord=result.record;
+      const saved=normalizeRecord({...original,...serverRecord});
+
+      if(!saved.clientId || String(saved.clientId)!==String(original.clientId)){
+        throw new Error('El servidor respondió con un ClientId diferente. Se bloqueó la impresión para evitar asociarla a otro registro.');
+      }
+
+      saved._serverConfirmed=true;
+      saved._serverResponseAt=result.serverTime || new Date().toISOString();
+      return saved;
+    }
+
+    function upsertConfirmedRecord(record,isEditing=false){
+      const normalized=normalizeRecord({...record,_serverConfirmed:true});
+
+      if(isEditing && normalized.sheetRow){
+        state.records=state.records.map(r=>
+          Number(r.sheetRow)===Number(normalized.sheetRow) ? normalized : r
+        );
+      }else{
+        state.records=[
+          normalized,
+          ...state.records.filter(r=>String(r.clientId)!==String(normalized.clientId))
+        ];
+      }
+
+      applyFilters(false);
+    }
+
     async function cargarRegistros(showToast=false){
-      $('sync-status').textContent='Actualizando…';
+      if(syncInFlight){
+        console.debug('[SYNC] GET reutilizado: ya existe una sincronización en vuelo.');
+        return syncInFlight;
+      }
+
+      const myRevision=syncRevision;
+
+      syncInFlight=(async()=>{
+        $('sync-status').textContent='Actualizando…';
+
+        try{
+          const url=`${SCRIPT_URL}${SCRIPT_URL.includes('?')?'&':'?'}ts=${Date.now()}`;
+          const json=await fetchJson(url,{},'GET registros');
+
+          if(json?.status!=='success' || !Array.isArray(json.data)){
+            throw new Error(json?.message || 'Respuesta no válida del servicio.');
+          }
+
+          // Si mientras esperábamos empezó una escritura, esta GET es vieja.
+          if(myRevision!==syncRevision || saveInFlight){
+            console.warn('[SYNC] Respuesta GET descartada por ser anterior a una escritura.');
+            return false;
+          }
+
+          state.records=json.data.map(r=>{
+            const out=normalizeRecord(r);
+            out._serverConfirmed=true;
+            return out;
+          });
+
+          const serverContract=Number(json.valorContrato);
+          state.contract=Number.isFinite(serverContract) && serverContract>0
+            ? serverContract
+            : CONTRACT_VALUE_FALLBACK;
+
+          applyFilters(false);
+
+          $('sync-status').textContent=`Sincronizado ${formatDateTime(json.serverTime || new Date().toISOString())}`;
+          $('records-badge').textContent=`${state.records.length} datos`;
+          $('sidebar-status').textContent='Sincronizado';
+
+          if(showToast){
+            toast('Datos actualizados',`${state.records.length} registros cargados desde Google Sheets.`);
+          }
+
+          return true;
+        }catch(err){
+          // Una GET fallida no altera el estado oficial del formulario ni habilita impresión.
+          console.error('[SYNC] Error de sincronización',err);
+
+          if(myRevision===syncRevision && !saveInFlight){
+            $('sync-status').textContent='Sin sincronizar';
+            $('records-badge').textContent='Sin confirmar';
+            $('sidebar-status').textContent='Conexión pendiente';
+          }
+
+          if(showToast){
+            toast('No se pudo sincronizar',err.message || 'Google Sheets no respondió correctamente.','warn');
+          }
+
+          return false;
+        }finally{
+          // Liberamos el singleton solo si esta promesa sigue siendo la actual.
+        }
+      })();
+
       try{
-        const json=await fetchJson(SCRIPT_URL);
-        if(json?.status!=='success' || !Array.isArray(json.data))throw new Error('Respuesta no válida del servicio');
-        state.records=json.data.map(normalizeRecord);
-        const serverContract=Number(json.valorContrato);
-        state.contract=Number.isFinite(serverContract) && serverContract>0 ? serverContract : CONTRACT_VALUE_FALLBACK;
-        saveCache();
-        applyFilters(false);
-        $('sync-status').textContent=`Sincronizado ${formatDateTime(new Date().toISOString())}`;
-        $('records-badge').textContent=`${state.records.length} datos`;
-        $('sidebar-status').textContent='Sincronizado';
-        if(showToast)toast('Datos actualizados',`${state.records.length} registros cargados desde Google Sheets.`);
-      }catch(err){
-        console.error(err);
-        $('sync-status').textContent='Sin conexión · usando datos locales';
-        $('records-badge').textContent='Modo local';
-        $('sidebar-status').textContent='Modo local';
-        if(showToast)toast('Sincronización pendiente','No fue posible consultar Google Sheets. Se conservan los datos locales visibles.','warn');
+        return await syncInFlight;
+      }finally{
+        if(syncInFlight){
+          syncInFlight=null;
+        }
       }
     }
 
     async function enviarAGoogleSheets(record){
-      const json=await fetchJson(SCRIPT_URL,{
-        method:'POST',
-        mode:'cors',
-        headers:{'Content-Type':'text/plain;charset=utf-8'},
-        body:JSON.stringify(record)
-      });
-      if(json?.status!=='success')throw new Error(json?.message || 'El backend no confirmó el guardado.');
-      return json;
+      const payload={
+        action:'create',
+        ...record
+      };
+
+      const json=await postJson('create',payload,{retryTransport:true});
+      return requireServerSuccess(json,'guardado');
     }
 
     async function autorizarEdicion(password){
       if(!password)return false;
-      const json=await fetchJson(SCRIPT_URL,{
-        method:'POST',
-        mode:'cors',
-        headers:{'Content-Type':'text/plain;charset=utf-8'},
-        body:JSON.stringify({action:'authorizeEdit',password})
+      const json=await postJson('authorizeEdit',{
+        action:'authorizeEdit',
+        password
       });
-      if(json?.status!=='success')throw new Error(json?.message || 'La clave no fue aceptada.');
+      requireServerSuccess(json,'autorización');
       return true;
     }
 
     async function editarEnGoogleSheets(record,password){
       if(!password)throw new Error('La sesión de edición no tiene una clave válida.');
-      const json=await fetchJson(SCRIPT_URL,{
-        method:'POST',
-        mode:'cors',
-        headers:{'Content-Type':'text/plain;charset=utf-8'},
-        body:JSON.stringify({
-          action:'edit',
-          password,
-          sheetRow:record.sheetRow,
-          clientId:record.clientId,
-          maquina:record.maquina,
-          fecha:record.fecha,
-          orderNumber:record.orderNumber,
-          ...Object.fromEntries(MATERIALS.map(m=>[m.key,record[m.key]])),
-          total_precio:record.total_precio
-        })
+
+      const json=await postJson('edit',{
+        action:'edit',
+        password,
+        sheetRow:record.sheetRow,
+        clientId:record.clientId,
+        maquina:record.maquina,
+        fecha:record.fecha,
+        orderNumber:record.orderNumber,
+        ...Object.fromEntries(MATERIALS.map(m=>[m.key,record[m.key]])),
+        total_precio:record.total_precio
       });
-      if(json?.status!=='success')throw new Error(json?.message || 'El backend no confirmó la edición.');
-      return json;
+
+      return requireServerSuccess(json,'edición');
     }
 
     async function eliminarEnGoogleSheets(record,password){
       if(!password)throw new Error('La sesión de eliminación no tiene una clave válida.');
       if(!record?.sheetRow)throw new Error('Este registro no tiene una fila válida para eliminar.');
-      const json=await fetchJson(SCRIPT_URL,{
-        method:'POST',
-        mode:'cors',
-        headers:{'Content-Type':'text/plain;charset=utf-8'},
-        body:JSON.stringify({
-          action:'delete',
-          password,
-          sheetRow:record.sheetRow,
-          clientId:record.clientId,
-          orderNumber:record.orderNumber,
-          maquina:record.maquina
-        })
+
+      const json=await postJson('delete',{
+        action:'delete',
+        password,
+        sheetRow:record.sheetRow,
+        clientId:record.clientId,
+        orderNumber:record.orderNumber,
+        maquina:record.maquina
       });
-      if(json?.status!=='success')throw new Error(json?.message || 'El backend no confirmó la eliminación.');
-      return json;
+
+      return requireServerSuccess(json,'eliminación');
     }
 
     /* ==========================================================
@@ -1919,13 +2104,22 @@
     // Generación
     $('consumo-form').addEventListener('submit',async e=>{
       e.preventDefault();
-      if(state.saving)return;
+
+      if(state.saving || saveInFlight)return;
 
       const base=getFormRecord();
-      if(!base.maquina){toast('Falta máquina','Selecciona un equipo antes de continuar.','warn');return}
-      if(base.total_precio<=0){toast('Recibo vacío','Ingresa al menos una cantidad de material.','warn');return}
+      if(!base.maquina){
+        toast('Falta máquina','Selecciona un equipo antes de continuar.','warn');
+        return;
+      }
+
+      if(base.total_precio<=0){
+        toast('Recibo vacío','Ingresa al menos una cantidad de material.','warn');
+        return;
+      }
 
       const isEditing=!!state.editingRecord;
+
       const record=isEditing ? {
         ...state.editingRecord,
         maquina:base.maquina,
@@ -1935,77 +2129,116 @@
         editedAt:new Date().toISOString()
       } : base;
 
-      state.lastRecord=record;
+      // Invalida cualquier GET que haya comenzado antes de esta escritura.
+      syncRevision++;
+      saveInFlight=true;
       setSaving(true);
+
+      console.info('[SAVE] Iniciando persistencia',{
+        mode:isEditing?'edit':'create',
+        clientId:record.clientId,
+        machine:record.maquina,
+        orderNumber:record.orderNumber
+      });
 
       try{
         let result;
+
         if(isEditing){
           result=await editarEnGoogleSheets(record,state.editPassword);
         }else{
           result=await enviarAGoogleSheets(record);
         }
 
-        const saved=normalizeRecord({...record,...(result?.record||{})});
+        // Este es el único punto que puede convertir un registro en "confirmado".
+        const saved=buildConfirmedRecord(record,result);
         state.lastRecord=saved;
 
-        // Google Sheets es la fuente oficial. Volvemos a leer el servidor
-        // después de guardar para que esta computadora también quede alineada
-        // y para que nunca dependamos del cache local.
-        try{
-          await cargarRegistros(false);
-        }catch(syncError){
-          console.warn('Registro guardado en servidor, pero no fue posible refrescar inmediatamente.',syncError);
-          state.records=[saved,...state.records.filter(r=>{
-            if(isEditing){
-              return Number(r.sheetRow)!==Number(saved.sheetRow);
-            }
-            return r.clientId!==saved.clientId;
-          })];
-          applyFilters(false);
-        }
+        // Actualizamos la interfaz local inmediatamente con el registro confirmado,
+        // sin esperar una segunda GET que podría llegar fuera de orden.
+        upsertConfirmedRecord(saved,isEditing);
 
         if(isEditing){
           const label=`Orden #${saved.orderNumber} · ${saved.maquina} · ${money(saved.total_precio)}`;
           cancelEdit(true);
-          setSaving(false);
+          $('mensaje').innerHTML='<span style="font-size:11px;color:#15803d;font-weight:800">✓ Recibo actualizado y confirmado por Google Sheets</span>';
           toast('Recibo actualizado',`${label} · cambios guardados correctamente.`);
-          $('mensaje').innerHTML='<span style="font-size:11px;color:#15803d;font-weight:800">✓ Recibo actualizado y sincronizado</span>';
-          if(state.settings.autoPrint)renderReceiptModal(saved);
         }else{
-          clearQuantities();
-          setSaving(false);
+          clearQuantities(true);
+          $('mensaje').innerHTML='<span style="font-size:11px;color:#15803d;font-weight:800">✓ Registro guardado y confirmado por Google Sheets</span>';
           toast('Registro guardado',`Orden #${saved.orderNumber} · ${saved.maquina} · ${money(saved.total_precio)}`);
-          $('mensaje').innerHTML='<span style="font-size:11px;color:#15803d;font-weight:800">✓ Registro guardado y sincronizado</span>';
-          if(state.settings.autoPrint)renderReceiptModal(saved);
         }
-      }catch(err){
-        console.error(err);
+
         setSaving(false);
-        $('mensaje').innerHTML=`<span style="font-size:11px;color:#b42318;font-weight:800">✕ ${escapeHtml(err.message||'No fue posible guardar los cambios.')}</span>`;
-        toast(isEditing?'No se pudo actualizar':'No se pudo guardar',err.message||'Verifica la conexión y vuelve a intentar.','error');
+
+        // Solo después del status:success + record persistido se permite imprimir.
+        if(state.settings.autoPrint){
+          renderReceiptModal(saved);
+        }
+
+        // Reconciliación en segundo plano; no bloquea la impresión y no puede
+        // sobrescribir un GET anterior gracias a syncRevision/single-flight.
+        window.setTimeout(()=>cargarRegistros(false),1000);
+
+        console.info('[SAVE] Persistencia confirmada; impresión habilitada.',{
+          clientId:saved.clientId,
+          sheetRow:saved.sheetRow,
+          total:saved.total_precio
+        });
+
+      }catch(err){
+        console.error('[SAVE] Fallo de persistencia',err);
+
+        setSaving(false);
+
+        $('mensaje').innerHTML=`<span style="font-size:11px;color:#b42318;font-weight:800">✕ ${escapeHtml(err.message||'No fue posible guardar los cambios. No se habilitó la impresión.')}</span>`;
+
+        toast(
+          isEditing?'No se pudo actualizar':'No se pudo guardar',
+          `${err.message||'Verifica la conexión y vuelve a intentar.'} La impresión fue bloqueada porque el servidor no confirmó la operación.`,
+          'error'
+        );
+      }finally{
+        saveInFlight=false;
       }
     });
 
     $('btn-cancel-edit').addEventListener('click',()=>cancelEdit());
 
+    function requireConfirmedLastRecord(){
+      if(!state.lastRecord || state.lastRecord._serverConfirmed!==true){
+        toast(
+          'Recibo no confirmado',
+          'La impresión está bloqueada hasta que Google Sheets confirme el guardado.',
+          'warn'
+        );
+        return null;
+      }
+      return state.lastRecord;
+    }
+
     $('btn-preview-print').addEventListener('click',()=>{
-      if(!state.lastRecord){toast('Sin recibo','Genera un recibo primero.','warn');return}
-      renderReceiptModal(state.lastRecord);
+      const record=requireConfirmedLastRecord();
+      if(!record)return;
+      renderReceiptModal(record);
     });
 
     $('btn-print-now').addEventListener('click',()=>{
-      if(!state.lastRecord)return;
-      openPrintWindow(state.lastRecord,'AMBAS COPIAS');
+      const record=requireConfirmedLastRecord();
+      if(!record)return;
+      openPrintWindow(record,'AMBAS COPIAS');
     });
 
     $('btn-print-c1').addEventListener('click',()=>{
-      if(!state.lastRecord){toast('Sin recibo','Genera un recibo primero.','warn');return}
-      openPrintWindow(state.lastRecord,'COPIA 1');
+      const record=requireConfirmedLastRecord();
+      if(!record)return;
+      openPrintWindow(record,'COPIA 1');
     });
+
     $('btn-print-c2').addEventListener('click',()=>{
-      if(!state.lastRecord){toast('Sin recibo','Genera un recibo primero.','warn');return}
-      openPrintWindow(state.lastRecord,'COPIA 2');
+      const record=requireConfirmedLastRecord();
+      if(!record)return;
+      openPrintWindow(record,'COPIA 2');
     });
 
     // Modales
@@ -2135,10 +2368,22 @@
       }
     });
 
-    // Resize / visibilidad: una sincronización adicional al volver a la pestaña.
+    // Visibilidad: una sincronización al volver a la pestaña, pero nunca
+    // durante una escritura activa.
     document.addEventListener('visibilitychange',()=>{
-      if(document.visibilityState==='visible')cargarRegistros(false);
+      if(document.visibilityState==='visible' && !saveInFlight && !state.saving){
+        cargarRegistros(false);
+      }
     });
+
+    function scheduleAutoRefresh(){
+      window.setTimeout(async()=>{
+        if(document.visibilityState==='visible' && !saveInFlight && !state.saving){
+          await cargarRegistros(false);
+        }
+        scheduleAutoRefresh();
+      },AUTO_REFRESH_MS);
+    }
 
     /* ==========================================================
        INICIALIZACIÓN
@@ -2154,9 +2399,9 @@
       renderAll();
       updateFormTotal();
 
-      // Carga inicial directamente desde Google Sheets.
+      // Carga inicial desde Google Sheets. No se abre ninguna impresión aquí.
       cargarRegistros(false);
-      setInterval(()=>{if(document.visibilityState==='visible')cargarRegistros(false)},AUTO_REFRESH_MS);
+      scheduleAutoRefresh();
     }
 
     init();
